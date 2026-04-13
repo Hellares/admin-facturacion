@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Card, Descriptions, Table, Tag, Button, Space, Row, Col, Typography, Spin, Result } from 'antd';
-import { FilePdfOutlined, CheckCircleOutlined, CloseCircleOutlined, ClockCircleOutlined, SafetyCertificateOutlined } from '@ant-design/icons';
+import { FilePdfOutlined, CheckCircleOutlined, CloseCircleOutlined, ClockCircleOutlined, SafetyCertificateOutlined, WarningOutlined, InfoCircleOutlined, LinkOutlined } from '@ant-design/icons';
 import apiClient from '@/lib/axios';
 
 const { Title, Text } = Typography;
@@ -16,6 +16,25 @@ const STATUS_CONFIG: Record<string, { color: string; icon: React.ReactNode; labe
   EN_COLA: { color: '#1677ff', icon: <ClockCircleOutlined />, label: 'En proceso' },
 };
 
+interface DocRelacionado {
+  tipo: string;
+  tipo_nombre: string;
+  numero_completo: string;
+  motivo: string;
+  cod_motivo: string;
+  estado_sunat: string;
+  total: number;
+  moneda: string;
+  consulta_url: string;
+}
+
+interface DocAfectado {
+  tipo: string;
+  tipo_nombre: string;
+  numero_completo: string;
+  consulta_url: string | null;
+}
+
 interface DocumentData {
   tipo_documento: string;
   tipo_documento_nombre: string;
@@ -28,6 +47,8 @@ interface DocumentData {
   totales: { gravada: number; exonerada: number; inafecta: number; igv: number; total: number };
   detalles: Array<{ descripcion: string; cantidad: number; unidad: string; mto_valor_unitario?: number; mto_total?: number }>;
   tiene_pdf: boolean;
+  documentos_relacionados?: DocRelacionado[];
+  documento_afectado?: DocAfectado | null;
 }
 
 export default function ConsultaDocumentoPage() {
@@ -112,6 +133,95 @@ export default function ConsultaDocumentoPage() {
             </div>
           </Space>
         </Card>
+
+        {/* DOCUMENTO AFECTADO (para NC y ND) */}
+        {data.documento_afectado && (
+          <Card size="small" style={{ marginBottom: 12, borderLeft: '4px solid #1677ff' }}>
+            <Space direction="vertical" size={4} style={{ width: '100%' }}>
+              <Space>
+                <InfoCircleOutlined style={{ color: '#1677ff' }} />
+                <Text strong>Este documento afecta a:</Text>
+              </Space>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div>
+                  <Tag color="blue">{data.documento_afectado.tipo_nombre}</Tag>
+                  <Text strong style={{ fontFamily: 'monospace' }}>{data.documento_afectado.numero_completo}</Text>
+                </div>
+                {data.documento_afectado.consulta_url && (
+                  <Button
+                    type="link"
+                    size="small"
+                    icon={<LinkOutlined />}
+                    href={data.documento_afectado.consulta_url}
+                  >
+                    Ver documento
+                  </Button>
+                )}
+              </div>
+            </Space>
+          </Card>
+        )}
+
+        {/* DOCUMENTOS RELACIONADOS (NC/ND para facturas y boletas) */}
+        {data.documentos_relacionados && data.documentos_relacionados.length > 0 && (
+          <Card size="small" style={{ marginBottom: 12, borderLeft: '4px solid #faad14' }}>
+            <Space direction="vertical" size={8} style={{ width: '100%' }}>
+              <Space>
+                <WarningOutlined style={{ color: '#faad14' }} />
+                <Text strong>Este documento tiene notas asociadas:</Text>
+              </Space>
+              {data.documentos_relacionados.map((doc, i) => {
+                const docSym = MONEDA_SYMBOL[doc.moneda] || 'S/';
+                return (
+                  <div
+                    key={i}
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      padding: '8px 12px',
+                      background: doc.tipo === '07' ? '#fff7e6' : '#fff1f0',
+                      borderRadius: 6,
+                    }}
+                  >
+                    <div>
+                      <Tag color={doc.tipo === '07' ? 'orange' : 'red'}>{doc.tipo_nombre}</Tag>
+                      <Text strong style={{ fontFamily: 'monospace' }}>{doc.numero_completo}</Text>
+                      <br />
+                      <Text type="secondary" style={{ fontSize: 12 }}>
+                        {doc.cod_motivo} - {doc.motivo}
+                      </Text>
+                      <br />
+                      <Text style={{ fontSize: 13, fontWeight: 600 }}>{docSym} {doc.total.toFixed(2)}</Text>
+                      {' '}
+                      <Tag color={doc.estado_sunat === 'ACEPTADO' ? 'green' : 'default'} style={{ fontSize: 10 }}>
+                        {doc.estado_sunat}
+                      </Tag>
+                    </div>
+                    <Space direction="vertical" size={4}>
+                      <Button
+                        type="link"
+                        size="small"
+                        icon={<LinkOutlined />}
+                        href={doc.consulta_url}
+                      >
+                        Ver
+                      </Button>
+                      <Button
+                        type="link"
+                        size="small"
+                        icon={<FilePdfOutlined />}
+                        href={`/api${doc.consulta_url}/pdf`}
+                      >
+                        PDF
+                      </Button>
+                    </Space>
+                  </div>
+                );
+              })}
+            </Space>
+          </Card>
+        )}
 
         {/* EMISOR + RECEPTOR */}
         <Card size="small" style={{ marginBottom: 12 }}>
