@@ -680,6 +680,65 @@ curl -X POST "${baseUrl}/v1/invoices/3/send-sunat" \\
           />
         </Card>
 
+        <Card title="Consulta publica de documentos (sin autenticacion)">
+          <Alert
+            type="success"
+            showIcon
+            style={{ marginBottom: 16 }}
+            message="Estas URLs son publicas — no requieren token. Puedes compartirlas con tus clientes para que consulten y descarguen sus comprobantes."
+          />
+          <Paragraph>
+            Cada documento emitido genera una URL publica de consulta. La estructura es:
+          </Paragraph>
+          <Input.TextArea
+            readOnly
+            autoSize
+            value={`${window.location.origin}/consulta/{ruc}/{tipo_doc}/{serie-correlativo}
+${window.location.origin}/consulta/{ruc}/{tipo_doc}/{serie-correlativo}/pdf`}
+            style={{ fontFamily: 'monospace', fontSize: 12, marginBottom: 16 }}
+          />
+          <Divider plain>Codigos de tipo de documento SUNAT</Divider>
+          <Input.TextArea
+            readOnly
+            autoSize
+            value={`01 = Factura
+03 = Boleta de Venta
+07 = Nota de Credito
+08 = Nota de Debito
+09 = Guia de Remision
+20 = Comprobante de Retencion
+40 = Comprobante de Percepcion`}
+            style={{ fontFamily: 'monospace', fontSize: 12, marginBottom: 16 }}
+          />
+          <Divider plain>Ejemplos reales</Divider>
+          <Input.TextArea
+            readOnly
+            autoSize
+            value={`# Consultar Factura F001-000003
+${window.location.origin}/consulta/20132373958/01/F001-00000003
+
+# Descargar PDF de Factura F001-000003
+${window.location.origin}/consulta/20132373958/01/F001-00000003/pdf
+
+# Consultar Boleta B001-000001
+${window.location.origin}/consulta/20132373958/03/B001-00000001
+
+# Consultar Nota de Credito FC01-000001
+${window.location.origin}/consulta/20132373958/07/FC01-00000001
+
+# Consultar Nota de Debito FD01-000001
+${window.location.origin}/consulta/20132373958/08/FD01-00000001
+
+# Consultar Guia de Remision T001-000001
+${window.location.origin}/consulta/20132373958/09/T001-00000001
+
+# Estructura general:
+# /consulta/{RUC_EMISOR}/{TIPO_DOC}/{SERIE-CORRELATIVO}
+# /consulta/{RUC_EMISOR}/{TIPO_DOC}/{SERIE-CORRELATIVO}/pdf`}
+            style={{ fontFamily: 'monospace', fontSize: 12 }}
+          />
+        </Card>
+
         <Card title="Referencia de campos">
           <Collapse
             items={[
