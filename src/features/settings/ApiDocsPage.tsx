@@ -265,19 +265,24 @@ Content-Type: application/json`}
           />
         </Card>
 
-        <Card title="Ejemplo completo: crear una factura">
-          <Input.TextArea
-            readOnly
-            autoSize
-            value={`curl -X POST "${baseUrl}/v1/invoices" \\
+        <Card title="Ejemplos de creacion de documentos">
+          <Collapse
+            items={[
+              {
+                key: 'factura',
+                label: <Space><Tag color="blue">POST</Tag><Text>Crear Factura (precio sin IGV)</Text></Space>,
+                children: (
+                  <Input.TextArea
+                    readOnly
+                    autoSize
+                    value={`curl -X POST "${baseUrl}/v1/invoices" \\
   -H "Authorization: Bearer TU_TOKEN" \\
-  -H "Accept: application/json" \\
   -H "Content-Type: application/json" \\
   -d '{
     "company_id": 1,
     "branch_id": 1,
     "serie": "F001",
-    "fecha_emision": "2026-04-11",
+    "fecha_emision": "2026-04-13",
     "moneda": "PEN",
     "forma_pago_tipo": "Contado",
     "tipo_operacion": "0101",
@@ -294,12 +299,451 @@ Content-Type: application/json`}
         "unidad": "NIU",
         "cantidad": 1,
         "mto_valor_unitario": 100,
-        "porcentaje_igv": 18,
+        "tip_afe_igv": "10"
+      }
+    ]
+  }'
+
+# Notas:
+# - mto_valor_unitario = precio SIN IGV (el IGV se calcula automaticamente)
+# - mto_precio_unitario = precio CON IGV (alternativa, usar uno u otro)
+# - porcentaje_igv es opcional (default: 18%)
+# - tip_afe_igv: "10"=Gravado, "20"=Exonerado, "30"=Inafecto`}
+                    style={{ fontFamily: 'monospace', fontSize: 12 }}
+                  />
+                ),
+              },
+              {
+                key: 'factura-credito',
+                label: <Space><Tag color="blue">POST</Tag><Text>Crear Factura a Credito (con cuotas)</Text></Space>,
+                children: (
+                  <Input.TextArea
+                    readOnly
+                    autoSize
+                    value={`curl -X POST "${baseUrl}/v1/invoices" \\
+  -H "Authorization: Bearer TU_TOKEN" \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "company_id": 1,
+    "branch_id": 1,
+    "serie": "F001",
+    "fecha_emision": "2026-04-13",
+    "moneda": "PEN",
+    "forma_pago_tipo": "Credito",
+    "forma_pago_cuotas": [
+      { "moneda": "PEN", "monto": 590.00, "fecha_pago": "2026-05-13" },
+      { "moneda": "PEN", "monto": 590.00, "fecha_pago": "2026-06-13" }
+    ],
+    "client": {
+      "tipo_documento": "6",
+      "numero_documento": "20100039207",
+      "razon_social": "RANSA COMERCIAL S.A."
+    },
+    "detalles": [
+      {
+        "codigo": "SERV001",
+        "descripcion": "Servicio de consultoria mensual",
+        "unidad": "ZZ",
+        "cantidad": 1,
+        "mto_valor_unitario": 1000.00,
         "tip_afe_igv": "10"
       }
     ]
   }'`}
-            style={{ fontFamily: 'monospace', fontSize: 12 }}
+                    style={{ fontFamily: 'monospace', fontSize: 12 }}
+                  />
+                ),
+              },
+              {
+                key: 'factura-retail',
+                label: <Space><Tag color="blue">POST</Tag><Text>Crear Factura (precio con IGV - modo retail)</Text></Space>,
+                children: (
+                  <Input.TextArea
+                    readOnly
+                    autoSize
+                    value={`curl -X POST "${baseUrl}/v1/invoices" \\
+  -H "Authorization: Bearer TU_TOKEN" \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "company_id": 1,
+    "branch_id": 1,
+    "serie": "F001",
+    "fecha_emision": "2026-04-13",
+    "moneda": "PEN",
+    "forma_pago_tipo": "Contado",
+    "client": {
+      "tipo_documento": "6",
+      "numero_documento": "20100039207",
+      "razon_social": "RANSA COMERCIAL S.A."
+    },
+    "detalles": [
+      {
+        "codigo": "LAP001",
+        "descripcion": "LAPTOP HP PAVILION 15",
+        "unidad": "NIU",
+        "cantidad": 2,
+        "mto_precio_unitario": 3540.00,
+        "tip_afe_igv": "10"
+      },
+      {
+        "codigo": "INST001",
+        "descripcion": "Instalacion y configuracion",
+        "unidad": "ZZ",
+        "cantidad": 1,
+        "mto_precio_unitario": 236.00,
+        "tip_afe_igv": "10"
+      }
+    ]
+  }'
+
+# Nota: mto_precio_unitario incluye IGV.
+# El sistema calcula automaticamente el valor sin IGV.`}
+                    style={{ fontFamily: 'monospace', fontSize: 12 }}
+                  />
+                ),
+              },
+              {
+                key: 'boleta',
+                label: <Space><Tag color="cyan">POST</Tag><Text>Crear Boleta</Text></Space>,
+                children: (
+                  <Input.TextArea
+                    readOnly
+                    autoSize
+                    value={`curl -X POST "${baseUrl}/v1/boletas" \\
+  -H "Authorization: Bearer TU_TOKEN" \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "company_id": 1,
+    "branch_id": 1,
+    "serie": "B001",
+    "fecha_emision": "2026-04-13",
+    "moneda": "PEN",
+    "metodo_envio": "individual",
+    "forma_pago_tipo": "Contado",
+    "client": {
+      "tipo_documento": "1",
+      "numero_documento": "12345678",
+      "razon_social": "JUAN PEREZ GARCIA"
+    },
+    "detalles": [
+      {
+        "codigo": "PROD001",
+        "descripcion": "Producto de venta al publico",
+        "unidad": "NIU",
+        "cantidad": 3,
+        "mto_precio_unitario": 59.00,
+        "tip_afe_igv": "10",
+        "porcentaje_igv": 18
+      }
+    ]
+  }'
+
+# Notas:
+# - metodo_envio: "individual" (envio directo) o "resumen_diario"
+# - Si monto > S/ 700, se requiere DNI real (no generico)
+# - porcentaje_igv es requerido en boletas`}
+                    style={{ fontFamily: 'monospace', fontSize: 12 }}
+                  />
+                ),
+              },
+              {
+                key: 'nota-credito',
+                label: <Space><Tag color="purple">POST</Tag><Text>Crear Nota de Credito</Text></Space>,
+                children: (
+                  <Input.TextArea
+                    readOnly
+                    autoSize
+                    value={`curl -X POST "${baseUrl}/v1/credit-notes" \\
+  -H "Authorization: Bearer TU_TOKEN" \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "company_id": 1,
+    "branch_id": 1,
+    "serie": "FC01",
+    "fecha_emision": "2026-04-13",
+    "moneda": "PEN",
+    "tipo_doc_afectado": "01",
+    "num_doc_afectado": "F001-000001",
+    "cod_motivo": "01",
+    "des_motivo": "Anulacion de la operacion",
+    "client": {
+      "tipo_documento": "6",
+      "numero_documento": "20100039207",
+      "razon_social": "RANSA COMERCIAL S.A."
+    },
+    "detalles": [
+      {
+        "codigo": "PROD001",
+        "descripcion": "Producto devuelto",
+        "unidad": "NIU",
+        "cantidad": 1,
+        "mto_valor_unitario": 100.00,
+        "tip_afe_igv": "10"
+      }
+    ]
+  }'
+
+# Motivos NC: 01=Anulacion, 02=Error RUC, 03=Error descripcion,
+# 04=Descuento global, 05=Descuento item, 06=Devolucion total,
+# 07=Devolucion item, 08=Bonificacion, 09=Disminucion valor
+# tipo_doc_afectado: "01"=Factura, "03"=Boleta`}
+                    style={{ fontFamily: 'monospace', fontSize: 12 }}
+                  />
+                ),
+              },
+              {
+                key: 'nota-debito',
+                label: <Space><Tag color="purple">POST</Tag><Text>Crear Nota de Debito</Text></Space>,
+                children: (
+                  <Input.TextArea
+                    readOnly
+                    autoSize
+                    value={`curl -X POST "${baseUrl}/v1/debit-notes" \\
+  -H "Authorization: Bearer TU_TOKEN" \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "company_id": 1,
+    "branch_id": 1,
+    "serie": "FD01",
+    "fecha_emision": "2026-04-13",
+    "moneda": "PEN",
+    "tipo_doc_afectado": "01",
+    "num_doc_afectado": "F001-000001",
+    "cod_motivo": "01",
+    "des_motivo": "Intereses por mora",
+    "client": {
+      "tipo_documento": "6",
+      "numero_documento": "20100039207",
+      "razon_social": "RANSA COMERCIAL S.A."
+    },
+    "detalles": [
+      {
+        "codigo": "INT001",
+        "descripcion": "Intereses por mora - 30 dias",
+        "unidad": "ZZ",
+        "cantidad": 1,
+        "mto_valor_unitario": 50.00,
+        "tip_afe_igv": "10"
+      }
+    ]
+  }'
+
+# Motivos ND: 01=Intereses por mora, 02=Aumento en el valor,
+# 03=Penalidades u otros conceptos`}
+                    style={{ fontFamily: 'monospace', fontSize: 12 }}
+                  />
+                ),
+              },
+              {
+                key: 'guia-privado',
+                label: <Space><Tag color="orange">POST</Tag><Text>Crear Guia de Remision (transporte privado)</Text></Space>,
+                children: (
+                  <Input.TextArea
+                    readOnly
+                    autoSize
+                    value={`curl -X POST "${baseUrl}/v1/dispatch-guides" \\
+  -H "Authorization: Bearer TU_TOKEN" \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "company_id": 1,
+    "branch_id": 1,
+    "serie": "T001",
+    "fecha_emision": "2026-04-13",
+    "cod_traslado": "01",
+    "mod_traslado": "02",
+    "fecha_traslado": "2026-04-14",
+    "peso_total": 150.5,
+    "und_peso_total": "KGM",
+    "destinatario": {
+      "tipo_documento": "6",
+      "numero_documento": "20100039207",
+      "razon_social": "RANSA COMERCIAL S.A."
+    },
+    "partida": {
+      "ubigeo": "130101",
+      "direccion": "AV. ESPAÑA 1234, TRUJILLO"
+    },
+    "llegada": {
+      "ubigeo": "150101",
+      "direccion": "AV. ARGENTINA 2833, LIMA"
+    },
+    "conductor_tipo_doc": "1",
+    "conductor_num_doc": "41410641",
+    "conductor_nombres": "JUAN",
+    "conductor_apellidos": "ROMERO AVALOS",
+    "conductor_licencia": "Q41410641",
+    "vehiculo_placa": "T7R831",
+    "detalles": [
+      {
+        "codigo": "PROD001",
+        "descripcion": "Mercaderia general",
+        "unidad": "KGM",
+        "cantidad": 150.5
+      }
+    ]
+  }'
+
+# mod_traslado: "01"=Publico, "02"=Privado
+# cod_traslado: "01"=Venta, "02"=Compra, "04"=Traslado entre establec.
+# Transporte privado requiere: conductor + vehiculo`}
+                    style={{ fontFamily: 'monospace', fontSize: 12 }}
+                  />
+                ),
+              },
+              {
+                key: 'guia-publico',
+                label: <Space><Tag color="orange">POST</Tag><Text>Crear Guia de Remision (transporte publico)</Text></Space>,
+                children: (
+                  <Input.TextArea
+                    readOnly
+                    autoSize
+                    value={`curl -X POST "${baseUrl}/v1/dispatch-guides" \\
+  -H "Authorization: Bearer TU_TOKEN" \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "company_id": 1,
+    "branch_id": 1,
+    "serie": "T001",
+    "fecha_emision": "2026-04-13",
+    "cod_traslado": "01",
+    "mod_traslado": "01",
+    "fecha_traslado": "2026-04-14",
+    "peso_total": 500,
+    "und_peso_total": "KGM",
+    "destinatario": {
+      "tipo_documento": "6",
+      "numero_documento": "20100039207",
+      "razon_social": "RANSA COMERCIAL S.A."
+    },
+    "partida": {
+      "ubigeo": "130101",
+      "direccion": "AV. ESPAÑA 1234, TRUJILLO"
+    },
+    "llegada": {
+      "ubigeo": "150101",
+      "direccion": "AV. ARGENTINA 2833, LIMA"
+    },
+    "transportista_tipo_doc": "6",
+    "transportista_num_doc": "20100039207",
+    "transportista_razon_social": "TRANSPORTES CRUZ DEL SUR S.A.",
+    "transportista_nro_mtc": "123456",
+    "detalles": [
+      {
+        "codigo": "PROD001",
+        "descripcion": "Mercaderia general",
+        "unidad": "NIU",
+        "cantidad": 50
+      }
+    ]
+  }'
+
+# Transporte publico requiere datos del transportista
+# No requiere conductor ni vehiculo`}
+                    style={{ fontFamily: 'monospace', fontSize: 12 }}
+                  />
+                ),
+              },
+              {
+                key: 'consultar',
+                label: <Space><Tag color="green">GET</Tag><Text>Consultar estado de documento</Text></Space>,
+                children: (
+                  <Input.TextArea
+                    readOnly
+                    autoSize
+                    value={`# Consultar factura por ID
+curl "${baseUrl}/v1/invoices/3" \\
+  -H "Authorization: Bearer TU_TOKEN"
+
+# Descargar PDF
+curl -o factura.pdf "${baseUrl}/v1/invoices/3/download-pdf" \\
+  -H "Authorization: Bearer TU_TOKEN"
+
+# Descargar XML firmado
+curl -o factura.xml "${baseUrl}/v1/invoices/3/download-xml" \\
+  -H "Authorization: Bearer TU_TOKEN"
+
+# Descargar CDR de SUNAT
+curl -o factura-cdr.zip "${baseUrl}/v1/invoices/3/download-cdr" \\
+  -H "Authorization: Bearer TU_TOKEN"
+
+# Reenviar a SUNAT (si fallo o quedo en ERROR)
+curl -X POST "${baseUrl}/v1/invoices/3/send-sunat" \\
+  -H "Authorization: Bearer TU_TOKEN"
+
+# Reemplazar "invoices" por: boletas, credit-notes,
+# debit-notes o dispatch-guides segun el tipo`}
+                    style={{ fontFamily: 'monospace', fontSize: 12 }}
+                  />
+                ),
+              },
+            ]}
+          />
+        </Card>
+
+        <Card title="Referencia de campos">
+          <Collapse
+            items={[
+              {
+                key: 'tipos-doc',
+                label: 'Tipos de documento de identidad',
+                children: (
+                  <Input.TextArea readOnly autoSize value={`"0" = Otros (Sin RUC)
+"1" = DNI
+"4" = Carnet de Extranjeria
+"6" = RUC
+"7" = Pasaporte
+"A" = Cedula Diplomatica`} style={{ fontFamily: 'monospace', fontSize: 12 }} />
+                ),
+              },
+              {
+                key: 'tip-afe',
+                label: 'Tipos de afectacion IGV (tip_afe_igv)',
+                children: (
+                  <Input.TextArea readOnly autoSize value={`"10" = Gravado - Operacion Onerosa (IGV 18%)
+"20" = Exonerado - Operacion Onerosa (IGV 0%)
+"30" = Inafecto - Operacion Onerosa (IGV 0%)
+"40" = Exportacion (IGV 0%)
+"11"-"16" = Gravado - Gratuita (no cobra IGV al cliente)
+"17" = Gravado - IVAP (tasa variable)
+"31"-"36" = Inafecto - Gratuita`} style={{ fontFamily: 'monospace', fontSize: 12 }} />
+                ),
+              },
+              {
+                key: 'unidades',
+                label: 'Unidades de medida comunes',
+                children: (
+                  <Input.TextArea readOnly autoSize value={`"NIU" = Unidad
+"ZZ"  = Servicio
+"KGM" = Kilogramo
+"TNE" = Tonelada
+"MTR" = Metro
+"LTR" = Litro
+"GLL" = Galon
+"DZN" = Docena
+"BX"  = Caja`} style={{ fontFamily: 'monospace', fontSize: 12 }} />
+                ),
+              },
+              {
+                key: 'estados',
+                label: 'Estados SUNAT',
+                children: (
+                  <Input.TextArea readOnly autoSize value={`"PENDIENTE"  = Creado, sin enviar
+"EN_COLA"    = En cola de envio automatico (se envia en segundos)
+"ENVIANDO"   = Enviandose a SUNAT
+"ACEPTADO"   = Aceptado por SUNAT
+"RECHAZADO"  = Rechazado por SUNAT (revisar mensaje de error)
+"ERROR"      = Error en el procesamiento (se puede reintentar)`} style={{ fontFamily: 'monospace', fontSize: 12 }} />
+                ),
+              },
+              {
+                key: 'monedas',
+                label: 'Monedas',
+                children: (
+                  <Input.TextArea readOnly autoSize value={`"PEN" = Sol peruano
+"USD" = Dolar americano`} style={{ fontFamily: 'monospace', fontSize: 12 }} />
+                ),
+              },
+            ]}
           />
         </Card>
 
