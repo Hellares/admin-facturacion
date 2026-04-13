@@ -37,6 +37,7 @@ const companySchema = z.object({
   clave_sol: z.string().max(100).optional(),
   modo_produccion: z.boolean().optional(),
   activo: z.boolean().optional(),
+  enviar_email_cliente: z.boolean().optional(),
   mostrar_cuentas_en_pdf: z.boolean().optional(),
   mostrar_billeteras_en_pdf: z.boolean().optional(),
   mostrar_redes_sociales_en_pdf: z.boolean().optional(),
@@ -86,6 +87,7 @@ export default function CompanyFormPage() {
       clave_sol: '',
       modo_produccion: false,
       activo: true,
+      enviar_email_cliente: false,
       mostrar_cuentas_en_pdf: false,
       mostrar_billeteras_en_pdf: false,
       mostrar_redes_sociales_en_pdf: false,
@@ -124,6 +126,7 @@ export default function CompanyFormPage() {
         clave_sol: '',
         modo_produccion: company.modo_produccion,
         activo: company.activo,
+        enviar_email_cliente: company.enviar_email_cliente ?? false,
         mostrar_cuentas_en_pdf: company.mostrar_cuentas_en_pdf ?? false,
         mostrar_billeteras_en_pdf: company.mostrar_billeteras_en_pdf ?? false,
         mostrar_redes_sociales_en_pdf: company.mostrar_redes_sociales_en_pdf ?? false,
@@ -424,6 +427,12 @@ export default function CompanyFormPage() {
           <Form.Item label="Activo">
             <Controller name="activo" control={control} render={({ field }) => (
               <Switch checked={field.value} onChange={field.onChange} />
+            )} />
+          </Form.Item>
+          <Divider plain>Notificaciones</Divider>
+          <Form.Item label="Enviar email al cliente" tooltip="Al emitir un documento aceptado por SUNAT, se envia automaticamente el PDF al email del cliente">
+            <Controller name="enviar_email_cliente" control={control} render={({ field }) => (
+              <Switch checked={field.value} onChange={field.onChange} checkedChildren="Si" unCheckedChildren="No" />
             )} />
           </Form.Item>
         </Space>

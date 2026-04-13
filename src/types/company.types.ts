@@ -36,6 +36,7 @@ export interface Company {
   mostrar_billeteras_en_pdf: boolean;
   mostrar_redes_sociales_en_pdf: boolean;
   mostrar_contactos_adicionales_en_pdf: boolean;
+  enviar_email_cliente: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -87,6 +88,7 @@ export interface CompanyFormData {
   mostrar_billeteras_en_pdf?: boolean;
   mostrar_redes_sociales_en_pdf?: boolean;
   mostrar_contactos_adicionales_en_pdf?: boolean;
+  enviar_email_cliente?: boolean;
   mensaje_pdf?: string;
   terminos_condiciones_pdf?: string;
   politica_garantia?: string;
