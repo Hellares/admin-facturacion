@@ -9,7 +9,7 @@ interface UseTableFiltersOptions {
 }
 
 export function useTableFilters(options: UseTableFiltersOptions = {}) {
-  const { defaultPerPage = 25, defaultSortBy, defaultSortDir = 'desc' } = options;
+  const { defaultPerPage = 15, defaultSortBy, defaultSortDir = 'desc' } = options;
 
   const selectedCompanyId = useCompanyContextStore((s) => s.selectedCompanyId);
   const selectedBranchId = useCompanyContextStore((s) => s.selectedBranchId);
