@@ -3,6 +3,7 @@ import { Outlet } from 'react-router-dom';
 import { Layout, Drawer, Grid } from 'antd';
 import Sidebar from './Sidebar';
 import Header from './Header';
+import { useCompanyContextSync } from '@/hooks/useCompanyContextSync';
 
 const { Content } = Layout;
 const { useBreakpoint } = Grid;
@@ -12,6 +13,8 @@ export default function AppLayout() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const screens = useBreakpoint();
   const isMobile = !screens.lg;
+
+  useCompanyContextSync();
 
   // Auto-collapse on mobile
   useEffect(() => {
