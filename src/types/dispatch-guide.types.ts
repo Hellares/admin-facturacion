@@ -33,6 +33,7 @@ export interface DetalleGuia {
 export interface DispatchGuide {
   id: number;
   company_id: number;
+  origen?: 'web' | 'api';
   branch_id: number;
   serie: string;
   correlativo: number;

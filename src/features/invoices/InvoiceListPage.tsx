@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
-import { Card, Table, Space, Button, Input, InputNumber, Tooltip, Segmented, Row, Col, Tag, message } from 'antd';
+import { Card, Table, Space, Button, Input, InputNumber, Tooltip, Segmented, Row, Col, Tag, Select, message } from 'antd';
+import OrigenTag from '@/components/common/OrigenTag';
 import { EyeOutlined, StopOutlined, FileExcelOutlined, ReloadOutlined } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import PageHeader from '@/components/common/PageHeader';
@@ -32,6 +33,7 @@ export default function InvoiceListPage() {
   const [clienteRazonSocial, setClienteRazonSocial] = useState('');
   const [numeroFilter, setNumeroFilter] = useState('');
   const [serieFilter, setSerieFilter] = useState<string | undefined>();
+  const [origenFilter, setOrigenFilter] = useState<'web' | 'api' | undefined>();
   const [montoDesde, setMontoDesde] = useState<number | null>(null);
   const [montoHasta, setMontoHasta] = useState<number | null>(null);
   const [anularTarget, setAnularTarget] = useState<AnulableDocumento | null>(null);
@@ -54,6 +56,7 @@ export default function InvoiceListPage() {
     cliente_razon_social: clienteRazonSocial || undefined,
     numero: numeroFilter || undefined,
     serie: serieFilter,
+    origen: origenFilter,
     monto_desde: montoDesde ?? undefined,
     monto_hasta: montoHasta ?? undefined,
   };
@@ -77,6 +80,7 @@ export default function InvoiceListPage() {
     setClienteRazonSocial('');
     setNumeroFilter('');
     setSerieFilter(undefined);
+    setOrigenFilter(undefined);
     setMontoDesde(null);
     setMontoHasta(null);
     setDateRange([null, null]);
@@ -146,6 +150,14 @@ export default function InvoiceListPage() {
       width: 120,
       align: 'right',
       render: (_: unknown, record) => <MoneyDisplay amount={record.totales?.total ?? 0} moneda={record.moneda as Moneda} strong />,
+    },
+    {
+      title: 'Origen',
+      dataIndex: 'origen',
+      key: 'origen',
+      width: 70,
+      responsive: ['md'],
+      render: (origen: Invoice['origen']) => <OrigenTag origen={origen} />,
     },
     {
       title: 'Estado',
@@ -301,6 +313,19 @@ export default function InvoiceListPage() {
                 </datalist>
               </div>
             </Tooltip>
+          </Col>
+          <Col xs={24} sm={12} md={6}>
+            <Select
+              placeholder="Origen: Todos"
+              value={origenFilter}
+              onChange={(v) => setOrigenFilter(v)}
+              allowClear
+              style={{ width: '100%' }}
+              options={[
+                { value: 'web', label: 'Web (portal)' },
+                { value: 'api', label: 'API (integracion)' },
+              ]}
+            />
           </Col>
         </Row>
         <Table

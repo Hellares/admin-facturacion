@@ -7,6 +7,7 @@ import type {
 export interface Invoice {
   id: number;
   company_id: number;
+  origen?: 'web' | 'api';
   branch_id: number;
   serie: string;
   /** Correlativo en el formato que devuelve el backend (string zero-padded, ej. "000003") */
@@ -132,6 +133,7 @@ export type EstadoUI = 'todos' | 'proceso' | 'validado' | 'error' | 'baja';
 export interface InvoiceListParams {
   company_id?: number;
   branch_id?: number;
+  origen?: 'web' | 'api';
   estado_sunat?: SunatStatus;
   estado_ui?: EstadoUI;
   fecha_desde?: string;

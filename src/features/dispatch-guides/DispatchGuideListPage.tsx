@@ -8,6 +8,7 @@ import SunatStatusBadge from '@/components/common/SunatStatusBadge';
 import DateCell from '@/components/common/DateCell';
 import DocumentActions from '@/components/common/DocumentActions';
 import DocumentPdfViewer from '@/components/common/DocumentPdfViewer';
+import OrigenTag from '@/components/common/OrigenTag';
 import { useDispatchGuides } from './hooks/useDispatchGuides';
 import { useTableFilters } from '@/hooks/useTableFilters';
 import { dispatchGuideService } from '@/services/dispatch-guide.service';
@@ -80,6 +81,7 @@ export default function DispatchGuideListPage() {
     },
     { title: 'Destinatario', key: 'dest', ellipsis: true, render: (_, r) => r.destinatario?.razon_social },
     { title: 'Peso (kg)', dataIndex: 'peso_total', width: 90, align: 'right' },
+    { title: 'Origen', dataIndex: 'origen', width: 70, responsive: ['md'], render: (origen: 'web' | 'api' | undefined) => <OrigenTag origen={origen} /> },
     { title: 'Estado', dataIndex: 'estado_sunat', width: 110, render: (s: SunatStatus, record: DispatchGuide) => <SunatStatusBadge status={s} sunatInfo={record.respuesta_sunat} /> },
     {
       title: 'Acciones',

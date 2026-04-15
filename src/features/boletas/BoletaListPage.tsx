@@ -9,6 +9,7 @@ import MoneyDisplay from '@/components/common/MoneyDisplay';
 import DateCell from '@/components/common/DateCell';
 import DocumentActions from '@/components/common/DocumentActions';
 import DocumentPdfViewer from '@/components/common/DocumentPdfViewer';
+import OrigenTag from '@/components/common/OrigenTag';
 import EstadoBadge from '@/components/common/EstadoBadge';
 import AnularBoletaDialog from './components/AnularBoletaDialog';
 import { useBoletas } from './hooks/useBoletas';
@@ -135,6 +136,14 @@ export default function BoletaListPage() {
           {method === 'individual' ? 'Individual' : 'Resumen'}
         </Tag>
       ),
+    },
+    {
+      title: 'Origen',
+      dataIndex: 'origen',
+      key: 'origen',
+      width: 70,
+      responsive: ['md'],
+      render: (origen: 'web' | 'api' | undefined) => <OrigenTag origen={origen} />,
     },
     {
       title: 'Estado',

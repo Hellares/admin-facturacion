@@ -6,6 +6,7 @@ import type {
 export interface CreditNote {
   id: number;
   company_id: number;
+  origen?: 'web' | 'api';
   branch_id: number;
   serie: string;
   /** Correlativo en el formato que devuelve el backend (string zero-padded, ej. "000003") */

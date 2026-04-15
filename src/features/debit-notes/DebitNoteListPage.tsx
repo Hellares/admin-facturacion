@@ -8,6 +8,7 @@ import SunatStatusBadge from '@/components/common/SunatStatusBadge';
 import MoneyDisplay from '@/components/common/MoneyDisplay';
 import DateCell from '@/components/common/DateCell';
 import DocumentActions from '@/components/common/DocumentActions';
+import OrigenTag from '@/components/common/OrigenTag';
 import DocumentPdfViewer from '@/components/common/DocumentPdfViewer';
 import AnularDocumentoDialog, {
   type AnulableDocumento,
@@ -109,6 +110,7 @@ export default function DebitNoteListPage() {
     { title: 'Motivo', dataIndex: 'des_motivo', ellipsis: true },
     { title: 'Cliente', key: 'cliente', ellipsis: true, responsive: ['lg'], render: (_, r) => r.cliente?.razon_social },
     { title: 'Total', key: 'total', width: 120, align: 'right', render: (_: unknown, r: DebitNote) => <MoneyDisplay amount={r.totales?.total ?? 0} moneda={r.moneda as Moneda} strong /> },
+    { title: 'Origen', dataIndex: 'origen', width: 70, responsive: ['md'], render: (origen: 'web' | 'api' | undefined) => <OrigenTag origen={origen} /> },
     { title: 'Estado', dataIndex: 'estado_sunat', width: 110, render: (s: SunatStatus, record: DebitNote) => <SunatStatusBadge status={s} sunatInfo={record.sunat ?? record.respuesta_sunat} /> },
     {
       title: 'Acciones',
