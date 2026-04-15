@@ -22,10 +22,15 @@ const branchSchema = z.object({
   telefono: z.string().optional(),
   email: z.string().email('Email invalido').optional().or(z.literal('')),
   series_factura: z.array(z.string()).optional(),
+  series_factura_api: z.array(z.string()).optional(),
   series_boleta: z.array(z.string()).optional(),
+  series_boleta_api: z.array(z.string()).optional(),
   series_nota_credito: z.array(z.string()).optional(),
+  series_nota_credito_api: z.array(z.string()).optional(),
   series_nota_debito: z.array(z.string()).optional(),
+  series_nota_debito_api: z.array(z.string()).optional(),
   series_guia_remision: z.array(z.string()).optional(),
+  series_guia_remision_api: z.array(z.string()).optional(),
 });
 
 type FormValues = z.infer<typeof branchSchema>;
@@ -74,10 +79,15 @@ export default function BranchFormPage() {
       nombre: '',
       direccion: '',
       series_factura: [],
+      series_factura_api: [],
       series_boleta: [],
+      series_boleta_api: [],
       series_nota_credito: [],
+      series_nota_credito_api: [],
       series_nota_debito: [],
+      series_nota_debito_api: [],
       series_guia_remision: [],
+      series_guia_remision_api: [],
     },
   });
 
@@ -94,10 +104,15 @@ export default function BranchFormPage() {
         telefono: branch.telefono || '',
         email: branch.email || '',
         series_factura: branch.series_factura || [],
+        series_factura_api: branch.series_factura_api || [],
         series_boleta: branch.series_boleta || [],
+        series_boleta_api: branch.series_boleta_api || [],
         series_nota_credito: branch.series_nota_credito || [],
+        series_nota_credito_api: branch.series_nota_credito_api || [],
         series_nota_debito: branch.series_nota_debito || [],
+        series_nota_debito_api: branch.series_nota_debito_api || [],
         series_guia_remision: branch.series_guia_remision || [],
+        series_guia_remision_api: branch.series_guia_remision_api || [],
       });
     }
   }, [branch, isEdit, reset]);
@@ -174,33 +189,73 @@ export default function BranchFormPage() {
                 </Form.Item>
               </Space>
 
+              <Divider orientation="left" style={{ marginTop: 8, marginBottom: 8, fontSize: 13 }}>Series Web (emitidas desde el portal)</Divider>
+
               <Form.Item label="Series Factura">
                 <Controller name="series_factura" control={control} render={({ field }) => (
-                  <Select mode="tags" value={field.value} onChange={field.onChange} placeholder="Ej: F001, F002" tokenSeparators={[',']} />
+                  <Select mode="tags" value={field.value} onChange={field.onChange} placeholder="Ej: F001" tokenSeparators={[',']} />
                 )} />
               </Form.Item>
 
               <Form.Item label="Series Boleta">
                 <Controller name="series_boleta" control={control} render={({ field }) => (
-                  <Select mode="tags" value={field.value} onChange={field.onChange} placeholder="Ej: B001, B002" tokenSeparators={[',']} />
+                  <Select mode="tags" value={field.value} onChange={field.onChange} placeholder="Ej: B001" tokenSeparators={[',']} />
                 )} />
               </Form.Item>
 
               <Form.Item label="Series Nota Credito">
                 <Controller name="series_nota_credito" control={control} render={({ field }) => (
-                  <Select mode="tags" value={field.value} onChange={field.onChange} placeholder="Ej: FC01, BC01" tokenSeparators={[',']} />
+                  <Select mode="tags" value={field.value} onChange={field.onChange} placeholder="Ej: FC01" tokenSeparators={[',']} />
                 )} />
               </Form.Item>
 
               <Form.Item label="Series Nota Debito">
                 <Controller name="series_nota_debito" control={control} render={({ field }) => (
-                  <Select mode="tags" value={field.value} onChange={field.onChange} placeholder="Ej: FD01, BD01" tokenSeparators={[',']} />
+                  <Select mode="tags" value={field.value} onChange={field.onChange} placeholder="Ej: FD01" tokenSeparators={[',']} />
                 )} />
               </Form.Item>
 
               <Form.Item label="Series Guia Remision">
                 <Controller name="series_guia_remision" control={control} render={({ field }) => (
                   <Select mode="tags" value={field.value} onChange={field.onChange} placeholder="Ej: T001" tokenSeparators={[',']} />
+                )} />
+              </Form.Item>
+
+              <Divider orientation="left" style={{ marginTop: 16, marginBottom: 8, fontSize: 13 }}>
+                Series API (solo uso por integraciones externas)
+              </Divider>
+              <div style={{ fontSize: 12, color: '#888', marginBottom: 12 }}>
+                Estas series solo seran usadas por sistemas externos via API. No apareceran al emitir desde el portal.
+                Manten numeracion separada (ej: F002, B002) para evitar colisiones de correlativo.
+              </div>
+
+              <Form.Item label="Series Factura (API)">
+                <Controller name="series_factura_api" control={control} render={({ field }) => (
+                  <Select mode="tags" value={field.value} onChange={field.onChange} placeholder="Ej: F002" tokenSeparators={[',']} />
+                )} />
+              </Form.Item>
+
+              <Form.Item label="Series Boleta (API)">
+                <Controller name="series_boleta_api" control={control} render={({ field }) => (
+                  <Select mode="tags" value={field.value} onChange={field.onChange} placeholder="Ej: B002" tokenSeparators={[',']} />
+                )} />
+              </Form.Item>
+
+              <Form.Item label="Series Nota Credito (API)">
+                <Controller name="series_nota_credito_api" control={control} render={({ field }) => (
+                  <Select mode="tags" value={field.value} onChange={field.onChange} placeholder="Ej: FC02" tokenSeparators={[',']} />
+                )} />
+              </Form.Item>
+
+              <Form.Item label="Series Nota Debito (API)">
+                <Controller name="series_nota_debito_api" control={control} render={({ field }) => (
+                  <Select mode="tags" value={field.value} onChange={field.onChange} placeholder="Ej: FD02" tokenSeparators={[',']} />
+                )} />
+              </Form.Item>
+
+              <Form.Item label="Series Guia Remision (API)">
+                <Controller name="series_guia_remision_api" control={control} render={({ field }) => (
+                  <Select mode="tags" value={field.value} onChange={field.onChange} placeholder="Ej: T002" tokenSeparators={[',']} />
                 )} />
               </Form.Item>
             </Space>
