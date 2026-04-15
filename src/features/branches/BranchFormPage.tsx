@@ -189,7 +189,7 @@ export default function BranchFormPage() {
                 </Form.Item>
               </Space>
 
-              <Divider orientation="left" style={{ marginTop: 8, marginBottom: 8, fontSize: 13 }}>Series Web (emitidas desde el portal)</Divider>
+              <Divider orientation="start" style={{ marginTop: 8, marginBottom: 8, fontSize: 13 }}>Series Web (emitidas desde el portal)</Divider>
 
               <Form.Item label="Series Factura">
                 <Controller name="series_factura" control={control} render={({ field }) => (
@@ -221,7 +221,7 @@ export default function BranchFormPage() {
                 )} />
               </Form.Item>
 
-              <Divider orientation="left" style={{ marginTop: 16, marginBottom: 8, fontSize: 13 }}>
+              <Divider orientation="start" style={{ marginTop: 16, marginBottom: 8, fontSize: 13 }}>
                 Series API (solo uso por integraciones externas)
               </Divider>
               <div style={{ fontSize: 12, color: '#888', marginBottom: 12 }}>
