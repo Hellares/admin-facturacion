@@ -344,6 +344,76 @@ curl -H "Authorization: Bearer TU_TOKEN" \\
                 ),
               },
               {
+                key: 'bancarizacion',
+                label: (
+                  <Space>
+                    <Tag color="volcano">BANCARIZACION</Tag>
+                    <Text>Ley N° 28194</Text>
+                  </Space>
+                ),
+                children: (
+                  <div>
+                    <EndpointGroup
+                      endpoints={[
+                        { method: 'GET', path: '/v1/bancarizacion/medios-pago', desc: 'Catalogo de medios de pago aceptados (codigo, descripcion, requisitos)' },
+                        { method: 'POST', path: '/v1/bancarizacion/validar', desc: 'Valida si un monto exige bancarizacion antes de emitir' },
+                      ]}
+                    />
+
+                    <div style={{ marginTop: 16, padding: 12, background: '#fff2e8', border: '1px solid #ffbb96', borderRadius: 4, fontSize: 13 }}>
+                      <strong>Cuando aplica:</strong> operaciones con total <strong>{'>='} S/ 2,000 PEN</strong> o <strong>{'>='} US$ 500 USD</strong> requieren
+                      datos del medio de pago bancario para ser gasto deducible y otorgar credito fiscal IGV.
+                      Syncrofact valida automaticamente en cada POST de factura/boleta.
+                    </div>
+
+                    <div style={{ marginTop: 16, fontSize: 13 }}>
+                      <strong>Formato recomendado</strong> (<code>medios_pago</code> en el body del POST, soporta multiples medios):
+                    </div>
+
+                    <div style={{ marginTop: 8, background: '#fafafa', border: '1px solid #e8e8e8', borderRadius: 4, padding: 12 }}>
+                      <pre style={{ margin: 0, fontSize: 12, whiteSpace: 'pre-wrap' }}>{`{
+  "medios_pago": [
+    {
+      "tipo": "BANCA_WEB",
+      "entidad_financiera": "BCP",
+      "referencia": "OP-20260415-0001",
+      "fecha_operacion": "2026-04-15",
+      "monto": 2832.00
+    }
+  ],
+  "company_id": 1, "branch_id": 1, "serie": "F002",
+  ...
+}`}</pre>
+                    </div>
+
+                    <div style={{ marginTop: 12, fontSize: 13 }}>
+                      <strong>Campos importantes:</strong>
+                    </div>
+                    <ul style={{ fontSize: 13, marginTop: 4 }}>
+                      <li><code>tipo</code>: codigo del catalogo (<code>BANCA_WEB</code>, <code>BANCA_APP</code>, <code>TRANSFERENCIA</code>, <code>AGORA</code>, <code>EFECTIVO</code>, etc.). <strong>NO usar codigos SUNAT (008, 009)</strong>.</li>
+                      <li><code>referencia</code>: numero de operacion/transaccion. <strong>El campo se llama <code>referencia</code></strong>, no <code>numero_operacion</code> (este ultimo es el nombre del formato legacy <code>bancarizacion</code>).</li>
+                      <li><code>entidad_financiera</code>: banco (requerido para tipos bancarios).</li>
+                      <li><code>monto</code>: la suma de todos los medios debe cubrir <code>mto_imp_venta</code>.</li>
+                    </ul>
+
+                    <div style={{ marginTop: 12, fontSize: 13 }}>
+                      <strong>Leyenda automatica:</strong> Syncrofact agrega al XML la leyenda
+                      <code> 2005 - "OPERACION SUJETA A BANCARIZACION - LEY N° 28194"</code> cuando detecta que aplica. No la envies manualmente.
+                    </div>
+
+                    <div style={{ marginTop: 16, background: '#fafafa', border: '1px solid #e8e8e8', borderRadius: 4, padding: 12 }}>
+                      <div style={{ fontSize: 12, color: '#888', marginBottom: 6 }}>Consultar catalogo de medios</div>
+                      <pre style={{ margin: 0, fontSize: 12, whiteSpace: 'pre-wrap' }}>{`curl -H "Authorization: Bearer TU_TOKEN" \\
+  https://api.syncrofact.net.pe/api/v1/bancarizacion/medios-pago`}</pre>
+                    </div>
+
+                    <div style={{ marginTop: 12, background: '#fffbe6', border: '1px solid #ffe58f', borderRadius: 4, padding: 12, fontSize: 13 }}>
+                      <strong>Error comun:</strong> si la API rechaza con "Requiere numero de referencia/operacion", el campo debe llamarse <code>referencia</code> (no <code>numero_operacion</code>). Si envias monto {'>'} S/ 2,000 sin <code>medios_pago</code>, obtienes error 422 con el mensaje de bancarizacion obligatoria.
+                    </div>
+                  </div>
+                ),
+              },
+              {
                 key: 'catalogs',
                 label: (
                   <Space>
