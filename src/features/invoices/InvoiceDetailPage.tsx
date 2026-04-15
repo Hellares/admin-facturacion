@@ -95,6 +95,39 @@ export default function InvoiceDetailPage() {
       />
 
       <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+        {/* Banner de rechazo/error: aparece cuando SUNAT rechazo o hubo error tecnico */}
+        {(invoice.estado_sunat === 'RECHAZADO' || invoice.estado_sunat === 'ERROR') && invoice.sunat?.descripcion && (
+          <Alert
+            type="error"
+            showIcon
+            message={
+              <Space wrap size="small">
+                <strong>{invoice.estado_sunat === 'RECHAZADO' ? 'RECHAZADO POR SUNAT' : 'ERROR TECNICO'}</strong>
+                {invoice.sunat.codigo && (
+                  <Tag color="red" style={{ fontFamily: 'monospace', margin: 0 }}>
+                    Codigo {invoice.sunat.codigo}
+                  </Tag>
+                )}
+              </Space>
+            }
+            description={
+              <div>
+                <div style={{ marginTop: 4 }}>{invoice.sunat.descripcion}</div>
+                {invoice.sunat.notas && invoice.sunat.notas.length > 0 && (
+                  <ul style={{ marginTop: 8, marginBottom: 0 }}>
+                    {invoice.sunat.notas.map((n: string, i: number) => <li key={i}>{n}</li>)}
+                  </ul>
+                )}
+                <div style={{ marginTop: 8, fontSize: 12, color: '#888' }}>
+                  {invoice.estado_sunat === 'ERROR'
+                    ? 'Error tecnico (conectividad, certificado, etc). Puedes reintentar el envio.'
+                    : 'SUNAT rechazo por validacion. Corregir y emitir un documento NUEVO; no se puede reenviar el mismo.'}
+                </div>
+              </div>
+            }
+          />
+        )}
+
         {/* Banner de anulacion: aparece cuando la factura fue dada de baja via RA */}
         {anulacionInfo && (
           <Alert
