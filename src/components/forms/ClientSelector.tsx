@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Input, Select, Space, Form, Button, Divider, message } from 'antd';
 import { SearchOutlined, PlusOutlined } from '@ant-design/icons';
 import { Controller, useFormContext } from 'react-hook-form';
@@ -8,11 +8,21 @@ import { useCompanyContextStore } from '@/stores/company-context.store';
 import { TIPO_DOCUMENTO_OPTIONS } from '@/utils/constants';
 import type { Client } from '@/types/client.types';
 
+type DocumentType = 'factura' | 'boleta' | 'credit_note' | 'debit_note' | 'dispatch_guide' | 'cotizacion';
+
 interface ClientSelectorProps {
-  prefix?: string; // form field prefix e.g. 'client'
+  prefix?: string;
+  /**
+   * Tipo de documento que se esta emitiendo. Restringe los tipos de documento
+   * de identidad disponibles segun reglas SUNAT:
+   * - factura: solo RUC (6)
+   * - boleta: sin doc (0), DNI (1), CE (4), Pasaporte (7) — sin RUC
+   * - resto: todas las opciones
+   */
+  documentType?: DocumentType;
 }
 
-export default function ClientSelector({ prefix = 'client' }: ClientSelectorProps) {
+export default function ClientSelector({ prefix = 'client', documentType }: ClientSelectorProps) {
   const { control, setValue, watch, formState: { errors } } = useFormContext();
   const companyId = useCompanyContextStore((s) => s.selectedCompanyId);
   const [searching, setSearching] = useState(false);
@@ -99,6 +109,31 @@ export default function ClientSelector({ prefix = 'client' }: ClientSelectorProp
 
   const p = prefix ? `${prefix}.` : '';
 
+  // Filtrar opciones de tipo documento segun el tipo de comprobante
+  const filteredTipoDocOptions = (() => {
+    if (documentType === 'factura') {
+      return TIPO_DOCUMENTO_OPTIONS.filter((o) => o.value === '6');
+    }
+    if (documentType === 'boleta') {
+      return TIPO_DOCUMENTO_OPTIONS.filter((o) => o.value !== '6');
+    }
+    return TIPO_DOCUMENTO_OPTIONS;
+  })();
+
+  const tipoDocDisabled = filteredTipoDocOptions.length === 1;
+  const currentTipoDoc = watch(`${p}tipo_documento`) as string | undefined;
+
+  // Auto-forzar el tipo de documento cuando hay restriccion y el actual no es valido
+  useEffect(() => {
+    if (!documentType) return;
+    const validValues = filteredTipoDocOptions.map((o) => o.value);
+    if (currentTipoDoc && !validValues.includes(currentTipoDoc as typeof validValues[number])) {
+      setValue(`${p}tipo_documento`, filteredTipoDocOptions[0].value);
+    } else if (!currentTipoDoc && tipoDocDisabled) {
+      setValue(`${p}tipo_documento`, filteredTipoDocOptions[0].value);
+    }
+  }, [documentType, currentTipoDoc]); // eslint-disable-line react-hooks/exhaustive-deps
+
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 2 }}>
@@ -119,7 +154,12 @@ export default function ClientSelector({ prefix = 'client' }: ClientSelectorProp
             name={`${p}tipo_documento`}
             control={control}
             render={({ field }) => (
-              <Select {...field} style={{ width: 180 }} options={TIPO_DOCUMENTO_OPTIONS} />
+              <Select
+                {...field}
+                style={{ width: 180 }}
+                options={filteredTipoDocOptions}
+                disabled={tipoDocDisabled}
+              />
             )}
           />
         </Form.Item>

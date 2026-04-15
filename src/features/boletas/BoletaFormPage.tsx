@@ -152,7 +152,7 @@ export default function BoletaFormPage() {
                 {/* CLIENTE */}
                 <Card size="small" title={<SectionTitle icon={<UserOutlined />} title="Cliente" />} styles={{ body: { paddingTop: 0 } }}>
                   <Form layout="vertical" component="div">
-                    <ClientSelector prefix="client" />
+                    <ClientSelector prefix="client" documentType="boleta" />
                   </Form>
                 </Card>
 

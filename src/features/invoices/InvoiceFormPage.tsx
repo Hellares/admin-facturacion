@@ -171,7 +171,7 @@ export default function InvoiceFormPage() {
                   styles={{ body: { paddingTop: 0 } }}
                 >
                   <Form layout="vertical" component="div">
-                    <ClientSelector prefix="client" />
+                    <ClientSelector prefix="client" documentType="factura" />
                   </Form>
                 </Card>
 
