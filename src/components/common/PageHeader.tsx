@@ -64,8 +64,8 @@ export default function PageHeader({
           }))}
         />
       )}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Space>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
+        <Space style={{ minWidth: 0, flex: '1 1 auto' }}>
           {showBack && (
             <Button
               icon={<ArrowLeftOutlined />}
@@ -73,8 +73,8 @@ export default function PageHeader({
               style={{ background: '#e6f0fa', color: '#1677ff', border: 'none', fontWeight: 500 }}
             />
           )}
-          <div>
-            <Title level={4} style={{ margin: 0 }}>{title}</Title>
+          <div style={{ minWidth: 0 }}>
+            <Title level={4} style={{ margin: 0, wordBreak: 'break-word' }}>{title}</Title>
             {subtitle && (
               <Typography.Text type="secondary" style={{ fontSize: 13 }}>
                 {subtitle}
@@ -82,7 +82,7 @@ export default function PageHeader({
             )}
           </div>
         </Space>
-        <Space>
+        <Space wrap>
           {extra}
           {showAdd && (
             <Button type="primary" icon={<PlusOutlined />} onClick={onAdd}>
