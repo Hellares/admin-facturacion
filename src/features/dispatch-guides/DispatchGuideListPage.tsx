@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { Card, Table, Space, Button, Input, Tooltip, Tag, Segmented, Row, Col, message } from 'antd';
-import { EyeOutlined, FileExcelOutlined, ReloadOutlined } from '@ant-design/icons';
+import { EyeOutlined, FileExcelOutlined, ReloadOutlined, SyncOutlined } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import PageHeader from '@/components/common/PageHeader';
 import DateRangeFilter from '@/components/common/DateRangeFilter';
@@ -126,6 +126,9 @@ export default function DispatchGuideListPage() {
         }
         extra={
           <Space>
+            <Tooltip title="Refrescar datos">
+              <Button icon={<SyncOutlined spin={isLoading} />} onClick={() => refetch()} />
+            </Tooltip>
             <Tooltip title="Limpiar filtros">
               <Button icon={<ReloadOutlined />} onClick={handleReset} />
             </Tooltip>

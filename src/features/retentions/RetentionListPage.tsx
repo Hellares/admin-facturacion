@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { Card, Table, Space, Button, Input, InputNumber, Tooltip, Segmented, Row, Col, message } from 'antd';
-import { EyeOutlined, FileExcelOutlined, ReloadOutlined } from '@ant-design/icons';
+import { EyeOutlined, FileExcelOutlined, ReloadOutlined, SyncOutlined } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import { useMemo, useState } from 'react';
 import PageHeader from '@/components/common/PageHeader';
@@ -132,6 +132,9 @@ export default function RetentionListPage() {
         }
         extra={
           <Space>
+            <Tooltip title="Refrescar datos">
+              <Button icon={<SyncOutlined spin={isLoading} />} onClick={() => refetch()} />
+            </Tooltip>
             <Tooltip title="Limpiar filtros">
               <Button icon={<ReloadOutlined />} onClick={handleReset} />
             </Tooltip>

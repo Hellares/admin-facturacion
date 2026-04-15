@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { Card, Table, Space, Button, Input, InputNumber, Tooltip, Segmented, Row, Col, Tag, Select, message } from 'antd';
 import OrigenTag from '@/components/common/OrigenTag';
-import { EyeOutlined, StopOutlined, FileExcelOutlined, ReloadOutlined } from '@ant-design/icons';
+import { EyeOutlined, StopOutlined, FileExcelOutlined, ReloadOutlined, SyncOutlined } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import PageHeader from '@/components/common/PageHeader';
 import DateRangeFilter from '@/components/common/DateRangeFilter';
@@ -233,6 +233,9 @@ export default function InvoiceListPage() {
         }
         extra={
           <Space>
+            <Tooltip title="Refrescar datos">
+              <Button icon={<SyncOutlined spin={isLoading} />} onClick={() => refetch()} />
+            </Tooltip>
             <Tooltip title="Limpiar filtros">
               <Button icon={<ReloadOutlined />} onClick={handleReset} />
             </Tooltip>
