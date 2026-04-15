@@ -1,8 +1,9 @@
-import { Layout, Dropdown, Avatar, Space, Typography, Button } from 'antd';
-import { UserOutlined, LogoutOutlined, MenuOutlined } from '@ant-design/icons';
+import { Layout, Dropdown, Avatar, Space, Typography, Button, Tag } from 'antd';
+import { UserOutlined, LogoutOutlined, MenuOutlined, BankOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/stores/auth.store';
 import { authService } from '@/services/auth.service';
+import { useCompanyContextStore } from '@/stores/company-context.store';
 import CompanyBranchSelector from './CompanyBranchSelector';
 
 const { Header: AntHeader } = Layout;
@@ -16,6 +17,8 @@ interface HeaderProps {
 export default function Header({ onMenuClick, isMobile = false }: HeaderProps) {
   const navigate = useNavigate();
   const { user, logout } = useAuthStore();
+  const { selectedCompanyId, companies } = useCompanyContextStore();
+  const selectedCompany = companies.find((c) => c.id === selectedCompanyId);
 
   const handleLogout = async () => {
     try {
@@ -57,11 +60,27 @@ export default function Header({ onMenuClick, isMobile = false }: HeaderProps) {
       boxShadow: '0 1px 4px rgba(0,0,0,0.08)',
       zIndex: 1,
     }}>
-      <Space>
+      <Space size={8} style={{ flex: 1, minWidth: 0 }}>
         {isMobile && onMenuClick && (
           <Button type="text" icon={<MenuOutlined />} onClick={onMenuClick} style={{ fontSize: 18 }} />
         )}
         {!isMobile && <CompanyBranchSelector />}
+        {isMobile && selectedCompany && (
+          <Tag
+            color="blue"
+            icon={<BankOutlined />}
+            style={{
+              margin: 0,
+              fontSize: 12,
+              maxWidth: '100%',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {selectedCompany.razon_social}
+          </Tag>
+        )}
       </Space>
 
       <Space size={isMobile ? 'small' : 'middle'}>

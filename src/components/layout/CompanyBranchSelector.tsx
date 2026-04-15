@@ -5,7 +5,11 @@ import { useCompanyContextStore } from '@/stores/company-context.store';
 
 const { Text } = Typography;
 
-export default function CompanyBranchSelector() {
+interface Props {
+  vertical?: boolean;
+}
+
+export default function CompanyBranchSelector({ vertical = false }: Props) {
   const user = useAuthStore((s) => s.user);
   const isSuperAdmin = useAuthStore((s) => s.isSuperAdmin());
   const userCompanyId = user?.company_id;
@@ -30,9 +34,11 @@ export default function CompanyBranchSelector() {
     !!selectedCompanyId &&
     Number(userCompanyId) !== Number(selectedCompanyId);
 
+  const selectWidth = vertical ? '100%' : undefined;
+
   return (
-    <Space size="middle">
-      <Space size={4}>
+    <Space size="middle" direction={vertical ? 'vertical' : 'horizontal'} style={vertical ? { width: '100%' } : undefined}>
+      <Space size={4} style={vertical ? { width: '100%' } : undefined}>
         <BankOutlined style={{ color: '#1677ff' }} />
         <Text type="secondary" style={{ fontSize: 12 }}>Empresa:</Text>
         {isLocked ? (
@@ -44,7 +50,7 @@ export default function CompanyBranchSelector() {
             value={selectedCompanyId}
             onChange={(value) => setSelectedCompany(value)}
             placeholder="Seleccionar empresa"
-            style={{ minWidth: 220 }}
+            style={{ minWidth: 220, width: selectWidth }}
             size="small"
             allowClear
             showSearch
@@ -64,14 +70,14 @@ export default function CompanyBranchSelector() {
         )}
       </Space>
 
-      <Space size={4}>
+      <Space size={4} style={vertical ? { width: '100%' } : undefined}>
         <ShopOutlined style={{ color: '#52c41a' }} />
         <Text type="secondary" style={{ fontSize: 12 }}>Sucursal:</Text>
         <Select
           value={selectedBranchId}
           onChange={(value) => setSelectedBranch(value)}
           placeholder="Seleccionar sucursal"
-          style={{ minWidth: 180 }}
+          style={{ minWidth: 180, width: selectWidth }}
           size="small"
           allowClear
           disabled={!selectedCompanyId}

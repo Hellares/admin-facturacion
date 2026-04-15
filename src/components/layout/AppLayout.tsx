@@ -3,6 +3,7 @@ import { Outlet } from 'react-router-dom';
 import { Layout, Drawer, Grid } from 'antd';
 import Sidebar from './Sidebar';
 import Header from './Header';
+import CompanyBranchSelector from './CompanyBranchSelector';
 import { useCompanyContextSync } from '@/hooks/useCompanyContextSync';
 
 const { Content } = Layout;
@@ -28,11 +29,16 @@ export default function AppLayout() {
           placement="left"
           open={drawerOpen}
           onClose={() => setDrawerOpen(false)}
-          width={250}
-          styles={{ body: { padding: 0, background: '#001529' } }}
+          width={280}
+          styles={{ body: { padding: 0, background: '#001529', display: 'flex', flexDirection: 'column' } }}
           closable={false}
         >
-          <Sidebar collapsed={false} onCollapse={() => setDrawerOpen(false)} />
+          <div style={{ padding: 12, background: '#fff', borderBottom: '1px solid #f0f0f0' }}>
+            <CompanyBranchSelector vertical />
+          </div>
+          <div style={{ flex: 1, overflowY: 'auto' }}>
+            <Sidebar collapsed={false} onCollapse={() => setDrawerOpen(false)} />
+          </div>
         </Drawer>
         <Layout>
           <Header onMenuClick={() => setDrawerOpen(true)} isMobile />
