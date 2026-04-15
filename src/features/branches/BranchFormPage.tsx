@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Card, Form, Input, Button, Space, Select, message, Modal, InputNumber, Divider } from 'antd';
-import { PlusOutlined, DeleteOutlined } from '@ant-design/icons';
+import { Card, Form, Input, Button, Space, Select, message, Modal, InputNumber, Divider, Tooltip } from 'antd';
+import { PlusOutlined, DeleteOutlined, ThunderboltOutlined } from '@ant-design/icons';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
@@ -70,6 +70,29 @@ export default function BranchFormPage() {
       setBatchRows([{ tipo_documento: '01', serie: '', correlativo_inicial: 1 }]);
     },
     onError: () => message.error('Error al crear series en batch'),
+  });
+
+  const generateApiMut = useMutation({
+    mutationFn: () => branchService.generateApiSeries(Number(id)),
+    onSuccess: (result) => {
+      const count = Object.keys(result.generadas ?? {}).length;
+      if (count === 0) {
+        message.info('Todas las series API ya estaban configuradas');
+      } else {
+        message.success(`${count} series API generadas`);
+        // Actualizar formulario con las nuevas series
+        const b = result.branch;
+        reset((prev) => ({
+          ...prev,
+          series_factura_api: b.series_factura_api || prev.series_factura_api,
+          series_boleta_api: b.series_boleta_api || prev.series_boleta_api,
+          series_nota_credito_api: b.series_nota_credito_api || prev.series_nota_credito_api,
+          series_nota_debito_api: b.series_nota_debito_api || prev.series_nota_debito_api,
+          series_guia_remision_api: b.series_guia_remision_api || prev.series_guia_remision_api,
+        }));
+      }
+    },
+    onError: () => message.error('Error al generar series API'),
   });
 
   const { control, handleSubmit, reset, formState: { errors } } = useForm<FormValues>({
@@ -224,9 +247,23 @@ export default function BranchFormPage() {
               <Divider titlePlacement="start" style={{ marginTop: 16, marginBottom: 8, fontSize: 13 }}>
                 Series API (solo uso por integraciones externas)
               </Divider>
-              <div style={{ fontSize: 12, color: '#888', marginBottom: 12 }}>
-                Estas series solo seran usadas por sistemas externos via API. No apareceran al emitir desde el portal.
-                Manten numeracion separada (ej: F002, B002) para evitar colisiones de correlativo.
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12, gap: 12 }}>
+                <div style={{ fontSize: 12, color: '#888', flex: 1 }}>
+                  Estas series solo seran usadas por sistemas externos via API. No apareceran al emitir desde el portal.
+                  Manten numeracion separada (ej: F002, B002) para evitar colisiones de correlativo.
+                </div>
+                {isEdit && (
+                  <Tooltip title="Calcula automaticamente la siguiente serie API a partir de las series web existentes. Respeta las series API ya configuradas.">
+                    <Button
+                      icon={<ThunderboltOutlined />}
+                      onClick={() => generateApiMut.mutate()}
+                      loading={generateApiMut.isPending}
+                      size="small"
+                    >
+                      Auto-generar
+                    </Button>
+                  </Tooltip>
+                )}
               </div>
 
               <Form.Item label="Series Factura (API)">

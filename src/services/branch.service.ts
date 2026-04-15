@@ -71,6 +71,13 @@ export const branchService = {
     return response.data.data;
   },
 
+  generateApiSeries: async (branchId: number): Promise<{ branch: Partial<Branch>; generadas: Record<string, string> }> => {
+    const response = await apiClient.post<ApiResponse<{ branch: Partial<Branch>; generadas: Record<string, string> }>>(
+      `/v1/branches/${branchId}/generate-api-series`
+    );
+    return response.data.data;
+  },
+
   incrementCorrelative: async (branchId: number, correlativeId: number): Promise<unknown> => {
     const response = await apiClient.post<ApiResponse<unknown>>(`/v1/branches/${branchId}/correlatives/${correlativeId}/increment`);
     return response.data.data;
