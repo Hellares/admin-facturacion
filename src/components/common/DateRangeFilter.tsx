@@ -21,12 +21,27 @@ const presets: { label: string; value: [Dayjs, Dayjs] }[] = [
 ];
 
 export default function DateRangeFilter({ value, onChange, label }: DateRangeFilterProps) {
+  // Parseamos el valor guardado (ISO YYYY-MM-DD). Si no es parseable,
+  // lo tratamos como null para evitar "Invalid Date" en el input.
+  const parse = (v: string | null): Dayjs | null => {
+    if (!v) return null;
+    const d = dayjs(v);
+    return d.isValid() ? d : null;
+  };
+
   const dayjsValue: [Dayjs | null, Dayjs | null] | undefined = value
-    ? [value[0] ? dayjs(value[0]) : null, value[1] ? dayjs(value[1]) : null]
+    ? [parse(value[0]), parse(value[1])]
     : undefined;
 
-  const handleChange = (_: unknown, dateStrings: [string, string]) => {
-    onChange([dateStrings[0] || null, dateStrings[1] || null]);
+  const handleChange = (dates: [Dayjs | null, Dayjs | null] | null) => {
+    if (!dates) {
+      onChange([null, null]);
+      return;
+    }
+    onChange([
+      dates[0]?.isValid() ? dates[0].format('YYYY-MM-DD') : null,
+      dates[1]?.isValid() ? dates[1].format('YYYY-MM-DD') : null,
+    ]);
   };
 
   return (
