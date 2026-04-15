@@ -5,6 +5,7 @@ import { useAuthStore } from '@/stores/auth.store';
 import { authService } from '@/services/auth.service';
 import { useCompanyContextStore } from '@/stores/company-context.store';
 import CompanyBranchSelector from './CompanyBranchSelector';
+import PlazoAlertsBell from './PlazoAlertsBell';
 
 const { Header: AntHeader } = Layout;
 const { Text } = Typography;
@@ -85,6 +86,7 @@ export default function Header({ onMenuClick, isMobile = false }: HeaderProps) {
 
       <Space size={isMobile ? 'small' : 'middle'}>
         {!isMobile && <Text type="secondary" style={{ fontSize: 13 }}>{user?.email}</Text>}
+        <PlazoAlertsBell />
         <Dropdown menu={{ items: userMenuItems }} placement="bottomRight">
           <Avatar
             icon={<UserOutlined />}
