@@ -6,6 +6,7 @@ import type { ColumnsType } from 'antd/es/table';
 import PageHeader from '@/components/common/PageHeader';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import SunatStatusBadge from '@/components/common/SunatStatusBadge';
+import OrigenTag from '@/components/common/OrigenTag';
 import EstadoBadge from '@/components/common/EstadoBadge';
 import MoneyDisplay from '@/components/common/MoneyDisplay';
 import DocumentActions from '@/components/common/DocumentActions';
@@ -104,6 +105,7 @@ export default function BoletaDetailPage() {
             <Descriptions.Item label="Numero">{boleta.numero_completo}</Descriptions.Item>
             <Descriptions.Item label="Fecha">{formatDate(boleta.fecha_emision)}</Descriptions.Item>
             <Descriptions.Item label="Estado SUNAT"><SunatStatusBadge status={boleta.estado_sunat} /></Descriptions.Item>
+            <Descriptions.Item label="Origen"><OrigenTag origen={boleta.origen} size="default" /></Descriptions.Item>
             <Descriptions.Item label="Metodo Envio">
               <Tag color={boleta.metodo_envio === 'individual' ? 'blue' : 'purple'}>
                 {boleta.metodo_envio === 'individual' ? 'Individual' : 'Resumen Diario'}

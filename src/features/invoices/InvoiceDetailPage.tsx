@@ -6,6 +6,7 @@ import type { ColumnsType } from 'antd/es/table';
 import PageHeader from '@/components/common/PageHeader';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import SunatStatusBadge from '@/components/common/SunatStatusBadge';
+import OrigenTag from '@/components/common/OrigenTag';
 import MoneyDisplay from '@/components/common/MoneyDisplay';
 import DocumentActions from '@/components/common/DocumentActions';
 import DocumentPdfViewer from '@/components/common/DocumentPdfViewer';
@@ -175,6 +176,9 @@ export default function InvoiceDetailPage() {
             <Descriptions.Item label="Fecha Vencimiento">{formatDate(invoice.fecha_vencimiento)}</Descriptions.Item>
             <Descriptions.Item label="Estado SUNAT">
               <SunatStatusBadge status={invoice.estado_sunat} />
+            </Descriptions.Item>
+            <Descriptions.Item label="Origen">
+              <OrigenTag origen={invoice.origen} size="default" />
             </Descriptions.Item>
             <Descriptions.Item label="Moneda">{invoice.moneda}</Descriptions.Item>
             <Descriptions.Item label="Tipo Operacion">{invoice.tipo_operacion}</Descriptions.Item>

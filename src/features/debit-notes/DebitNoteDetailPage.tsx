@@ -6,6 +6,7 @@ import type { ColumnsType } from 'antd/es/table';
 import PageHeader from '@/components/common/PageHeader';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import SunatStatusBadge from '@/components/common/SunatStatusBadge';
+import OrigenTag from '@/components/common/OrigenTag';
 import MoneyDisplay from '@/components/common/MoneyDisplay';
 import DocumentActions from '@/components/common/DocumentActions';
 import DocumentPdfViewer from '@/components/common/DocumentPdfViewer';
@@ -81,6 +82,7 @@ export default function DebitNoteDetailPage() {
             <Descriptions.Item label="Numero">{nd.numero_completo}</Descriptions.Item>
             <Descriptions.Item label="Fecha">{formatDate(nd.fecha_emision)}</Descriptions.Item>
             <Descriptions.Item label="Estado"><SunatStatusBadge status={nd.estado_sunat} /></Descriptions.Item>
+            <Descriptions.Item label="Origen"><OrigenTag origen={nd.origen} size="default" /></Descriptions.Item>
             <Descriptions.Item label="Moneda">{nd.moneda}</Descriptions.Item>
             <Descriptions.Item label="Doc. Afectado"><Tag>{nd.documento_afectado?.tipo === '01' ? 'Factura' : 'Boleta'}</Tag> {nd.documento_afectado?.numero_completo}</Descriptions.Item>
             <Descriptions.Item label="Motivo">{nd.cod_motivo ? `${nd.cod_motivo} - ${nd.des_motivo ?? ''}` : '-'}</Descriptions.Item>

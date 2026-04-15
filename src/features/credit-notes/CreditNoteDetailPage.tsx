@@ -6,6 +6,7 @@ import type { ColumnsType } from 'antd/es/table';
 import PageHeader from '@/components/common/PageHeader';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import SunatStatusBadge from '@/components/common/SunatStatusBadge';
+import OrigenTag from '@/components/common/OrigenTag';
 import MoneyDisplay from '@/components/common/MoneyDisplay';
 import DocumentActions from '@/components/common/DocumentActions';
 import DocumentPdfViewer from '@/components/common/DocumentPdfViewer';
@@ -81,6 +82,7 @@ export default function CreditNoteDetailPage() {
             <Descriptions.Item label="Numero">{nc.numero_completo}</Descriptions.Item>
             <Descriptions.Item label="Fecha">{formatDate(nc.fecha_emision)}</Descriptions.Item>
             <Descriptions.Item label="Estado"><SunatStatusBadge status={nc.estado_sunat} /></Descriptions.Item>
+            <Descriptions.Item label="Origen"><OrigenTag origen={nc.origen} size="default" /></Descriptions.Item>
             <Descriptions.Item label="Moneda">{nc.moneda}</Descriptions.Item>
             <Descriptions.Item label="Doc. Afectado"><Tag>{nc.documento_afectado?.tipo === '01' ? 'Factura' : 'Boleta'}</Tag> {nc.documento_afectado?.numero_completo}</Descriptions.Item>
             <Descriptions.Item label="Motivo">{nc.cod_motivo ? `${nc.cod_motivo} - ${nc.des_motivo ?? ''}` : '-'}</Descriptions.Item>

@@ -11,6 +11,7 @@ import type { SunatStatus } from '@/types/common.types';
 import PageHeader from '@/components/common/PageHeader';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import DocumentActions from '@/components/common/DocumentActions';
+import OrigenTag from '@/components/common/OrigenTag';
 import { useDispatchGuide, useCheckDispatchGuideStatus } from './hooks/useDispatchGuides';
 import { useUbigeos } from '@/hooks/useUbigeos';
 import { showApiError } from '@/lib/api-error';
@@ -137,7 +138,10 @@ export default function DispatchGuideDetailPage() {
               <span style={{ color: sc.color, fontSize: 20 }}>{sc.icon}</span>
               <div>
                 <div style={{ fontSize: 18, fontWeight: 600, fontFamily: 'monospace' }}>{String(g.numero_completo)}</div>
-                <Tag color={sc.color} style={{ fontSize: 11 }}>{estado}</Tag>
+                <Space size={4}>
+                  <Tag color={sc.color} style={{ fontSize: 11 }}>{estado}</Tag>
+                  <OrigenTag origen={g.origen as 'web' | 'api' | undefined} />
+                </Space>
               </div>
             </div>
           </Col>
