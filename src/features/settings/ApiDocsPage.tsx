@@ -240,6 +240,110 @@ Content-Type: application/json`}
                 ),
               },
               {
+                key: 'integracion',
+                label: (
+                  <Space>
+                    <Tag color="magenta">INTEGRACION</Tag>
+                    <Text>Series y correlativos disponibles</Text>
+                  </Space>
+                ),
+                children: (
+                  <div>
+                    <EndpointGroup
+                      endpoints={[
+                        { method: 'GET', path: '/v1/integracion/series-correlativos', desc: 'Lista todas las series (web y api) con sus correlativos actuales y el proximo numero' },
+                        { method: 'GET', path: '/v1/integracion/proximo-numero', desc: 'Consulta el proximo numero para un tipo_documento + serie (no reserva ni incrementa)' },
+                      ]}
+                    />
+
+                    <div style={{ marginTop: 16, fontSize: 13 }}>
+                      <strong>Uso tipico:</strong> tu sistema externo usa este endpoint para saber cuales series tiene asignadas
+                      y mostrar en su UI el proximo correlativo antes de emitir, sin tener que adivinar.
+                    </div>
+
+                    <div style={{ marginTop: 12, fontSize: 13 }}>
+                      <strong>tipo_uso:</strong> cada serie devuelta incluye <code>"tipo_uso": "web"</code> o <code>"tipo_uso": "api"</code>.
+                      Tu sistema externo debe usar <strong>solo</strong> las series con <code>tipo_uso: "api"</code> para evitar colisiones de correlativo con el portal.
+                    </div>
+
+                    <div style={{ marginTop: 16, background: '#fafafa', border: '1px solid #e8e8e8', borderRadius: 4, padding: 12 }}>
+                      <div style={{ fontSize: 12, color: '#888', marginBottom: 6 }}>Listar series y correlativos</div>
+                      <pre style={{ margin: 0, fontSize: 12, whiteSpace: 'pre-wrap' }}>{`curl -H "Authorization: Bearer TU_TOKEN" \\
+  https://api.syncrofact.net.pe/api/v1/integracion/series-correlativos
+
+# Filtrar solo series API:
+curl -H "Authorization: Bearer TU_TOKEN" \\
+  "https://api.syncrofact.net.pe/api/v1/integracion/series-correlativos?tipo_uso=api"
+
+# Filtrar por sucursal y tipo de documento:
+curl -H "Authorization: Bearer TU_TOKEN" \\
+  "https://api.syncrofact.net.pe/api/v1/integracion/series-correlativos?branch_id=1&tipo_documento=01"`}</pre>
+                    </div>
+
+                    <div style={{ marginTop: 12, background: '#fafafa', border: '1px solid #e8e8e8', borderRadius: 4, padding: 12 }}>
+                      <div style={{ fontSize: 12, color: '#888', marginBottom: 6 }}>Respuesta de series-correlativos</div>
+                      <pre style={{ margin: 0, fontSize: 12, whiteSpace: 'pre-wrap' }}>{`{
+  "success": true,
+  "data": {
+    "company_id": 1,
+    "branches": [
+      {
+        "branch_id": 1,
+        "codigo": "0000",
+        "nombre": "Principal",
+        "series": [
+          {
+            "serie": "F001",
+            "tipo_documento": "01",
+            "tipo_documento_nombre": "Factura",
+            "tipo_uso": "web",
+            "correlativo_actual": 13,
+            "proximo_numero": "F001-000014"
+          },
+          {
+            "serie": "F002",
+            "tipo_documento": "01",
+            "tipo_documento_nombre": "Factura",
+            "tipo_uso": "api",
+            "correlativo_actual": 0,
+            "proximo_numero": "F002-000001"
+          }
+        ]
+      }
+    ]
+  }
+}`}</pre>
+                    </div>
+
+                    <div style={{ marginTop: 12, background: '#fafafa', border: '1px solid #e8e8e8', borderRadius: 4, padding: 12 }}>
+                      <div style={{ fontSize: 12, color: '#888', marginBottom: 6 }}>Consultar proximo numero de una serie</div>
+                      <pre style={{ margin: 0, fontSize: 12, whiteSpace: 'pre-wrap' }}>{`curl -H "Authorization: Bearer TU_TOKEN" \\
+  "https://api.syncrofact.net.pe/api/v1/integracion/proximo-numero?tipo_documento=01&serie=F002"
+
+# Respuesta:
+{
+  "success": true,
+  "data": {
+    "branch_id": 1,
+    "tipo_documento": "01",
+    "serie": "F002",
+    "correlativo_actual": 42,
+    "proximo_correlativo": 43,
+    "proximo_numero": "F002-000043"
+  }
+}`}</pre>
+                    </div>
+
+                    <div style={{ marginTop: 16, padding: 12, background: '#fffbe6', border: '1px solid #ffe58f', borderRadius: 4, fontSize: 13 }}>
+                      <strong>Importante:</strong> la consulta NO reserva el numero. El correlativo se asigna y bloquea solo cuando
+                      el backend recibe el POST de creacion de documento (<code>/v1/invoices</code>, <code>/v1/boletas</code>, etc.).
+                      Entre una consulta y la creacion, si otro proceso emite en la misma serie, el numero devuelto puede quedar obsoleto.
+                      En produccion confia en el numero que retorna la API al crear el documento, no en lo que hayas consultado antes.
+                    </div>
+                  </div>
+                ),
+              },
+              {
                 key: 'catalogs',
                 label: (
                   <Space>
