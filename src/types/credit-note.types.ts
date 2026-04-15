@@ -75,7 +75,7 @@ export interface CreditNoteFormData {
   observaciones?: string;
 }
 
-export type EstadoUI = 'todos' | 'proceso' | 'validado' | 'error' | 'baja';
+export type EstadoUI = 'todos' | 'proceso' | 'pendiente' | 'en_cola' | 'validado' | 'rechazado' | 'error' | 'baja';
 
 export interface CreditNoteListParams {
   company_id?: number;

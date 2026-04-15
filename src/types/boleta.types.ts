@@ -98,7 +98,7 @@ export interface BoletaFormData {
 }
 
 /** Estado UI-friendly mapeado por backend a estados SUNAT */
-export type EstadoUI = 'todos' | 'proceso' | 'validado' | 'error' | 'baja';
+export type EstadoUI = 'todos' | 'proceso' | 'pendiente' | 'en_cola' | 'validado' | 'rechazado' | 'error' | 'baja';
 
 export interface BoletaListParams {
   company_id?: number;

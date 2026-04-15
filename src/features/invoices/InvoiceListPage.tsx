@@ -223,8 +223,10 @@ export default function InvoiceListPage() {
               onChange={(v) => setEstadoFilter(v as EstadoUI)}
               options={[
                 { label: 'Todos', value: 'todos' },
-                { label: 'En proceso', value: 'proceso' },
+                { label: 'Pendiente', value: 'pendiente' },
+                { label: 'En cola', value: 'en_cola' },
                 { label: 'Validado', value: 'validado' },
+                { label: 'Rechazado', value: 'rechazado' },
                 { label: 'Error', value: 'error' },
                 { label: 'Dado de baja', value: 'baja' },
               ]}
