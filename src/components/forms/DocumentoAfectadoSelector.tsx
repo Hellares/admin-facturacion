@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { invoiceService } from '@/services/invoice.service';
 import { boletaService } from '@/services/boleta.service';
 import { useCompanyContextStore } from '@/stores/company-context.store';
+import { devLog } from '@/lib/logger';
 import type { DetalleItem } from '@/types/common.types';
 
 interface DocumentoAfectadoSelectorProps {
@@ -26,12 +27,16 @@ export default function DocumentoAfectadoSelector({
     queryKey: ['invoices-for-note', companyId],
     queryFn: () => invoiceService.getAll({ company_id: companyId ?? undefined, estado_sunat: 'ACEPTADO', per_page: 100 }),
     enabled: !!companyId && tipoDoc === '01',
+    staleTime: 5 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
   });
 
   const { data: boletas } = useQuery({
     queryKey: ['boletas-for-note', companyId],
     queryFn: () => boletaService.getAll({ company_id: companyId ?? undefined, estado_sunat: 'ACEPTADO', per_page: 100 }),
     enabled: !!companyId && tipoDoc === '03',
+    staleTime: 5 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
   });
 
   // El endpoint de listado devuelve una version recortada.
@@ -97,7 +102,7 @@ export default function DocumentoAfectadoSelector({
 
       message.success(`Datos del ${tipoDoc === '01' ? 'factura' : 'boleta'} ${numeroCompleto} copiados`);
     } catch (err) {
-      console.error('Error cargando documento afectado', err);
+      devLog.error('Error cargando documento afectado', err);
       message.error('No se pudo cargar el documento seleccionado');
     }
   };

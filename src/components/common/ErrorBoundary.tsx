@@ -1,5 +1,6 @@
 import { Component, type ReactNode } from 'react';
 import { Result, Button } from 'antd';
+import { devLog } from '@/lib/logger';
 
 interface Props {
   children: ReactNode;
@@ -21,7 +22,7 @@ export default class ErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    console.error('ErrorBoundary caught:', error, errorInfo);
+    devLog.error('ErrorBoundary caught:', error, errorInfo);
   }
 
   render() {

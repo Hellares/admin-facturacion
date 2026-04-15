@@ -4,6 +4,7 @@ import { FileTextOutlined, UserOutlined, ShoppingCartOutlined, DollarOutlined, S
 import { useForm, FormProvider, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import dayjs from '@/lib/dayjs';
+import { devLog } from '@/lib/logger';
 import PageHeader from '@/components/common/PageHeader';
 import ClientSelector from '@/components/forms/ClientSelector';
 import ItemsTable from '@/components/forms/ItemsTable';
@@ -73,7 +74,7 @@ export default function InvoiceFormPage() {
 
   const onValidationError = (formErrors: Record<string, unknown>) => {
     const fieldNames = Object.keys(formErrors);
-    console.error('Form validation errors:', formErrors);
+    devLog.error('Form validation errors:', formErrors);
     message.error(`Campos con error: ${fieldNames.join(', ')}`);
   };
 

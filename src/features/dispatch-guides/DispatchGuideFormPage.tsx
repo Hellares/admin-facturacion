@@ -4,6 +4,7 @@ import { Alert, Card, Form, InputNumber, Select, DatePicker, Space, Button, Row,
 import { useForm, FormProvider, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import dayjs from '@/lib/dayjs';
+import { devLog } from '@/lib/logger';
 import PageHeader from '@/components/common/PageHeader';
 import ClientSelector from '@/components/forms/ClientSelector';
 import ItemsTable from '@/components/forms/ItemsTable';
@@ -63,7 +64,7 @@ export default function DispatchGuideFormPage() {
   // Muestra errores de validación del schema para debugging
   const onValidationError = (formErrors: Record<string, unknown>) => {
     const fieldNames = Object.keys(formErrors);
-    console.error('Form validation errors:', formErrors);
+    devLog.error('Form validation errors:', formErrors);
     message.error(`Campos con error: ${fieldNames.join(', ')}. Revise los campos marcados.`);
   };
 
