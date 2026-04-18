@@ -45,6 +45,8 @@ export interface SerieInfo {
   tipo_documento_nombre: string;
   tipo_uso: string;
   correlativo_actual: number;
+  cant_bd: number;
+  gaps: number;
   proximo_numero: string;
 }
 

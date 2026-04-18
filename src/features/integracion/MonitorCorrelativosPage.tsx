@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import {
-  Card, Table, Select, Space, Tag, Progress, InputNumber, Segmented,
+  Card, Table, Select, Space, Tag, Progress, InputNumber, Segmented, Badge,
   Button, Typography, Statistic, Row, Col, Alert, Tooltip,
 } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
@@ -57,7 +57,7 @@ interface ResumenSerie {
   doc_final: number;
   cant_correlativos: number;
   cant_bd: number;
-  diferencia: number;
+  gaps: number;
 }
 
 export default function MonitorCorrelativosPage() {
@@ -89,8 +89,8 @@ export default function MonitorCorrelativosPage() {
           doc_inicial: 1,
           doc_final: s.correlativo_actual,
           cant_correlativos: s.correlativo_actual,
-          cant_bd: 0, // se llenara con el detalle
-          diferencia: 0,
+          cant_bd: s.cant_bd ?? 0,
+          gaps: s.gaps ?? 0,
         });
       }
     }
@@ -143,8 +143,15 @@ export default function MonitorCorrelativosPage() {
     {
       title: 'Tipo de Documento',
       dataIndex: 'tipo_documento_nombre',
-      width: 160,
-      render: (val: string) => <Text code style={{ color: '#1677ff', fontSize: 13 }}>{val}</Text>,
+      width: 180,
+      render: (val: string, record) => (
+        <Space size={8}>
+          <Text code style={{ color: '#1677ff', fontSize: 13 }}>{val}</Text>
+          {record.gaps > 0 && (
+            <Badge count={record.gaps} size="small" style={{ backgroundColor: '#ff4d4f' }} title={`${record.gaps} gap(s)`} />
+          )}
+        </Space>
+      ),
     },
     {
       title: 'Serie',
@@ -184,6 +191,22 @@ export default function MonitorCorrelativosPage() {
       width: 100,
       align: 'center',
       render: (val: number) => <Text>{val}</Text>,
+    },
+    {
+      title: 'Cant. BD',
+      dataIndex: 'cant_bd',
+      width: 90,
+      align: 'center',
+      render: (val: number) => <Text>{val}</Text>,
+    },
+    {
+      title: 'Diferencia',
+      dataIndex: 'gaps',
+      width: 100,
+      align: 'center',
+      render: (val: number) => (
+        <Text strong style={{ color: val > 0 ? '#ff4d4f' : '#52c41a' }}>{val}</Text>
+      ),
     },
     {
       title: 'Proximo',
