@@ -11,7 +11,7 @@ import {
 } from '@ant-design/icons';
 import PageHeader from '@/components/common/PageHeader';
 import { integracionService } from '@/services/integracion.service';
-import type { MonitorDocumento, MonitorCorrelativosData, SerieInfo } from '@/services/integracion.service';
+import type { MonitorDocumento, SerieInfo } from '@/services/integracion.service';
 
 const { Text } = Typography;
 
@@ -317,7 +317,7 @@ export default function MonitorCorrelativosPage() {
         </Row>
       )}
 
-      {monitor?.total_gaps > 0 && filtroEstado === 'todos' && (
+      {monitor && monitor.total_gaps > 0 && filtroEstado === 'todos' && (
         <Alert
           type="warning"
           showIcon
