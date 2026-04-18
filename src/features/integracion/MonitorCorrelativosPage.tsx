@@ -144,7 +144,7 @@ export default function MonitorCorrelativosPage() {
       title: 'Tipo de Documento',
       dataIndex: 'tipo_documento_nombre',
       width: 160,
-      render: (val: string) => <Text strong style={{ fontFamily: "'Amazon Ember', sans-serif" }}>{val}</Text>,
+      render: (val: string) => <Text code style={{ color: '#1677ff', fontSize: 13 }}>{val}</Text>,
     },
     {
       title: 'Serie',
