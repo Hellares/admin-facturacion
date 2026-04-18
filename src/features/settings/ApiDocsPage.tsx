@@ -344,6 +344,157 @@ curl -H "Authorization: Bearer TU_TOKEN" \\
                 ),
               },
               {
+                key: 'resiliencia',
+                label: (
+                  <Space>
+                    <Tag color="green">RESILIENCIA</Tag>
+                    <Text>Contingencia y correlativos</Text>
+                  </Space>
+                ),
+                children: (
+                  <div>
+                    <EndpointGroup
+                      endpoints={[
+                        { method: 'GET', path: '/v1/integracion/proximo-numero', desc: 'Sincroniza el counter de correlativos de tu POS al iniciar el dia' },
+                        { method: 'GET', path: '/v1/integracion/documentos', desc: 'Busca un documento por referencia_interna' },
+                        { method: 'POST', path: '/v1/integracion/batch-status', desc: 'Consulta masiva de estado por referencias internas (max 50)' },
+                      ]}
+                    />
+
+                    <div style={{ marginTop: 16, fontSize: 13 }}>
+                      <strong>Problema:</strong> si el sistema de facturacion cae, tu POS no puede emitir porque los correlativos
+                      se generan en el servidor. Tu negocio no deberia detenerse por una caida temporal.
+                    </div>
+
+                    <div style={{ marginTop: 12, fontSize: 13 }}>
+                      <strong>Solucion:</strong> tu POS puede enviar su propio <code>correlativo</code> y/o una <code>referencia_interna</code>
+                      en el POST de creacion. Esto permite 3 modos de operacion:
+                    </div>
+
+                    <div style={{ marginTop: 12, background: '#f6ffed', border: '1px solid #b7eb8f', borderRadius: 4, padding: 12, fontSize: 13 }}>
+                      <div><strong>Modo A - Correlativo desde POS:</strong> tu POS asigna el correlativo. Ideal para operar offline.</div>
+                      <div style={{ marginTop: 4 }}><strong>Modo C - Referencia interna:</strong> tu POS envia su ID interno para rastreo e idempotencia.</div>
+                      <div style={{ marginTop: 4 }}><strong>Modo A+C (recomendado):</strong> combina ambos. Correlativo + referencia para control total.</div>
+                    </div>
+
+                    <div style={{ marginTop: 16, background: '#fafafa', border: '1px solid #e8e8e8', borderRadius: 4, padding: 12 }}>
+                      <div style={{ fontSize: 12, color: '#888', marginBottom: 6 }}>Flujo de contingencia (sistema DOWN)</div>
+                      <pre style={{ margin: 0, fontSize: 12, whiteSpace: 'pre-wrap' }}>{`# 1. Al iniciar el dia, sincroniza tu counter:
+curl -H "Authorization: Bearer TU_TOKEN" \\
+  "https://api.syncrofact.net.pe/api/v1/integracion/proximo-numero?tipo_documento=01&serie=F002"
+# -> { "proximo_correlativo": 46 }
+
+# 2. Tu POS guarda: siguiente_correlativo = 46
+
+# 3. Sistema CAE - tu POS sigue vendiendo:
+#    Ticket TK-983 -> correlativo 47
+#    Ticket TK-984 -> correlativo 48
+#    Ticket TK-985 -> correlativo 49
+
+# 4. Sistema VUELVE - tu POS envia los documentos pendientes:
+curl -X POST -H "Authorization: Bearer TU_TOKEN" \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "company_id": 1,
+    "branch_id": 1,
+    "serie": "F002",
+    "correlativo": 47,
+    "referencia_interna": "TK-983",
+    "fecha_emision": "2026-04-18",
+    ...
+  }' \\
+  https://api.syncrofact.net.pe/api/v1/invoices`}</pre>
+                    </div>
+
+                    <div style={{ marginTop: 12, background: '#fafafa', border: '1px solid #e8e8e8', borderRadius: 4, padding: 12 }}>
+                      <div style={{ fontSize: 12, color: '#888', marginBottom: 6 }}>Crear factura con correlativo + referencia_interna</div>
+                      <pre style={{ margin: 0, fontSize: 12, whiteSpace: 'pre-wrap' }}>{`POST /api/v1/invoices
+{
+  "company_id": 1,
+  "branch_id": 1,
+  "serie": "F002",
+  "correlativo": 47,              // Opcional: tu POS asigna el correlativo
+  "referencia_interna": "TK-983", // Opcional: tu ID interno para rastreo
+  "fecha_emision": "2026-04-18",
+  "moneda": "PEN",
+  "forma_pago_tipo": "Contado",
+  "client": { ... },
+  "detalles": [ ... ]
+}
+
+// Respuesta exitosa (201):
+{
+  "success": true,
+  "data": {
+    "id": 501,
+    "numero_completo": "F002-000047",
+    "serie": "F002",
+    "correlativo": "000047",
+    "referencia_interna": "TK-983",
+    "estado_sunat": "EN_COLA",
+    ...
+  },
+  "message": "Factura creada correctamente"
+}
+
+// Si hay gap en correlativo, incluye warning:
+{
+  "success": true,
+  "data": { ... },
+  "warning": "Salto de 3 correlativo(s) detectado (47-49) en serie F002"
+}`}</pre>
+                    </div>
+
+                    <div style={{ marginTop: 12, background: '#fafafa', border: '1px solid #e8e8e8', borderRadius: 4, padding: 12 }}>
+                      <div style={{ fontSize: 12, color: '#888', marginBottom: 6 }}>Idempotencia: reenviar sin duplicar</div>
+                      <pre style={{ margin: 0, fontSize: 12, whiteSpace: 'pre-wrap' }}>{`# Si envias la misma referencia_interna dos veces,
+# el sistema retorna el documento existente (no crea duplicado):
+
+POST /api/v1/invoices  { "referencia_interna": "TK-983", ... }
+-> 201 Created (primera vez)
+
+POST /api/v1/invoices  { "referencia_interna": "TK-983", ... }
+-> 200 OK { "idempotent": true, "data": { ... documento existente ... } }`}</pre>
+                    </div>
+
+                    <div style={{ marginTop: 12, background: '#fafafa', border: '1px solid #e8e8e8', borderRadius: 4, padding: 12 }}>
+                      <div style={{ fontSize: 12, color: '#888', marginBottom: 6 }}>Consultar documentos por referencia</div>
+                      <pre style={{ margin: 0, fontSize: 12, whiteSpace: 'pre-wrap' }}>{`# Un documento:
+curl -H "Authorization: Bearer TU_TOKEN" \\
+  "https://api.syncrofact.net.pe/api/v1/integracion/documentos?referencia_interna=TK-983&tipo_documento=01"
+
+# Batch (hasta 50):
+curl -X POST -H "Authorization: Bearer TU_TOKEN" \\
+  -H "Content-Type: application/json" \\
+  -d '{ "tipo_documento": "01", "referencias": ["TK-983", "TK-984", "TK-985"] }' \\
+  https://api.syncrofact.net.pe/api/v1/integracion/batch-status
+
+# Respuesta batch:
+{
+  "success": true,
+  "data": [
+    { "encontrado": true, "referencia_interna": "TK-983", "numero_completo": "F002-000047", "estado_sunat": "ACEPTADO", "total": 118.00 },
+    { "encontrado": true, "referencia_interna": "TK-984", "numero_completo": "F002-000048", "estado_sunat": "ACEPTADO", "total": 59.00 },
+    { "encontrado": false, "referencia_interna": "TK-985" }
+  ],
+  "total": 3,
+  "encontrados": 2
+}`}</pre>
+                    </div>
+
+                    <div style={{ marginTop: 16, padding: 12, background: '#fff1f0', border: '1px solid #ffa39e', borderRadius: 4, fontSize: 13 }}>
+                      <strong>Validaciones del correlativo:</strong>
+                      <ul style={{ margin: '6px 0 0', paddingLeft: 20 }}>
+                        <li>Si el correlativo es <strong>menor al siguiente esperado</strong>: error 422</li>
+                        <li>Si el correlativo ya <strong>existe en la serie</strong>: error 422</li>
+                        <li>Si hay un <strong>salto</strong> (gap): se acepta con warning (SUNAT tolera gaps menores en contingencia)</li>
+                        <li>Si <strong>no envias correlativo</strong>: se auto-genera como siempre (backwards compatible)</li>
+                      </ul>
+                    </div>
+                  </div>
+                ),
+              },
+              {
                 key: 'bancarizacion',
                 label: (
                   <Space>
