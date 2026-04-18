@@ -371,10 +371,16 @@ curl -H "Authorization: Bearer TU_TOKEN" \\
                       en el POST de creacion. Esto permite 3 modos de operacion:
                     </div>
 
-                    <div style={{ marginTop: 12, background: '#f6ffed', border: '1px solid #b7eb8f', borderRadius: 4, padding: 12, fontSize: 13 }}>
-                      <div><strong>Modo A - Correlativo desde POS:</strong> tu POS asigna el correlativo. Ideal para operar offline.</div>
-                      <div style={{ marginTop: 4 }}><strong>Modo C - Referencia interna:</strong> tu POS envia su ID interno para rastreo e idempotencia.</div>
-                      <div style={{ marginTop: 4 }}><strong>Modo A+C (recomendado):</strong> combina ambos. Correlativo + referencia para control total.</div>
+                    <div style={{ marginTop: 12, background: '#f6ffed', border: '1px solid #b7eb8f', borderRadius: 4, padding: 16, fontSize: 13 }}>
+                      <div style={{ marginBottom: 8, padding: 8, background: '#d9f7be', borderRadius: 4 }}>
+                        <strong>RECOMENDADO: Enviar ambos campos</strong> (<code>correlativo</code> + <code>referencia_interna</code>).
+                        Esto te da control total del correlativo y proteccion contra duplicados, sin importar si cae
+                        el sistema de facturacion, SUNAT, o tu propio sistema.
+                      </div>
+                      <div style={{ marginTop: 6 }}><strong>Modo A+C (recomendado):</strong> tu POS asigna el correlativo + envia su ID interno. Control total + idempotencia.</div>
+                      <div style={{ marginTop: 4 }}><strong>Modo A:</strong> solo correlativo desde POS, sin idempotencia.</div>
+                      <div style={{ marginTop: 4 }}><strong>Modo C:</strong> solo referencia interna, correlativo auto-generado.</div>
+                      <div style={{ marginTop: 4 }}><strong>Auto (default):</strong> sin ambos campos, todo se auto-genera. Compatible con integraciones existentes.</div>
                     </div>
 
                     <div style={{ marginTop: 16, background: '#fafafa', border: '1px solid #e8e8e8', borderRadius: 4, padding: 12 }}>
@@ -482,13 +488,38 @@ curl -X POST -H "Authorization: Bearer TU_TOKEN" \\
 }`}</pre>
                     </div>
 
+                    <div style={{ marginTop: 12, background: '#fafafa', border: '1px solid #e8e8e8', borderRadius: 4, padding: 12 }}>
+                      <div style={{ fontSize: 12, color: '#888', marginBottom: 6 }}>Relleno de gaps (caso SAP IDDH)</div>
+                      <pre style={{ margin: 0, fontSize: 12, whiteSpace: 'pre-wrap' }}>{`# Si un correlativo fue emitido con error y se limpio en tu sistema,
+# puedes reutilizarlo enviandolo nuevamente:
+
+# Counter actual: 62. Correlativo 55 fue anulado/limpiado.
+POST /api/v1/invoices  { "correlativo": 55, "referencia_interna": "TK-055-FIX", ... }
+-> 201 Created (rellena el gap, counter sigue en 62)
+
+# El sistema acepta cualquier correlativo que NO exista ya en la tabla,
+# sin importar si es menor o mayor al counter actual.`}</pre>
+                    </div>
+
                     <div style={{ marginTop: 16, padding: 12, background: '#fff1f0', border: '1px solid #ffa39e', borderRadius: 4, fontSize: 13 }}>
                       <strong>Validaciones del correlativo:</strong>
                       <ul style={{ margin: '6px 0 0', paddingLeft: 20 }}>
-                        <li>Si el correlativo es <strong>menor al siguiente esperado</strong>: error 422</li>
-                        <li>Si el correlativo ya <strong>existe en la serie</strong>: error 422</li>
-                        <li>Si hay un <strong>salto</strong> (gap): se acepta con warning (SUNAT tolera gaps menores en contingencia)</li>
+                        <li>Si el correlativo ya <strong>existe en la tabla</strong>: error 422 (duplicado)</li>
+                        <li>Si el correlativo esta <strong>libre</strong> (no existe): se acepta, sin importar si es mayor o menor al counter</li>
+                        <li>Si hay un <strong>salto hacia adelante</strong> (gap): se acepta con warning informativo. Counter se actualiza</li>
+                        <li>Si <strong>rellena un gap</strong> (menor al counter, pero libre): se acepta sin warning. Counter no cambia</li>
                         <li>Si <strong>no envias correlativo</strong>: se auto-genera como siempre (backwards compatible)</li>
+                      </ul>
+                    </div>
+
+                    <div style={{ marginTop: 12, padding: 12, background: '#e6f7ff', border: '1px solid #91d5ff', borderRadius: 4, fontSize: 13 }}>
+                      <strong>Por que enviar ambos campos es la mejor opcion:</strong>
+                      <ul style={{ margin: '6px 0 0', paddingLeft: 20 }}>
+                        <li><strong>Sistema de facturacion cae:</strong> tu POS asigna correlativos localmente y reenvia cuando vuelve</li>
+                        <li><strong>SUNAT cae:</strong> los documentos quedan en cola, tu sistema sabe que correlativos envio</li>
+                        <li><strong>Tu propio sistema cae:</strong> al reiniciar, consulta <code>batch-status</code> para reconciliar</li>
+                        <li><strong>Error de red:</strong> la idempotencia por <code>referencia_interna</code> evita duplicados al reenviar</li>
+                        <li><strong>Correlativo mal emitido:</strong> se limpia en tu sistema y se reutiliza (relleno de gap)</li>
                       </ul>
                     </div>
                   </div>
