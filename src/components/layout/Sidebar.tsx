@@ -121,6 +121,7 @@ const menuItems = [
     label: 'Integracion API',
     children: [
       { key: 'my-api-token', icon: <ApiOutlined />, label: 'Mi Token API', path: ROUTES.MY_API_TOKEN },
+      { key: 'monitor-correlativos', icon: <AuditOutlined />, label: 'Monitor Correlativos', path: ROUTES.MONITOR_CORRELATIVOS },
       { key: 'api-docs', icon: <BookOutlined />, label: 'Documentacion', path: ROUTES.API_DOCS },
     ],
   },
@@ -147,7 +148,7 @@ const ROLE_MENU_ACCESS: Record<string, string[]> = {
     'admin', 'branches', 'clients', 'users',
     'config', 'company-config', 'gre-credentials', 'webhooks', 'catalogs',
     'alertas', 'plazo-alerts', 'bancarizacion',
-    'api', 'my-api-token', 'api-docs',
+    'api', 'my-api-token', 'monitor-correlativos', 'api-docs',
   ],
   company_user: [
     'dashboard', 'ventas', 'invoices', 'boletas', 'credit-notes', 'debit-notes',
@@ -157,7 +158,7 @@ const ROLE_MENU_ACCESS: Record<string, string[]> = {
     'retentions',
     'admin', 'clients',
     'alertas', 'plazo-alerts', 'bancarizacion',
-    'api', 'my-api-token', 'api-docs',
+    'api', 'my-api-token', 'monitor-correlativos', 'api-docs',
     'config', 'catalogs',
   ],
   read_only: [

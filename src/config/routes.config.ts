@@ -57,6 +57,7 @@ export const ROUTES = {
   // API Integration
   MY_API_TOKEN: '/settings/api-token',
   API_DOCS: '/api-docs',
+  MONITOR_CORRELATIVOS: '/monitor-correlativos',
 
   // Procesos SUNAT
   ANULACIONES: '/anulaciones',

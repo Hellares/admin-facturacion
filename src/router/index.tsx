@@ -64,6 +64,7 @@ const GreCredentialsPage = lazy(() => import('@/features/config/GreCredentialsPa
 const SetupPage = lazy(() => import('@/features/setup/SetupPage'));
 const MyApiTokenPage = lazy(() => import('@/features/settings/MyApiTokenPage'));
 const ApiDocsPage = lazy(() => import('@/features/settings/ApiDocsPage'));
+const MonitorCorrelativosPage = lazy(() => import('@/features/integracion/MonitorCorrelativosPage'));
 const SystemSettingsPage = lazy(() => import('@/features/system-settings/SystemSettingsPage'));
 const LandingPage = lazy(() => import('@/features/landing/LandingPage'));
 
@@ -186,6 +187,7 @@ export const router = createBrowserRouter([
       // Settings / API integration
       { path: 'settings/api-token', element: <Suspense fallback={<Loading />}><MyApiTokenPage /></Suspense> },
       { path: 'api-docs', element: <Suspense fallback={<Loading />}><ApiDocsPage /></Suspense> },
+      { path: 'monitor-correlativos', element: <Suspense fallback={<Loading />}><MonitorCorrelativosPage /></Suspense> },
 
       // 404
       { path: '*', element: <NotFoundPage /> },
