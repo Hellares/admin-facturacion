@@ -2,9 +2,12 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/png" href="/logo.png" />
+    <link rel="icon" type="image/png" href="/iconapp.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Syncrofact</title>
+    <script>
+      if (location.hostname.includes('beta')) document.title = 'Syncrofact - Beta';
+    </script>
   </head>
   <body>
     <div id="root"></div>
