@@ -355,7 +355,9 @@ curl -H "Authorization: Bearer TU_TOKEN" \\
                   <div>
                     <EndpointGroup
                       endpoints={[
-                        { method: 'GET', path: '/v1/integracion/proximo-numero', desc: 'Sincroniza el counter de correlativos de tu POS al iniciar el dia' },
+                        { method: 'GET', path: '/v1/integracion/series-correlativos', desc: 'Lista todas las series con correlativos, cant. BD y gaps' },
+                        { method: 'GET', path: '/v1/integracion/proximo-numero', desc: 'Proximo correlativo para una serie (sincronizar counter del POS)' },
+                        { method: 'GET', path: '/v1/integracion/monitor-correlativos', desc: 'Monitor completo: cada correlativo con referencia, cliente, estado y gaps' },
                         { method: 'GET', path: '/v1/integracion/documentos', desc: 'Busca un documento por referencia_interna' },
                         { method: 'POST', path: '/v1/integracion/batch-status', desc: 'Consulta masiva de estado por referencias internas (max 50)' },
                       ]}
@@ -486,6 +488,77 @@ curl -X POST -H "Authorization: Bearer TU_TOKEN" \\
   "total": 3,
   "encontrados": 2
 }`}</pre>
+                    </div>
+
+                    <div style={{ marginTop: 12, background: '#fafafa', border: '1px solid #e8e8e8', borderRadius: 4, padding: 12 }}>
+                      <div style={{ fontSize: 12, color: '#888', marginBottom: 6 }}>Monitor de correlativos (auditoria completa)</div>
+                      <pre style={{ margin: 0, fontSize: 12, whiteSpace: 'pre-wrap' }}>{`# Resumen de todas las series (con gaps):
+curl -H "Authorization: Bearer TU_TOKEN" \\
+  "https://api.syncrofact.net.pe/api/v1/integracion/series-correlativos"
+
+# Respuesta incluye por cada serie:
+# { serie, correlativo_actual, cant_bd, gaps, proximo_numero }
+
+# Monitor detallado de una serie (cada correlativo con cliente y referencia):
+curl -H "Authorization: Bearer TU_TOKEN" \\
+  "https://api.syncrofact.net.pe/api/v1/integracion/monitor-correlativos?tipo_documento=01&serie=F002"
+
+# Filtrar por rango:
+curl -H "Authorization: Bearer TU_TOKEN" \\
+  "https://api.syncrofact.net.pe/api/v1/integracion/monitor-correlativos?tipo_documento=01&serie=F002&desde=50&hasta=62"
+
+# Respuesta:
+{
+  "success": true,
+  "data": {
+    "serie": "F002",
+    "tipo_documento_nombre": "Factura",
+    "correlativo_actual": 62,
+    "total_emitidos": 62,
+    "total_gaps": 0,
+    "integridad": "100%",
+    "gaps": [],
+    "documentos": [
+      {
+        "correlativo": 62,
+        "numero_completo": "F002-000062",
+        "referencia_interna": "TK-062-F002-000062",
+        "cliente": {
+          "tipo_documento": "6",
+          "numero_documento": "20512528458",
+          "razon_social": "SISTEMA TERCERO S.A.C."
+        },
+        "estado_sunat": "ACEPTADO",
+        "total": 295.00,
+        "origen": "api"
+      }
+    ]
+  }
+}`}</pre>
+                    </div>
+
+                    <div style={{ marginTop: 12, background: '#fafafa', border: '1px solid #e8e8e8', borderRadius: 4, padding: 12 }}>
+                      <div style={{ fontSize: 12, color: '#888', marginBottom: 6 }}>Rutas API completas para integracion</div>
+                      <pre style={{ margin: 0, fontSize: 12, whiteSpace: 'pre-wrap' }}>{`# === EMISION DE DOCUMENTOS (con correlativo + referencia_interna opcionales) ===
+POST /api/v1/invoices            # Crear factura
+POST /api/v1/boletas             # Crear boleta
+POST /api/v1/credit-notes        # Crear nota de credito
+POST /api/v1/debit-notes         # Crear nota de debito
+POST /api/v1/dispatch-guides     # Crear guia de remision
+
+# === CONSULTA Y SINCRONIZACION ===
+GET  /api/v1/integracion/series-correlativos       # Resumen de series con gaps
+GET  /api/v1/integracion/proximo-numero            # Proximo correlativo de una serie
+GET  /api/v1/integracion/monitor-correlativos      # Detalle completo por correlativo
+GET  /api/v1/integracion/documentos                # Buscar por referencia_interna
+POST /api/v1/integracion/batch-status              # Estado masivo por referencias
+
+# === DESCARGA DE ARCHIVOS ===
+GET  /api/v1/invoices/{id}/download-xml            # XML firmado
+GET  /api/v1/invoices/{id}/download-cdr            # CDR de SUNAT
+GET  /api/v1/invoices/{id}/download-pdf            # PDF del comprobante
+
+# Todos los endpoints requieren: Authorization: Bearer TU_TOKEN`}</pre>
                     </div>
 
                     <div style={{ marginTop: 12, background: '#fafafa', border: '1px solid #e8e8e8', borderRadius: 4, padding: 12 }}>
