@@ -14,6 +14,7 @@ export interface Client {
   departamento?: string;
   telefono?: string;
   email?: string;
+  enviar_email: boolean;
   activo: boolean;
   created_at: string;
   updated_at: string;
@@ -32,6 +33,7 @@ export interface ClientFormData {
   departamento?: string;
   telefono?: string;
   email?: string;
+  enviar_email?: boolean;
   activo?: boolean;
 }
 

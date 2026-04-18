@@ -21,6 +21,7 @@ const clientSchema = z.object({
   departamento: z.string().optional(),
   telefono: z.string().max(20).optional(),
   email: z.string().email('Email invalido').optional().or(z.literal('')),
+  enviar_email: z.boolean().optional(),
   activo: z.boolean().optional(),
 });
 
@@ -59,6 +60,7 @@ export default function ClientFormPage() {
         departamento: client.departamento || '',
         telefono: client.telefono || '',
         email: client.email || '',
+        enviar_email: client.enviar_email ?? false,
         activo: client.activo,
       });
     }
@@ -135,11 +137,18 @@ export default function ClientFormPage() {
               </Form.Item>
             </Space>
 
-            <Form.Item label="Activo">
-              <Controller name="activo" control={control} render={({ field }) => (
-                <Switch checked={field.value} onChange={field.onChange} />
-              )} />
-            </Form.Item>
+            <Space size="large">
+              <Form.Item label="Enviar comprobantes por email">
+                <Controller name="enviar_email" control={control} render={({ field }) => (
+                  <Switch checked={field.value} onChange={field.onChange} checkedChildren="Si" unCheckedChildren="No" />
+                )} />
+              </Form.Item>
+              <Form.Item label="Activo">
+                <Controller name="activo" control={control} render={({ field }) => (
+                  <Switch checked={field.value} onChange={field.onChange} />
+                )} />
+              </Form.Item>
+            </Space>
 
             <div style={{ marginTop: 24, textAlign: 'right' }}>
               <Space>
