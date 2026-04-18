@@ -137,7 +137,7 @@ export default function LoginPage() {
                   <Button
                     icon={<MailFilled />}
                     style={{ borderRadius: 20 }}
-                    href="mailto:ventas@syncronize.net.pe?subject=Solicitud%20de%20acceso%20-%20Facturacion%20Electronica"
+                    href="mailto:ventas@syncrofact.net.pe?subject=Solicitud%20de%20acceso%20-%20Facturacion%20Electronica"
                     target="_blank"
                   >
                     Email

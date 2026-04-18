@@ -236,7 +236,7 @@ export default function LandingPage() {
                     </div>
                     <div style={{ textAlign: 'center', marginTop: 8 }}>
                       <Text style={{ fontSize: 11, color: '#aaa' }}>Listo para produccion? </Text>
-                      <a href="https://app.syncronize.net.pe" target="_blank" rel="noopener noreferrer" style={{ fontSize: 11, color: '#6ba3d6' }}>Contactanos para activar tu cuenta</a>
+                      <a href="https://app.syncrofact.net.pe" target="_blank" rel="noopener noreferrer" style={{ fontSize: 11, color: '#6ba3d6' }}>Contactanos para activar tu cuenta</a>
                     </div>
                   </Space>
                 </form>
@@ -323,7 +323,7 @@ export default function LandingPage() {
           Sistema de Facturacion Electronica - SUNAT Peru
         </div>
         <div style={{ color: 'rgba(255,255,255,0.35)', fontSize: 12 }}>
-          Listo para produccion? <a href="https://app.syncronize.net.pe" target="_blank" rel="noopener noreferrer" style={{ color: '#06b6d4' }}>Contactanos para activar tu cuenta</a>
+          Listo para produccion? <a href="https://app.syncrofact.net.pe" target="_blank" rel="noopener noreferrer" style={{ color: '#06b6d4' }}>Contactanos para activar tu cuenta</a>
         </div>
       </div>
 
