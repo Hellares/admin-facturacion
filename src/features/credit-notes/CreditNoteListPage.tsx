@@ -104,12 +104,12 @@ export default function CreditNoteListPage() {
   });
 
   const columns: ColumnsType<CreditNote> = [
-    { title: 'Numero', dataIndex: 'numero_completo', width: 150, render: (t: string) => <span style={{ fontFamily: 'monospace', fontWeight: 500, whiteSpace: 'nowrap' }}>{t}</span> },
+    { title: 'Numero', dataIndex: 'numero_completo', width: 150, render: (t: string) => <span style={{ fontSize: 12, color: '#1677ff', fontWeight: 500, whiteSpace: 'nowrap' }}>{t}</span> },
     { title: 'Fecha', dataIndex: 'fecha_emision', width: 110, render: (d: string) => <DateCell value={d} /> },
-    { title: 'Doc. Afectado', dataIndex: 'num_doc_afectado', width: 160, render: (t: string) => <span style={{ fontFamily: 'monospace' }}>{t}</span> },
+    { title: 'Doc. Afectado', dataIndex: 'num_doc_afectado', width: 160, render: (t: string) => <span style={{ fontSize: 12, color: '#1677ff' }}>{t}</span> },
     { title: 'Motivo', dataIndex: 'des_motivo', ellipsis: true },
-    { title: 'Cliente', key: 'cliente', ellipsis: true, responsive: ['lg'], render: (_, r) => r.cliente?.razon_social },
-    { title: 'Total', key: 'total', width: 120, align: 'right', render: (_: unknown, r: CreditNote) => <MoneyDisplay amount={r.totales?.total ?? 0} moneda={r.moneda as Moneda} strong /> },
+    { title: 'Cliente', key: 'cliente', ellipsis: true, responsive: ['lg'], render: (_, r) => <span style={{ fontSize: 13 }}>{r.cliente?.razon_social}</span> },
+    { title: 'Total', key: 'total', width: 120, align: 'right', render: (_: unknown, r: CreditNote) => <MoneyDisplay amount={r.totales?.total ?? 0} moneda={r.moneda as Moneda} strong fontSize={13} /> },
     { title: 'Origen', dataIndex: 'origen', width: 70, responsive: ['md'], render: (origen: 'web' | 'api' | undefined) => <OrigenTag origen={origen} /> },
     { title: 'Estado', dataIndex: 'estado_sunat', width: 110, render: (s: SunatStatus, record: CreditNote) => <SunatStatusBadge status={s} sunatInfo={record.sunat ?? record.respuesta_sunat} /> },
     {

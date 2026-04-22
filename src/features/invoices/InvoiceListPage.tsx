@@ -117,7 +117,7 @@ export default function InvoiceListPage() {
       dataIndex: 'numero_completo',
       key: 'numero_completo',
       width: 150,
-      render: (text: string) => <span style={{ fontFamily: 'monospace', fontWeight: 500, whiteSpace: 'nowrap' }}>{text}</span>,
+      render: (text: string) => <span style={{ fontSize: 12, color: '#1677ff', fontWeight: 500, whiteSpace: 'nowrap' }}>{text}</span>,
     },
     {
       title: 'Fecha',
@@ -132,7 +132,7 @@ export default function InvoiceListPage() {
       ellipsis: true,
       render: (_, record) => (
         <div>
-          <div>{record.cliente?.razon_social}</div>
+          <div style={{ fontSize: 13 }}>{record.cliente?.razon_social}</div>
           <div style={{ fontSize: 11, color: '#999' }}>{record.cliente?.numero_documento}</div>
         </div>
       ),
@@ -143,13 +143,14 @@ export default function InvoiceListPage() {
       key: 'moneda',
       width: 70,
       responsive: ['lg'],
+      render: (m: string) => <span style={{ fontSize: 13 }}>{m}</span>,
     },
     {
       title: 'Total',
       key: 'total',
       width: 120,
       align: 'right',
-      render: (_: unknown, record) => <MoneyDisplay amount={record.totales?.total ?? 0} moneda={record.moneda as Moneda} strong />,
+      render: (_: unknown, record) => <MoneyDisplay amount={record.totales?.total ?? 0} moneda={record.moneda as Moneda} strong fontSize={13} />,
     },
     {
       title: 'Origen',

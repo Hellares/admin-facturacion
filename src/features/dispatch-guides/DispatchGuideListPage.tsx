@@ -72,14 +72,14 @@ export default function DispatchGuideListPage() {
   };
 
   const columns: ColumnsType<DispatchGuide> = [
-    { title: 'Numero', dataIndex: 'numero_completo', width: 150, render: (t: string) => <span style={{ fontFamily: 'monospace', fontWeight: 500, whiteSpace: 'nowrap' }}>{t}</span> },
+    { title: 'Numero', dataIndex: 'numero_completo', width: 150, render: (t: string) => <span style={{ fontSize: 12, color: '#1677ff', fontWeight: 500, whiteSpace: 'nowrap' }}>{t}</span> },
     { title: 'Fecha Emision', dataIndex: 'fecha_emision', width: 110, render: (d: string) => <DateCell value={d} /> },
     { title: 'Fecha Traslado', dataIndex: 'fecha_traslado', width: 120, render: (d: string) => <DateCell value={d} /> },
     {
       title: 'Modalidad', dataIndex: 'mod_traslado', width: 110,
       render: (m: string) => <Tag color={m === '01' ? 'blue' : 'green'}>{m === '01' ? 'Publico' : 'Privado'}</Tag>,
     },
-    { title: 'Destinatario', key: 'dest', ellipsis: true, render: (_, r) => r.destinatario?.razon_social },
+    { title: 'Destinatario', key: 'dest', ellipsis: true, render: (_, r) => <span style={{ fontSize: 13 }}>{r.destinatario?.razon_social}</span> },
     { title: 'Peso (kg)', dataIndex: 'peso_total', width: 90, align: 'right' },
     { title: 'Origen', dataIndex: 'origen', width: 70, responsive: ['md'], render: (origen: 'web' | 'api' | undefined) => <OrigenTag origen={origen} /> },
     { title: 'Estado', dataIndex: 'estado_sunat', width: 110, render: (s: SunatStatus, record: DispatchGuide) => <SunatStatusBadge status={s} sunatInfo={record.respuesta_sunat} /> },
