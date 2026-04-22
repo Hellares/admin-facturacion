@@ -113,7 +113,7 @@ export default function BoletaListPage() {
       ellipsis: true,
       render: (_, record) => (
         <div>
-          <div style={{ fontSize: 13 }}>{record.cliente?.razon_social}</div>
+          <div style={{ fontSize: 12 }}>{record.cliente?.razon_social}</div>
           <div style={{ fontSize: 11, color: '#999' }}>{record.cliente?.numero_documento}</div>
         </div>
       ),
@@ -123,7 +123,7 @@ export default function BoletaListPage() {
       key: 'total',
       width: 120,
       align: 'right',
-      render: (_: unknown, record) => <MoneyDisplay amount={record.totales?.total ?? 0} moneda={record.moneda as Moneda} strong fontSize={13} />,
+      render: (_: unknown, record) => <MoneyDisplay amount={record.totales?.total ?? 0} moneda={record.moneda as Moneda} strong fontSize={12} />,
     },
     {
       title: 'Envio',

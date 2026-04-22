@@ -84,10 +84,10 @@ export default function RetentionListPage() {
   const columns: ColumnsType<Retention> = [
     { title: 'Numero', dataIndex: 'numero_completo', width: 150, render: (t: string) => <span style={{ fontSize: 12, color: '#1677ff', fontWeight: 500, whiteSpace: 'nowrap' }}>{t}</span> },
     { title: 'Fecha', dataIndex: 'fecha_emision', width: 110, render: (d: string) => <DateCell value={d} /> },
-    { title: 'Proveedor', key: 'prov', ellipsis: true, render: (_, r) => <span style={{ fontSize: 13 }}>{r.proveedor?.razon_social}</span> },
+    { title: 'Proveedor', key: 'prov', ellipsis: true, render: (_, r) => <span style={{ fontSize: 12 }}>{r.proveedor?.razon_social}</span> },
     { title: 'Regimen', dataIndex: 'regimen', width: 80 },
     { title: 'Tasa', dataIndex: 'tasa', width: 70, render: (t: number) => `${t}%` },
-    { title: 'Retenido', dataIndex: 'imp_retenido', width: 120, align: 'right', render: (m: number) => <MoneyDisplay amount={m} strong fontSize={13} /> },
+    { title: 'Retenido', dataIndex: 'imp_retenido', width: 120, align: 'right', render: (m: number) => <MoneyDisplay amount={m} strong fontSize={12} /> },
     { title: 'Estado', dataIndex: 'estado_sunat', width: 110, render: (s: SunatStatus, record: Retention) => <SunatStatusBadge status={s} sunatInfo={record.respuesta_sunat} /> },
     {
       title: 'Acciones',
