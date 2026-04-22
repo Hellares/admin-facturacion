@@ -116,8 +116,8 @@ export default function InvoiceListPage() {
       title: 'Numero',
       dataIndex: 'numero_completo',
       key: 'numero_completo',
-      width: 110,
-      render: (text: string) => <span style={{ fontFamily: 'monospace', fontWeight: 500 }}>{text}</span>,
+      width: 150,
+      render: (text: string) => <span style={{ fontFamily: 'monospace', fontWeight: 500, whiteSpace: 'nowrap' }}>{text}</span>,
     },
     {
       title: 'Fecha',

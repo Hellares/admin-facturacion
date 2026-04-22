@@ -72,7 +72,7 @@ export default function DispatchGuideListPage() {
   };
 
   const columns: ColumnsType<DispatchGuide> = [
-    { title: 'Numero', dataIndex: 'numero_completo', width: 110, render: (t: string) => <span style={{ fontFamily: 'monospace', fontWeight: 500 }}>{t}</span> },
+    { title: 'Numero', dataIndex: 'numero_completo', width: 150, render: (t: string) => <span style={{ fontFamily: 'monospace', fontWeight: 500, whiteSpace: 'nowrap' }}>{t}</span> },
     { title: 'Fecha Emision', dataIndex: 'fecha_emision', width: 110, render: (d: string) => <DateCell value={d} /> },
     { title: 'Fecha Traslado', dataIndex: 'fecha_traslado', width: 120, render: (d: string) => <DateCell value={d} /> },
     {
