@@ -24,10 +24,12 @@ server {
     client_max_body_size 20M;
 
     # Proxy API requests to backend.
-    # Usar variable nginx fuerza re-resolucion DNS por request (con resolver arriba).
+    # Cuando proxy_pass usa variable, nginx no acepta path al final y
+    # pasa el $request_uri tal cual. El cliente ya pide /api/... asi
+    # que el backend recibe la URI correcta sin rewrite.
     location /api/ {
         set $backend "http://${BACKEND_HOST}:80";
-        proxy_pass $backend/api/;
+        proxy_pass $backend;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -35,10 +37,13 @@ server {
         proxy_read_timeout 60s;
     }
 
-    # Ruta publica de consulta - PDF directo (descarga)
+    # Ruta publica de consulta - PDF directo (descarga).
+    # El cliente pide /consulta/.../pdf y el backend la sirve bajo /api/...
+    # asi que rewrite prefija /api antes del proxy.
     location ~ ^/consulta/.+/pdf$ {
         set $backend "http://${BACKEND_HOST}:80";
-        proxy_pass $backend/api$request_uri;
+        rewrite ^/(.*)$ /api/$1 break;
+        proxy_pass $backend;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
