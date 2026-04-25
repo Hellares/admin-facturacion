@@ -4,6 +4,12 @@ server {
     root /usr/share/nginx/html;
     index index.html;
 
+    # Docker embedded DNS resolver para re-resolver upstreams cuando los
+    # containers app-beta/app-prod cambian de IP (recreate). Sin esto,
+    # nginx cachea la IP al startup y un --force-recreate del backend
+    # deja al frontend apuntando a la IP vieja.
+    resolver 127.0.0.11 valid=10s ipv6=off;
+
     # Security headers
     add_header X-Frame-Options "SAMEORIGIN" always;
     add_header X-Content-Type-Options "nosniff" always;
@@ -17,9 +23,11 @@ server {
 
     client_max_body_size 20M;
 
-    # Proxy API requests to backend (parametrizable)
+    # Proxy API requests to backend.
+    # Usar variable nginx fuerza re-resolucion DNS por request (con resolver arriba).
     location /api/ {
-        proxy_pass http://${BACKEND_HOST}:80/api/;
+        set $backend "http://${BACKEND_HOST}:80";
+        proxy_pass $backend/api/;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -29,7 +37,8 @@ server {
 
     # Ruta publica de consulta - PDF directo (descarga)
     location ~ ^/consulta/.+/pdf$ {
-        proxy_pass http://${BACKEND_HOST}:80/api$request_uri;
+        set $backend "http://${BACKEND_HOST}:80";
+        proxy_pass $backend/api$request_uri;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
