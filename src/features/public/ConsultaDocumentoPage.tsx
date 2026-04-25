@@ -45,7 +45,14 @@ interface DocumentData {
   emisor: { ruc: string; razon_social: string; nombre_comercial?: string; direccion?: string };
   receptor: { tipo_documento: string; numero_documento: string; razon_social: string } | null;
   totales: { gravada: number; exonerada: number; inafecta: number; igv: number; total: number };
-  detalles: Array<{ descripcion: string; cantidad: number; unidad: string; mto_valor_unitario?: number; mto_total?: number }>;
+  detalles: Array<{
+    descripcion: string;
+    cantidad: number;
+    unidad: string;
+    mto_valor_unitario?: number;
+    mto_precio_unitario?: number;
+    mto_valor_venta?: number;
+  }>;
   tiene_pdf: boolean;
   documentos_relacionados?: DocRelacionado[];
   documento_afectado?: DocAfectado | null;
@@ -102,13 +109,34 @@ export default function ConsultaDocumentoPage() {
   const sc = STATUS_CONFIG[data.estado_sunat] || STATUS_CONFIG.PENDIENTE;
   const sym = MONEDA_SYMBOL[data.moneda] || 'S/';
 
+  // P. Unit. y Total se muestran CON IGV incluido (precio que paga el cliente).
+  // Para items gratuitos mto_precio_unitario es 0; el fallback usa mto_valor_unitario.
+  const getPrecioUnit = (record: DocumentData['detalles'][0]) =>
+    record.mto_precio_unitario || record.mto_valor_unitario || 0;
+
   const columns = [
     { title: '#', width: 40, render: (_: unknown, __: unknown, i: number) => i + 1 },
     { title: 'Descripcion', dataIndex: 'descripcion' },
     { title: 'Cant.', dataIndex: 'cantidad', width: 60, align: 'right' as const },
     { title: 'Und', dataIndex: 'unidad', width: 50 },
-    { title: 'P. Unit.', dataIndex: 'mto_valor_unitario', width: 90, align: 'right' as const, render: (v: number) => v ? `${sym} ${v.toFixed(2)}` : '-' },
-    { title: 'Total', dataIndex: 'mto_total', width: 100, align: 'right' as const, render: (v: number) => v ? `${sym} ${v.toFixed(2)}` : '-' },
+    {
+      title: 'P. Unit.',
+      width: 90,
+      align: 'right' as const,
+      render: (_: unknown, record: DocumentData['detalles'][0]) => {
+        const v = getPrecioUnit(record);
+        return v ? `${sym} ${v.toFixed(2)}` : '-';
+      },
+    },
+    {
+      title: 'Total',
+      width: 100,
+      align: 'right' as const,
+      render: (_: unknown, record: DocumentData['detalles'][0]) => {
+        const total = (record.cantidad || 0) * getPrecioUnit(record);
+        return total ? `${sym} ${total.toFixed(2)}` : '-';
+      },
+    },
   ];
 
   return (
