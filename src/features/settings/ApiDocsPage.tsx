@@ -170,17 +170,36 @@ Content-Type: application/json`}
                   </Space>
                 ),
                 children: (
-                  <EndpointGroup
-                    endpoints={[
-                      { method: 'GET', path: '/v1/credit-notes', desc: 'Lista notas de credito' },
-                      { method: 'POST', path: '/v1/credit-notes', desc: 'Crea nota de credito' },
-                      { method: 'POST', path: '/v1/credit-notes/{id}/send-sunat', desc: 'Envia a SUNAT' },
-                      { method: 'GET', path: '/v1/debit-notes', desc: 'Lista notas de debito' },
-                      { method: 'POST', path: '/v1/debit-notes', desc: 'Crea nota de debito' },
-                      { method: 'GET', path: '/v1/credit-notes/export', desc: 'Descarga XLSX NC' },
-                      { method: 'GET', path: '/v1/debit-notes/export', desc: 'Descarga XLSX ND' },
-                    ]}
-                  />
+                  <div>
+                    <EndpointGroup
+                      endpoints={[
+                        { method: 'GET', path: '/v1/credit-notes', desc: 'Lista notas de credito' },
+                        { method: 'POST', path: '/v1/credit-notes', desc: 'Crea nota de credito' },
+                        { method: 'POST', path: '/v1/credit-notes/{id}/send-sunat', desc: 'Envia a SUNAT' },
+                        { method: 'GET', path: '/v1/debit-notes', desc: 'Lista notas de debito' },
+                        { method: 'POST', path: '/v1/debit-notes', desc: 'Crea nota de debito' },
+                        { method: 'GET', path: '/v1/credit-notes/export', desc: 'Descarga XLSX NC' },
+                        { method: 'GET', path: '/v1/debit-notes/export', desc: 'Descarga XLSX ND' },
+                      ]}
+                    />
+
+                    <div style={{ marginTop: 16, padding: 12, background: '#fffbe6', border: '1px solid #ffe58f', borderRadius: 4, fontSize: 13 }}>
+                      <strong>Comprobante individual</strong> — NC y ND se emiten directo al SEE Del Contribuyente, igual que una factura. <strong>NO van por resumen diario</strong>. El resumen RC es solo para anular boletas (estado <code>3</code>), no para emitir notas vinculadas a ellas.
+                    </div>
+
+                    <div style={{ marginTop: 12, padding: 12, background: '#fff1f0', border: '1px solid #ffa39e', borderRadius: 4, fontSize: 13 }}>
+                      <strong>Regla critica de serie segun documento afectado:</strong>
+                      <ul style={{ margin: '6px 0 0', paddingLeft: 20 }}>
+                        <li><code>tipo_doc_afectado: "01"</code> (Factura) -&gt; serie con prefijo <code>FC*</code> (NC) o <code>FD*</code> (ND). Ej: <code>FC01</code>, <code>FD02</code></li>
+                        <li><code>tipo_doc_afectado: "03"</code> (Boleta) -&gt; serie con prefijo <code>BC*</code> (NC) o <code>BD*</code> (ND). Ej: <code>BC01</code>, <code>BD02</code></li>
+                      </ul>
+                      <div style={{ marginTop: 6 }}>El prefijo incorrecto provoca rechazo SUNAT (codigo <code>2335</code>). Tu sucursal trae <code>FC01/BC01/FD01/BD01</code> auto-creadas; las API <code>FC02/BC02/FD02/BD02</code> se generan al crear tu primer token.</div>
+                    </div>
+
+                    <div style={{ marginTop: 12, padding: 12, background: '#e6f7ff', border: '1px solid #91d5ff', borderRadius: 4, fontSize: 13 }}>
+                      <strong>NC vs Comunicacion de Baja:</strong> en la practica la NC es la herramienta universal para revertir efectos contables (devoluciones, descuentos, correcciones, anulaciones). La Comunicacion de Baja solo sirve para documentos muy recientes (&lt; 7 dias) sin notas asociadas. Si tienes duda, emite una NC.
+                    </div>
+                  </div>
                 ),
               },
               {
@@ -934,22 +953,23 @@ POST /api/v1/invoices  { "correlativo": 55, "referencia_interna": "TK-055-FIX", 
               },
               {
                 key: 'nota-credito',
-                label: <Space><Tag color="purple">POST</Tag><Text>Crear Nota de Credito</Text></Space>,
+                label: <Space><Tag color="purple">POST</Tag><Text>Crear Nota de Credito a Factura</Text></Space>,
                 children: (
                   <Input.TextArea
                     readOnly
                     autoSize
-                    value={`curl -X POST "${baseUrl}/v1/credit-notes" \\
+                    value={`# NC que afecta una FACTURA -> serie FC*, tipo_doc_afectado=01
+curl -X POST "${baseUrl}/v1/credit-notes" \\
   -H "Authorization: Bearer TU_TOKEN" \\
   -H "Content-Type: application/json" \\
   -d '{
     "company_id": 1,
     "branch_id": 1,
-    "serie": "FC01",
-    "fecha_emision": "2026-04-13",
+    "serie": "FC02",
+    "fecha_emision": "2026-04-28",
     "moneda": "PEN",
     "tipo_doc_afectado": "01",
-    "num_doc_afectado": "F001-000001",
+    "num_doc_afectado": "F001-00000001",
     "cod_motivo": "01",
     "des_motivo": "Anulacion de la operacion",
     "client": {
@@ -971,30 +991,79 @@ POST /api/v1/invoices  { "correlativo": 55, "referencia_interna": "TK-055-FIX", 
 
 # Motivos NC: 01=Anulacion, 02=Error RUC, 03=Error descripcion,
 # 04=Descuento global, 05=Descuento item, 06=Devolucion total,
-# 07=Devolucion item, 08=Bonificacion, 09=Disminucion valor
-# tipo_doc_afectado: "01"=Factura, "03"=Boleta`}
+# 07=Devolucion item, 08=Bonificacion, 09=Disminucion valor`}
+                    style={{ fontFamily: 'monospace', fontSize: 12 }}
+                  />
+                ),
+              },
+              {
+                key: 'nota-credito-boleta',
+                label: <Space><Tag color="purple">POST</Tag><Text>Crear Nota de Credito a Boleta</Text></Space>,
+                children: (
+                  <Input.TextArea
+                    readOnly
+                    autoSize
+                    value={`# NC que afecta una BOLETA -> serie BC*, tipo_doc_afectado=03
+# Es un comprobante INDIVIDUAL, NO va por resumen diario.
+curl -X POST "${baseUrl}/v1/credit-notes" \\
+  -H "Authorization: Bearer TU_TOKEN" \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "company_id": 1,
+    "branch_id": 1,
+    "serie": "BC02",
+    "fecha_emision": "2026-04-28",
+    "moneda": "PEN",
+    "tipo_doc_afectado": "03",
+    "num_doc_afectado": "B001-00000015",
+    "cod_motivo": "06",
+    "des_motivo": "Devolucion total - cliente desistio",
+    "client": {
+      "tipo_documento": "1",
+      "numero_documento": "12345678",
+      "razon_social": "JUAN PEREZ GARCIA"
+    },
+    "detalles": [
+      {
+        "codigo": "PROD001",
+        "descripcion": "Articulo devuelto",
+        "unidad": "NIU",
+        "cantidad": 1,
+        "mto_precio_unitario": 59.00,
+        "tip_afe_igv": "10",
+        "porcentaje_igv": 18
+      }
+    ]
+  }'
+
+# Reglas:
+# - serie debe empezar con BC (BC01, BC02, ...). Usar FC* da error 2335
+# - el cliente debe ser el mismo de la boleta original (mismo doc)
+# - si la boleta original > S/700 con DNI generico, NC requiere DNI real
+# - se emite individual al SEE, NO por resumen diario`}
                     style={{ fontFamily: 'monospace', fontSize: 12 }}
                   />
                 ),
               },
               {
                 key: 'nota-debito',
-                label: <Space><Tag color="purple">POST</Tag><Text>Crear Nota de Debito</Text></Space>,
+                label: <Space><Tag color="purple">POST</Tag><Text>Crear Nota de Debito (factura o boleta)</Text></Space>,
                 children: (
                   <Input.TextArea
                     readOnly
                     autoSize
-                    value={`curl -X POST "${baseUrl}/v1/debit-notes" \\
+                    value={`# ND a FACTURA -> serie FD*, tipo_doc_afectado=01
+curl -X POST "${baseUrl}/v1/debit-notes" \\
   -H "Authorization: Bearer TU_TOKEN" \\
   -H "Content-Type: application/json" \\
   -d '{
     "company_id": 1,
     "branch_id": 1,
-    "serie": "FD01",
-    "fecha_emision": "2026-04-13",
+    "serie": "FD02",
+    "fecha_emision": "2026-04-28",
     "moneda": "PEN",
     "tipo_doc_afectado": "01",
-    "num_doc_afectado": "F001-000001",
+    "num_doc_afectado": "F001-00000001",
     "cod_motivo": "01",
     "des_motivo": "Intereses por mora",
     "client": {
@@ -1014,8 +1083,42 @@ POST /api/v1/invoices  { "correlativo": 55, "referencia_interna": "TK-055-FIX", 
     ]
   }'
 
+
+# ND a BOLETA -> serie BD*, tipo_doc_afectado=03
+curl -X POST "${baseUrl}/v1/debit-notes" \\
+  -H "Authorization: Bearer TU_TOKEN" \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "company_id": 1,
+    "branch_id": 1,
+    "serie": "BD02",
+    "fecha_emision": "2026-04-28",
+    "moneda": "PEN",
+    "tipo_doc_afectado": "03",
+    "num_doc_afectado": "B001-00000020",
+    "cod_motivo": "02",
+    "des_motivo": "Aumento por servicio adicional",
+    "client": {
+      "tipo_documento": "1",
+      "numero_documento": "12345678",
+      "razon_social": "JUAN PEREZ GARCIA"
+    },
+    "detalles": [
+      {
+        "codigo": "EXTRA001",
+        "descripcion": "Servicio adicional de instalacion",
+        "unidad": "ZZ",
+        "cantidad": 1,
+        "mto_precio_unitario": 35.40,
+        "tip_afe_igv": "10",
+        "porcentaje_igv": 18
+      }
+    ]
+  }'
+
 # Motivos ND: 01=Intereses por mora, 02=Aumento en el valor,
-# 03=Penalidades u otros conceptos`}
+# 03=Penalidades u otros conceptos
+# Igual que NC: comprobante INDIVIDUAL al SEE, no por resumen.`}
                     style={{ fontFamily: 'monospace', fontSize: 12 }}
                   />
                 ),
