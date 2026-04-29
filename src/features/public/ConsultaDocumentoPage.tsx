@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { Card, Descriptions, Table, Tag, Button, Space, Row, Col, Typography, Spin, Result } from 'antd';
-import { FilePdfOutlined, CheckCircleOutlined, CloseCircleOutlined, ClockCircleOutlined, SafetyCertificateOutlined, WarningOutlined, InfoCircleOutlined, LinkOutlined } from '@ant-design/icons';
+import { Card, Descriptions, Table, Tag, Button, Space, Row, Col, Typography, Spin, Result, Alert } from 'antd';
+import { FilePdfOutlined, CheckCircleOutlined, CloseCircleOutlined, ClockCircleOutlined, SafetyCertificateOutlined, WarningOutlined, InfoCircleOutlined, LinkOutlined, StopOutlined } from '@ant-design/icons';
 import apiClient from '@/lib/axios';
 
 const { Title, Text } = Typography;
@@ -14,6 +14,8 @@ const STATUS_CONFIG: Record<string, { color: string; icon: React.ReactNode; labe
   RECHAZADO: { color: '#ff4d4f', icon: <CloseCircleOutlined />, label: 'Rechazado por SUNAT' },
   PENDIENTE: { color: '#faad14', icon: <ClockCircleOutlined />, label: 'Pendiente' },
   EN_COLA: { color: '#1677ff', icon: <ClockCircleOutlined />, label: 'En proceso' },
+  ANULADO: { color: '#ff4d4f', icon: <StopOutlined />, label: 'Anulado' },
+  ANULADA: { color: '#ff4d4f', icon: <StopOutlined />, label: 'Anulada' },
 };
 
 interface DocRelacionado {
@@ -56,6 +58,18 @@ interface DocumentData {
   tiene_pdf: boolean;
   documentos_relacionados?: DocRelacionado[];
   documento_afectado?: DocAfectado | null;
+  anulacion?: {
+    anulado: boolean;
+    mecanismo: 'comunicacion_baja' | 'resumen_diario' | 'local';
+    fecha_anulacion?: string | null;
+    motivo?: string | null;
+    estado_anulacion?: string | null;
+    comunicacion_baja?: {
+      numero_completo: string;
+      fecha_emision: string;
+      estado_sunat: string;
+    } | null;
+  } | null;
 }
 
 export default function ConsultaDocumentoPage() {
@@ -161,6 +175,46 @@ export default function ConsultaDocumentoPage() {
             </div>
           </Space>
         </Card>
+
+        {/* ANULACION (Comunicacion de Baja, Resumen Diario o anulacion local) */}
+        {data.anulacion?.anulado && (
+          <Alert
+            type="error"
+            showIcon
+            icon={<StopOutlined />}
+            style={{ marginBottom: 12 }}
+            message={
+              <Space wrap size="small">
+                <strong>DOCUMENTO ANULADO</strong>
+                {data.anulacion.mecanismo === 'comunicacion_baja' && data.anulacion.comunicacion_baja && (
+                  <>
+                    <span>via Comunicacion de Baja:</span>
+                    <Tag color="red" style={{ fontFamily: 'monospace', margin: 0 }}>
+                      {data.anulacion.comunicacion_baja.numero_completo}
+                    </Tag>
+                    <Tag color={data.anulacion.comunicacion_baja.estado_sunat === 'ACEPTADO' ? 'green' : 'default'}>
+                      {data.anulacion.comunicacion_baja.estado_sunat}
+                    </Tag>
+                  </>
+                )}
+                {data.anulacion.mecanismo === 'resumen_diario' && (
+                  <span>via Resumen Diario de Anulacion</span>
+                )}
+                {data.anulacion.mecanismo === 'local' && (
+                  <span>(anulacion local, no notificada a SUNAT)</span>
+                )}
+              </Space>
+            }
+            description={
+              <div style={{ fontSize: 12, marginTop: 4 }}>
+                {data.anulacion.fecha_anulacion && (
+                  <div>Fecha: {new Date(data.anulacion.fecha_anulacion).toLocaleString('es-PE')}</div>
+                )}
+                {data.anulacion.motivo && <div>Motivo: {data.anulacion.motivo}</div>}
+              </div>
+            }
+          />
+        )}
 
         {/* DOCUMENTO AFECTADO (para NC y ND) */}
         {data.documento_afectado && (
