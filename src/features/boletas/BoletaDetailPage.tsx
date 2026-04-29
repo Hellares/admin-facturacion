@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Card, Descriptions, Table, Tag, Space, Divider, Alert, Button } from 'antd';
-import { StopOutlined, LinkOutlined } from '@ant-design/icons';
+import { StopOutlined, LinkOutlined, FileExclamationOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import PageHeader from '@/components/common/PageHeader';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
@@ -100,6 +100,51 @@ export default function BoletaDetailPage() {
             description={localMotivo ? `Motivo: ${localMotivo}` : undefined}
           />
         )}
+
+        {/* Notas de credito asociadas (serie BC*) */}
+        {boleta.credit_notes && boleta.credit_notes.length > 0 && boleta.credit_notes.map((nc) => (
+          <Alert
+            key={`nc-${nc.id}`}
+            type="warning"
+            showIcon
+            icon={<FileExclamationOutlined />}
+            message={
+              <Space wrap size="small">
+                <strong>NOTA DE CREDITO</strong>
+                <Tag color="orange" style={{ fontFamily: 'monospace', margin: 0 }}>{nc.numero_completo}</Tag>
+                <SunatStatusBadge status={nc.estado_sunat as import('@/types/common.types').SunatStatus} />
+                <span style={{ fontSize: 12, color: '#666' }}>{nc.motivo}</span>
+                <Tag>{formatMoney(nc.total, nc.moneda as Moneda)}</Tag>
+                <Button size="small" type="link" icon={<LinkOutlined />} onClick={() => navigate(`/credit-notes/${nc.id}`)}>
+                  Ver detalle
+                </Button>
+              </Space>
+            }
+          />
+        ))}
+
+        {/* Notas de debito asociadas (serie BD*) */}
+        {boleta.debit_notes && boleta.debit_notes.length > 0 && boleta.debit_notes.map((nd) => (
+          <Alert
+            key={`nd-${nd.id}`}
+            type="info"
+            showIcon
+            icon={<ExclamationCircleOutlined />}
+            message={
+              <Space wrap size="small">
+                <strong>NOTA DE DEBITO</strong>
+                <Tag color="blue" style={{ fontFamily: 'monospace', margin: 0 }}>{nd.numero_completo}</Tag>
+                <SunatStatusBadge status={nd.estado_sunat as import('@/types/common.types').SunatStatus} />
+                <span style={{ fontSize: 12, color: '#666' }}>{nd.motivo}</span>
+                <Tag>{formatMoney(nd.total, nd.moneda as Moneda)}</Tag>
+                <Button size="small" type="link" icon={<LinkOutlined />} onClick={() => navigate(`/debit-notes/${nd.id}`)}>
+                  Ver detalle
+                </Button>
+              </Space>
+            }
+          />
+        ))}
+
         <Card>
           <Descriptions column={{ xs: 1, sm: 2, lg: 4 }}>
             <Descriptions.Item label="Numero">{boleta.numero_completo}</Descriptions.Item>

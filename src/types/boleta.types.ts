@@ -70,6 +70,25 @@ export interface Boleta {
   motivo_anulacion_local?: string | null;
   fecha_solicitud_anulacion?: string | null;
   fecha_anulacion_local?: string | null;
+  // Notas de credito y debito asociadas
+  credit_notes?: Array<{
+    id: number;
+    numero_completo: string;
+    motivo: string;
+    cod_motivo: string;
+    estado_sunat: string;
+    total: number;
+    moneda: string;
+  }>;
+  debit_notes?: Array<{
+    id: number;
+    numero_completo: string;
+    motivo: string;
+    cod_motivo: string;
+    estado_sunat: string;
+    total: number;
+    moneda: string;
+  }>;
   // Archivos
   xml_path?: string;
   cdr_path?: string;
