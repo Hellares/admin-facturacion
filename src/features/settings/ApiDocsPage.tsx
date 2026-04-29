@@ -211,15 +211,72 @@ Content-Type: application/json`}
                   </Space>
                 ),
                 children: (
-                  <EndpointGroup
-                    endpoints={[
-                      { method: 'POST', path: '/v1/voided-documents', desc: 'Crea Comunicacion de Baja (facturas/NC/ND)' },
-                      { method: 'POST', path: '/v1/voided-documents/{id}/send-sunat', desc: 'Envia la baja a SUNAT' },
-                      { method: 'GET', path: '/v1/voided-documents', desc: 'Lista Comunicaciones de Baja' },
-                      { method: 'POST', path: '/v1/boletas/anular-oficialmente', desc: 'Crea Resumen Diario de Anulacion (boletas)' },
-                      { method: 'GET', path: '/v1/daily-summaries', desc: 'Lista resumenes diarios (emision + anulacion)' },
-                    ]}
-                  />
+                  <div>
+                    <div style={{ fontSize: 13, marginBottom: 12 }}>
+                      <strong>Comunicacion de Baja</strong> (resumen tipo <code>RA</code>) anula comprobantes ya
+                      <strong> ACEPTADOS</strong>. Solo aplica a Facturas (<code>01</code>), Notas de Credito
+                      electronicas (<code>07</code>) y Notas de Debito electronicas (<code>08</code>).
+                      Las <strong>boletas</strong> se anulan via Resumen Diario (estado <code>3</code>).
+                    </div>
+
+                    <Divider plain style={{ margin: '12px 0' }}>Comunicacion de Baja (factura, NC, ND)</Divider>
+                    <EndpointGroup
+                      endpoints={[
+                        { method: 'POST', path: '/v1/voided-documents', desc: 'Crear comunicacion (paso 1)' },
+                        { method: 'POST', path: '/v1/voided-documents/{id}/send-sunat', desc: 'Enviar a SUNAT y auto-consultar estado (paso 2)' },
+                        { method: 'POST', path: '/v1/voided-documents/{id}/check-status', desc: 'Re-consultar estado por ticket si quedo en ENVIADO' },
+                        { method: 'GET', path: '/v1/voided-documents', desc: 'Listar comunicaciones (filtros: estado_sunat, fecha_desde, fecha_hasta, search, etc.)' },
+                        { method: 'GET', path: '/v1/voided-documents/{id}', desc: 'Detalle de una comunicacion' },
+                        { method: 'GET', path: '/v1/voided-documents/{id}/download-xml', desc: 'XML firmado' },
+                        { method: 'GET', path: '/v1/voided-documents/{id}/download-cdr', desc: 'CDR de SUNAT (solo si ACEPTADO)' },
+                        { method: 'GET', path: '/v1/voided-documents/available-documents', desc: 'Documentos elegibles para anular en una fecha' },
+                        { method: 'GET', path: '/v1/voided-documents/reasons', desc: 'Catalogo de motivos sugeridos' },
+                        { method: 'GET', path: '/v1/voided-documents/reasons/categories', desc: 'Categorias de motivos' },
+                      ]}
+                    />
+
+                    <Divider plain style={{ margin: '12px 0' }}>Anulacion de Boletas (via Resumen Diario)</Divider>
+                    <EndpointGroup
+                      endpoints={[
+                        { method: 'POST', path: '/v1/boletas/anular-oficialmente', desc: 'Crear Resumen Diario de Anulacion' },
+                        { method: 'GET', path: '/v1/boletas/anulables', desc: 'Boletas elegibles para anular' },
+                        { method: 'GET', path: '/v1/boletas/pendientes-anulacion', desc: 'Boletas en proceso de anulacion' },
+                        { method: 'GET', path: '/v1/boletas/anuladas', desc: 'Boletas ya anuladas' },
+                        { method: 'GET', path: '/v1/daily-summaries', desc: 'Lista resumenes diarios (emision + anulacion)' },
+                      ]}
+                    />
+
+                    <div style={{ marginTop: 16, padding: 12, background: '#fff1f0', border: '1px solid #ffa39e', borderRadius: 4, fontSize: 13 }}>
+                      <strong>Restricciones SUNAT (validadas antes de enviar):</strong>
+                      <ul style={{ margin: '6px 0 0', paddingLeft: 20 }}>
+                        <li><strong>Plazo:</strong> solo se anulan documentos emitidos en los ultimos <strong>7 dias calendario</strong> (medido desde <code>fecha_emision</code> del documento)</li>
+                        <li><strong>Tipo doc:</strong> solo <code>01</code>, <code>07</code>, <code>08</code> (boletas y notas de boletas van por Resumen Diario)</li>
+                        <li><strong>Estado:</strong> el documento debe estar en <code>ACEPTADO</code> por SUNAT</li>
+                        <li><strong>Sin notas asociadas:</strong> una factura con NC/ND aceptadas no puede ir a baja (la NC ya cumple el rol de anulacion)</li>
+                        <li><strong>Sin baja en curso:</strong> no puede existir otra comunicacion <code>PENDIENTE</code>, <code>ENVIADO</code> o <code>ACEPTADO</code> para el mismo documento</li>
+                        <li><strong>Lote:</strong> hasta <strong>100 documentos</strong> por comunicacion, sin duplicados</li>
+                      </ul>
+                    </div>
+
+                    <div style={{ marginTop: 12, padding: 12, background: '#e6f7ff', border: '1px solid #91d5ff', borderRadius: 4, fontSize: 13 }}>
+                      <strong>Flujo recomendado:</strong>
+                      <ol style={{ margin: '6px 0 0', paddingLeft: 20 }}>
+                        <li><code>POST /voided-documents</code> -&gt; recibes <code>id</code>, estado <code>PENDIENTE</code></li>
+                        <li><code>POST /voided-documents/{'{id}'}/send-sunat</code> -&gt; tipicamente queda <code>ACEPTADO</code> en segundos</li>
+                        <li>Si quedo <code>ENVIADO</code>: <code>POST /voided-documents/{'{id}'}/check-status</code> hasta que pase a <code>ACEPTADO</code> o <code>RECHAZADO</code></li>
+                        <li>Si <code>ACEPTADO</code>: <code>GET /voided-documents/{'{id}'}/download-cdr</code> (CDR como prueba legal)</li>
+                      </ol>
+                      <div style={{ marginTop: 6 }}>Ver ejemplo cURL completo en la seccion <strong>Ejemplos de creacion de documentos -&gt; Crear Comunicacion de Baja</strong>.</div>
+                    </div>
+
+                    <div style={{ marginTop: 12, padding: 12, background: '#fffbe6', border: '1px solid #ffe58f', borderRadius: 4, fontSize: 13 }}>
+                      <strong>Webhooks emitidos:</strong> <code>voided_document.sent</code>, <code>voided_document.processed</code>, <code>voided_document.accepted</code>. Configurables desde el panel.
+                    </div>
+
+                    <div style={{ marginTop: 12, padding: 12, background: '#fff2e8', border: '1px solid #ffbb96', borderRadius: 4, fontSize: 13 }}>
+                      <strong>Si el plazo de 7 dias ya vencio:</strong> usar <strong>Nota de Credito</strong> en su lugar (motivo <code>01</code> = Anulacion de la operacion). La baja ya no es viable.
+                    </div>
+                  </div>
                 ),
               },
               {
@@ -959,6 +1016,114 @@ POST /api/v1/invoices  { "correlativo": 55, "referencia_interna": "TK-055-FIX", 
 
 # Motivos ND: 01=Intereses por mora, 02=Aumento en el valor,
 # 03=Penalidades u otros conceptos`}
+                    style={{ fontFamily: 'monospace', fontSize: 12 }}
+                  />
+                ),
+              },
+              {
+                key: 'baja',
+                label: <Space><Tag color="red">POST</Tag><Text>Crear Comunicacion de Baja (anular factura/NC/ND)</Text></Space>,
+                children: (
+                  <Input.TextArea
+                    readOnly
+                    autoSize
+                    value={`# Paso 1: crear la comunicacion (queda en estado PENDIENTE)
+curl -X POST "${baseUrl}/v1/voided-documents" \\
+  -H "Authorization: Bearer TU_TOKEN" \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "company_id": 1,
+    "branch_id": 1,
+    "fecha_referencia": "2026-04-26",
+    "motivo_baja": "Anulacion masiva por error administrativo",
+    "detalles": [
+      {
+        "tipo_documento": "01",
+        "serie": "F001",
+        "correlativo": "00000123",
+        "motivo_especifico": "Cliente cancelo la operacion antes de la entrega"
+      },
+      {
+        "tipo_documento": "07",
+        "serie": "FC01",
+        "correlativo": "00000045",
+        "motivo_especifico": "Nota de credito emitida por error"
+      }
+    ]
+  }'
+
+# Respuesta 201:
+# { "data": { "id": 17, "estado_sunat": "PENDIENTE", ... } }
+
+
+# Paso 2: enviar a SUNAT (auto-consulta el estado tras 2s)
+curl -X POST "${baseUrl}/v1/voided-documents/17/send-sunat" \\
+  -H "Authorization: Bearer TU_TOKEN"
+
+# Respuesta:
+# { "data": { "estado_sunat": "ACEPTADO", "ticket": "176...", ... } }
+
+
+# Paso 3 (opcional): re-consultar si quedo en ENVIADO
+curl -X POST "${baseUrl}/v1/voided-documents/17/check-status" \\
+  -H "Authorization: Bearer TU_TOKEN"
+
+
+# Paso 4: descargar CDR como prueba (solo si ACEPTADO)
+curl -o baja-cdr.zip "${baseUrl}/v1/voided-documents/17/download-cdr" \\
+  -H "Authorization: Bearer TU_TOKEN"
+
+
+# Reglas:
+# - Solo aplica a Facturas (01), NC electronicas (07), ND electronicas (08)
+# - Boletas y NC/ND de boletas: usar /v1/boletas/anular-oficialmente
+# - Plazo: 7 dias calendario desde fecha_emision del documento
+# - El documento debe estar ACEPTADO por SUNAT
+# - Maximo 100 documentos por comunicacion`}
+                    style={{ fontFamily: 'monospace', fontSize: 12 }}
+                  />
+                ),
+              },
+              {
+                key: 'baja-boleta',
+                label: <Space><Tag color="red">POST</Tag><Text>Anular Boleta (via Resumen Diario)</Text></Space>,
+                children: (
+                  <Input.TextArea
+                    readOnly
+                    autoSize
+                    value={`# Las boletas NO se anulan por /v1/voided-documents.
+# Se anulan creando un Resumen Diario con estado 3.
+
+# Paso 1: ver boletas anulables (emitidas en los ultimos 7 dias)
+curl "${baseUrl}/v1/boletas/anulables?company_id=1&branch_id=1" \\
+  -H "Authorization: Bearer TU_TOKEN"
+
+
+# Paso 2: anular oficialmente una o varias boletas
+curl -X POST "${baseUrl}/v1/boletas/anular-oficialmente" \\
+  -H "Authorization: Bearer TU_TOKEN" \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "company_id": 1,
+    "branch_id": 1,
+    "fecha_referencia": "2026-04-26",
+    "boletas_ids": [501, 502, 503],
+    "motivo": "Anulacion por error en datos del cliente"
+  }'
+
+# El sistema crea un Resumen Diario con estado "3" (anulacion)
+# y lo encola para envio a SUNAT.
+
+
+# Paso 3: ver el estado del resumen creado
+curl "${baseUrl}/v1/daily-summaries" \\
+  -H "Authorization: Bearer TU_TOKEN"
+
+
+# Reglas:
+# - Solo boletas (tipo 03) y NC/ND de boletas (BC, BD)
+# - Misma restriccion de 7 dias
+# - SUNAT confirma la anulacion al aceptar el resumen`}
                     style={{ fontFamily: 'monospace', fontSize: 12 }}
                   />
                 ),
