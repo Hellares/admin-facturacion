@@ -254,17 +254,6 @@ Content-Type: application/json`}
                       ]}
                     />
 
-                    <Divider plain style={{ margin: '12px 0' }}>Anulacion de Boletas (via Resumen Diario)</Divider>
-                    <EndpointGroup
-                      endpoints={[
-                        { method: 'POST', path: '/v1/boletas/anular-oficialmente', desc: 'Crear Resumen Diario de Anulacion' },
-                        { method: 'GET', path: '/v1/boletas/anulables', desc: 'Boletas elegibles para anular' },
-                        { method: 'GET', path: '/v1/boletas/pendientes-anulacion', desc: 'Boletas en proceso de anulacion' },
-                        { method: 'GET', path: '/v1/boletas/anuladas', desc: 'Boletas ya anuladas' },
-                        { method: 'GET', path: '/v1/daily-summaries', desc: 'Lista resumenes diarios (emision + anulacion)' },
-                      ]}
-                    />
-
                     <div style={{ marginTop: 16, padding: 12, background: '#fff1f0', border: '1px solid #ffa39e', borderRadius: 4, fontSize: 13 }}>
                       <strong>Restricciones SUNAT (validadas antes de enviar):</strong>
                       <ul style={{ margin: '6px 0 0', paddingLeft: 20 }}>
@@ -294,6 +283,61 @@ Content-Type: application/json`}
 
                     <div style={{ marginTop: 12, padding: 12, background: '#fff2e8', border: '1px solid #ffbb96', borderRadius: 4, fontSize: 13 }}>
                       <strong>Si el plazo de 7 dias ya vencio:</strong> usar <strong>Nota de Credito</strong> en su lugar (motivo <code>01</code> = Anulacion de la operacion). La baja ya no es viable.
+                    </div>
+
+                    <Divider plain style={{ margin: '20px 0 12px' }}>Anulacion de Boletas (via Resumen Diario)</Divider>
+                    <div style={{ fontSize: 13, marginBottom: 12 }}>
+                      Las boletas (<code>03</code>) <strong>NO se anulan con Comunicacion de Baja</strong>. SUNAT exige
+                      crear un <strong>Resumen Diario</strong> (<code>RC</code>) con <code>estado = 3</code> por cada boleta.
+                      Funciona igual para boletas emitidas via API (individuales) que para las emitidas desde el panel.
+                    </div>
+                    <EndpointGroup
+                      endpoints={[
+                        { method: 'GET', path: '/v1/boletas/anulables', desc: 'Boletas elegibles para anular (paso 0, opcional)' },
+                        { method: 'POST', path: '/v1/boletas/anular-oficialmente', desc: 'Crear RC de anulacion (paso 1)' },
+                        { method: 'POST', path: '/v1/daily-summaries/{id}/send-sunat', desc: 'Enviar RC a SUNAT y auto-consultar estado (paso 2)' },
+                        { method: 'POST', path: '/v1/daily-summaries/{id}/check-status', desc: 'Re-consultar estado por ticket si quedo en PROCESANDO' },
+                        { method: 'GET', path: '/v1/daily-summaries/{id}', desc: 'Detalle del RC' },
+                        { method: 'GET', path: '/v1/boletas/pendientes-anulacion', desc: 'Listar boletas con estado_anulacion=pendiente_anulacion' },
+                        { method: 'GET', path: '/v1/boletas/anuladas', desc: 'Listar boletas anuladas' },
+                        { method: 'GET', path: '/v1/boletas/{id}', desc: 'Verificar estado actual (estado_sunat, estado_anulacion)' },
+                      ]}
+                    />
+
+                    <div style={{ marginTop: 16, padding: 12, background: '#fff1f0', border: '1px solid #ffa39e', borderRadius: 4, fontSize: 13 }}>
+                      <strong>Restricciones (validadas por la API antes de crear el RC):</strong>
+                      <ul style={{ margin: '6px 0 0', paddingLeft: 20 }}>
+                        <li><strong>Plazo:</strong> solo boletas con <code>fecha_emision</code> dentro de los ultimos <strong>3 dias calendario</strong>. Pasado el plazo, usar <code>POST /v1/boletas/anular-localmente</code> (no se reporta a SUNAT)</li>
+                        <li><strong>Estado:</strong> la boleta debe tener <code>estado_sunat = ACEPTADO</code></li>
+                        <li><strong>No anulada localmente:</strong> <code>anulada_localmente</code> debe ser <code>false</code></li>
+                        <li><strong>No en proceso:</strong> <code>estado_anulacion</code> debe ser <code>sin_anular</code></li>
+                        <li><strong>Misma fecha:</strong> todas las boletas del mismo request deben compartir <code>fecha_emision</code> (un RC por fecha)</li>
+                        <li><strong>Pertenencia:</strong> <code>branch_id</code> debe pertenecer a <code>company_id</code></li>
+                      </ul>
+                    </div>
+
+                    <div style={{ marginTop: 12, padding: 12, background: '#e6f7ff', border: '1px solid #91d5ff', borderRadius: 4, fontSize: 13 }}>
+                      <strong>Flujo recomendado:</strong>
+                      <ol style={{ margin: '6px 0 0', paddingLeft: 20 }}>
+                        <li><code>POST /v1/boletas/anular-oficialmente</code> -&gt; recibes <code>summary.id</code>, RC en <code>PENDIENTE</code>. Boletas marcadas <code>pendiente_anulacion</code></li>
+                        <li><code>POST /v1/daily-summaries/{'{id}'}/send-sunat</code> -&gt; tipicamente queda <code>ACEPTADO</code> en segundos (auto check-status incluido)</li>
+                        <li>Si quedo <code>PROCESANDO</code>: <code>POST /v1/daily-summaries/{'{id}'}/check-status</code> cada 30-60s hasta <code>ACEPTADO</code> o <code>RECHAZADO</code></li>
+                        <li>Cuando <code>ACEPTADO</code>: las boletas pasan automaticamente a <code>estado_sunat=ANULADO</code> + <code>estado_anulacion=anulada</code></li>
+                        <li>Verificar con <code>GET /v1/boletas/{'{id}'}</code> o suscribirse a webhook <code>daily_summary.processed</code></li>
+                      </ol>
+                      <div style={{ marginTop: 6 }}>Ver ejemplo cURL completo en la seccion <strong>Ejemplos -&gt; Anular Boleta (via Resumen Diario)</strong>.</div>
+                    </div>
+
+                    <div style={{ marginTop: 12, padding: 12, background: '#fffbe6', border: '1px solid #ffe58f', borderRadius: 4, fontSize: 13 }}>
+                      <strong>Webhooks emitidos:</strong> <code>daily_summary.created</code>, <code>daily_summary.sent</code>, <code>daily_summary.processed</code> (el ultimo se dispara para <em>cualquier</em> estado distinto de PENDIENTE — revisar <code>estado_sunat</code> en el payload para distinguir aceptaciones de rechazos).
+                    </div>
+
+                    <div style={{ marginTop: 12, padding: 12, background: '#fff2e8', border: '1px solid #ffbb96', borderRadius: 4, fontSize: 13 }}>
+                      <strong>Dos formatos de payload soportados:</strong>
+                      <ul style={{ margin: '6px 0 0', paddingLeft: 20 }}>
+                        <li><strong>Formato A (motivo unico):</strong> <code>{'{ boletas_ids: [14,15], motivo_anulacion: "..." }'}</code> — todas las boletas con el mismo motivo</li>
+                        <li><strong>Formato B (motivo individual):</strong> <code>{'{ boletas: [{id, motivo}, ...] }'}</code> — cada boleta con su propio motivo (recomendado para auditoria)</li>
+                      </ul>
                     </div>
                   </div>
                 ),
@@ -1195,38 +1239,61 @@ curl -o baja-cdr.zip "${baseUrl}/v1/voided-documents/17/download-cdr" \\
                     readOnly
                     autoSize
                     value={`# Las boletas NO se anulan por /v1/voided-documents.
-# Se anulan creando un Resumen Diario con estado 3.
+# Se anulan creando un Resumen Diario (RC) con estado 3.
+# Plazo: 3 dias desde fecha_emision (mas alla, usar anular-localmente).
 
-# Paso 1: ver boletas anulables (emitidas en los ultimos 7 dias)
+# Paso 0 (opcional): ver boletas anulables
 curl "${baseUrl}/v1/boletas/anulables?company_id=1&branch_id=1" \\
   -H "Authorization: Bearer TU_TOKEN"
 
 
-# Paso 2: anular oficialmente una o varias boletas
+# Paso 1: crear el RC de anulacion (Formato A - motivo unico)
 curl -X POST "${baseUrl}/v1/boletas/anular-oficialmente" \\
   -H "Authorization: Bearer TU_TOKEN" \\
   -H "Content-Type: application/json" \\
   -d '{
     "company_id": 1,
     "branch_id": 1,
-    "fecha_referencia": "2026-04-26",
-    "boletas_ids": [501, 502, 503],
-    "motivo": "Anulacion por error en datos del cliente"
+    "boletas_ids": [14, 15],
+    "motivo_anulacion": "Error de operador al cierre de caja"
   }'
 
-# El sistema crea un Resumen Diario con estado "3" (anulacion)
-# y lo encola para envio a SUNAT.
+# Alternativa: Formato B - motivo individual por boleta
+# -d '{
+#   "company_id": 1,
+#   "branch_id": 1,
+#   "boletas": [
+#     { "id": 14, "motivo": "Cliente cancelo la operacion" },
+#     { "id": 15, "motivo": "Error en cantidad facturada" }
+#   ]
+# }'
+#
+# Respuesta: { data: { summary: { id: 23, numero_completo: "RC-20260429-001" } } }
+# Las boletas quedan en estado_anulacion=pendiente_anulacion.
 
 
-# Paso 3: ver el estado del resumen creado
-curl "${baseUrl}/v1/daily-summaries" \\
+# Paso 2: enviar el RC a SUNAT (auto check-status incluido)
+curl -X POST "${baseUrl}/v1/daily-summaries/23/send-sunat" \\
   -H "Authorization: Bearer TU_TOKEN"
 
 
+# Paso 3 (opcional): re-consultar si quedo PROCESANDO
+curl -X POST "${baseUrl}/v1/daily-summaries/23/check-status" \\
+  -H "Authorization: Bearer TU_TOKEN"
+
+
+# Paso 4: verificar estado de la boleta tras aceptacion del RC
+curl "${baseUrl}/v1/boletas/14" \\
+  -H "Authorization: Bearer TU_TOKEN"
+# Esperado: estado_sunat=ANULADO, estado_anulacion=anulada
+
+
 # Reglas:
-# - Solo boletas (tipo 03) y NC/ND de boletas (BC, BD)
-# - Misma restriccion de 7 dias
-# - SUNAT confirma la anulacion al aceptar el resumen`}
+# - Solo boletas (tipo 03). Para NC/ND de boletas (BC, BD): mismo flujo si fueron por resumen
+# - Plazo: 3 dias desde fecha_emision (regla del sistema)
+# - Todas las boletas del mismo request deben tener la misma fecha_emision
+# - Funciona igual para boletas API individuales y para emitidas por panel
+# - Ver doc completa: API-integracion-terceros.md seccion 20`}
                     style={{ fontFamily: 'monospace', fontSize: 12 }}
                   />
                 ),
