@@ -29,6 +29,46 @@ export const debitNoteService = {
   },
 
   /**
+   * Anular ND vinculada a boleta (tipo_doc_afectado=03, serie BD*) via Resumen Diario.
+   * Devuelve el summary creado; despues hay que llamar a dailySummaryService.sendToSunat(summary.id).
+   * NO usar para ND de factura: SUNAT solo acepta BD* en RC, no en RA.
+   */
+  anularOficialmente: async (payload: {
+    company_id: number;
+    branch_id: number;
+    nota_debito_ids: number[];
+    motivo_anulacion: string;
+    usuario_id?: number;
+  }): Promise<{
+    summary: {
+      id: number;
+      numero_completo: string;
+      fecha_resumen: string;
+      fecha_generacion: string;
+      correlativo: string;
+      estado_proceso: string;
+      estado_sunat: string;
+    };
+    notas_count: number;
+    notas_ids: number[];
+  }> => {
+    const response = await apiClient.post<ApiResponse<{
+      summary: {
+        id: number;
+        numero_completo: string;
+        fecha_resumen: string;
+        fecha_generacion: string;
+        correlativo: string;
+        estado_proceso: string;
+        estado_sunat: string;
+      };
+      notas_count: number;
+      notas_ids: number[];
+    }>>('/v1/debit-notes/anular-oficialmente', payload);
+    return response.data.data;
+  },
+
+  /**
    * Exporta notas de debito filtradas a XLSX.
    */
   exportToExcel: async (params?: DebitNoteListParams): Promise<void> => {

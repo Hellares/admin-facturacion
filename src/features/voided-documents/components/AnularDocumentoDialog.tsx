@@ -1,11 +1,15 @@
 import { useEffect, useState } from 'react';
 import { Modal, Form, Input, Alert, Descriptions, Typography, Space, Tag, Button, message } from 'antd';
 import { ExclamationCircleOutlined, CloudUploadOutlined } from '@ant-design/icons';
+import { useMutation } from '@tanstack/react-query';
 import dayjs from '@/lib/dayjs';
 import {
   useCreateVoidedDocument,
   useSendVoidedDocumentToSunat,
 } from '../hooks/useVoidedDocuments';
+import { creditNoteService } from '@/services/credit-note.service';
+import { debitNoteService } from '@/services/debit-note.service';
+import { dailySummaryService } from '@/services/daily-summary.service';
 import { showApiError } from '@/lib/api-error';
 import { formatDate, formatNumber } from '@/utils/format';
 import type { SunatStatus } from '@/types/common.types';
@@ -27,10 +31,15 @@ const TIPO_LABELS: Record<TipoDocumentoAnulable, string> = {
 /**
  * Info minima del documento a anular. Generico para Invoice, CreditNote, DebitNote.
  * Cada list page debe proveer estos campos al abrir el dialog.
+ *
+ * Para NC/ND (tipo 07/08), tipo_doc_afectado='03' indica que esta vinculada a boleta:
+ * el dialog rutea al endpoint de Resumen Diario (RC) en lugar de Comunicacion de Baja (RA).
+ * SUNAT no acepta series con prefijo BC o BD en RA (error 2310).
  */
 export interface AnulableDocumento {
   id: number;
   tipo_documento: TipoDocumentoAnulable;
+  tipo_doc_afectado?: string; // '01' (factura) o '03' (boleta) para NC/ND
   company_id: number;
   branch_id: number;
   numero_completo: string;
@@ -80,15 +89,26 @@ export default function AnularDocumentoDialog({
   onSuccess,
 }: AnularDocumentoDialogProps) {
   const [motivo, setMotivo] = useState('');
-  const [voidedCreated, setVoidedCreated] = useState<{ id: number; numero_completo: string } | null>(null);
+  const [docCreado, setDocCreado] = useState<{ id: number; numero_completo: string } | null>(null);
 
   const createMutation = useCreateVoidedDocument();
   const sendMutation = useSendVoidedDocumentToSunat();
 
+  // Mutaciones para anulacion via Resumen Diario (NC/ND vinculadas a boleta)
+  const anularNcMutation = useMutation({
+    mutationFn: creditNoteService.anularOficialmente,
+  });
+  const anularNdMutation = useMutation({
+    mutationFn: debitNoteService.anularOficialmente,
+  });
+  const sendSummaryMutation = useMutation({
+    mutationFn: dailySummaryService.sendToSunat,
+  });
+
   useEffect(() => {
     if (open) {
       setMotivo('');
-      setVoidedCreated(null);
+      setDocCreado(null);
     }
   }, [open]);
 
@@ -97,15 +117,27 @@ export default function AnularDocumentoDialog({
   const tipoLabel = TIPO_LABELS[doc.tipo_documento];
   const esAceptada = doc.estado_sunat === 'ACEPTADO';
 
-  // Plazo SUNAT: 7 dias calendario para Comunicacion de Baja
+  // Una NC/ND vinculada a boleta (tipo_doc_afectado=03) se anula via Resumen Diario,
+  // no via Comunicacion de Baja. SUNAT no acepta series con prefijo BC o BD en RA.
+  const esNotaDeBoleta =
+    (doc.tipo_documento === '07' || doc.tipo_documento === '08') &&
+    doc.tipo_doc_afectado === '03';
+
+  // Plazo: 3 dias calendario para nota de boleta (RC), 7 para el resto (RA)
+  const plazoMaximo = esNotaDeBoleta ? 3 : 7;
+  const mecanismo = esNotaDeBoleta ? 'Resumen Diario' : 'Comunicacion de Baja';
+  const mecanismoTipo = esNotaDeBoleta ? 'RC' : 'RA';
+
   const diasTranscurridos = dayjs().diff(dayjs(doc.fecha_emision), 'day');
-  const diasRestantes = Math.max(0, 7 - diasTranscurridos);
-  const fueraDePlazo = esAceptada && diasTranscurridos > 7;
+  const diasRestantes = Math.max(0, plazoMaximo - diasTranscurridos);
+  const fueraDePlazo = esAceptada && diasTranscurridos > plazoMaximo;
   const noAceptada = !esAceptada;
 
   const puedeAnular = !fueraDePlazo && !noAceptada;
 
-  const loading = createMutation.isPending;
+  const loading =
+    createMutation.isPending || anularNcMutation.isPending || anularNdMutation.isPending;
+  const sending = sendMutation.isPending || sendSummaryMutation.isPending;
 
   const handleCrear = async () => {
     const motivoTrim = motivo.trim();
@@ -113,43 +145,59 @@ export default function AnularDocumentoDialog({
       message.warning('Ingrese el motivo de anulacion');
       return;
     }
-    if (motivoTrim.length > 250) {
-      message.warning('El motivo no puede superar los 250 caracteres');
+    if (motivoTrim.length > 100) {
+      message.warning('El motivo no puede superar los 100 caracteres');
       return;
     }
     if (!puedeAnular) {
       message.error(
         fueraDePlazo
-          ? 'El documento esta fuera del plazo de 7 dias'
+          ? `El documento esta fuera del plazo de ${plazoMaximo} dias`
           : 'Solo se pueden anular documentos aceptados por SUNAT'
       );
       return;
     }
 
-    // El backend busca el documento en DB por (serie + correlativo) con comparacion
-    // exacta de string. Por eso enviamos el correlativo TAL COMO viene del API
-    // (tipicamente zero-padded a 6 digitos, ej. "000003"), sin aplicar padding
-    // adicional porque eso romperia el match. El tipo TS dice number pero en
-    // runtime es string, por eso hacemos String() defensivo.
-    const correlativoStr = String(doc.correlativo).trim();
-
     try {
-      const result = await createMutation.mutateAsync({
-        company_id: doc.company_id,
-        branch_id: doc.branch_id,
-        fecha_referencia: dayjs(doc.fecha_emision).format('YYYY-MM-DD'),
-        motivo_baja: motivoTrim,
-        detalles: [
-          {
-            tipo_documento: doc.tipo_documento,
-            serie: doc.serie,
-            correlativo: correlativoStr,
-            motivo_especifico: motivoTrim,
-          },
-        ],
-      });
-      message.success(`Comunicacion de baja ${result.numero_completo} creada`);
-      setVoidedCreated({ id: result.id, numero_completo: result.numero_completo });
+      if (esNotaDeBoleta) {
+        // Ruta nueva: NC/ND vinculada a boleta -> Resumen Diario
+        const result =
+          doc.tipo_documento === '07'
+            ? await anularNcMutation.mutateAsync({
+                company_id: doc.company_id,
+                branch_id: doc.branch_id,
+                nota_credito_ids: [doc.id],
+                motivo_anulacion: motivoTrim,
+              })
+            : await anularNdMutation.mutateAsync({
+                company_id: doc.company_id,
+                branch_id: doc.branch_id,
+                nota_debito_ids: [doc.id],
+                motivo_anulacion: motivoTrim,
+              });
+        message.success(`Resumen ${result.summary.numero_completo} creado`);
+        setDocCreado({ id: result.summary.id, numero_completo: result.summary.numero_completo });
+      } else {
+        // Ruta clasica: factura, NC de factura, ND de factura -> Comunicacion de Baja
+        // El backend busca por (serie + correlativo) con comparacion exacta de string.
+        const correlativoStr = String(doc.correlativo).trim();
+        const result = await createMutation.mutateAsync({
+          company_id: doc.company_id,
+          branch_id: doc.branch_id,
+          fecha_referencia: dayjs(doc.fecha_emision).format('YYYY-MM-DD'),
+          motivo_baja: motivoTrim,
+          detalles: [
+            {
+              tipo_documento: doc.tipo_documento,
+              serie: doc.serie,
+              correlativo: correlativoStr,
+              motivo_especifico: motivoTrim,
+            },
+          ],
+        });
+        message.success(`Comunicacion de baja ${result.numero_completo} creada`);
+        setDocCreado({ id: result.id, numero_completo: result.numero_completo });
+      }
       // NO cerramos el dialog: ofrecemos el boton "Enviar a SUNAT" en el mismo flujo
     } catch (err) {
       showApiError(err, `Error al anular ${tipoLabel} ${doc.numero_completo}`);
@@ -157,41 +205,52 @@ export default function AnularDocumentoDialog({
   };
 
   const handleEnviar = async () => {
-    if (!voidedCreated) return;
+    if (!docCreado) return;
     try {
-      await sendMutation.mutateAsync(voidedCreated.id);
-      message.success(`Comunicacion ${voidedCreated.numero_completo} enviada a SUNAT`);
+      if (esNotaDeBoleta) {
+        await sendSummaryMutation.mutateAsync(docCreado.id);
+      } else {
+        await sendMutation.mutateAsync(docCreado.id);
+      }
+      message.success(`${mecanismo} ${docCreado.numero_completo} enviada a SUNAT`);
       onSuccess?.();
       onClose();
     } catch (err) {
-      showApiError(err, `Error al enviar ${voidedCreated.numero_completo}`);
+      showApiError(err, `Error al enviar ${docCreado.numero_completo}`);
       // Mantenemos el dialog abierto para permitir reintento
     }
   };
 
-  const alertType = fueraDePlazo || noAceptada ? 'error' : diasRestantes <= 2 ? 'warning' : 'info';
+  const alertType = fueraDePlazo || noAceptada ? 'error' : diasRestantes <= 1 ? 'warning' : 'info';
   const alertMessage = noAceptada
     ? `Solo se pueden anular ${tipoLabel.toLowerCase()}s aceptadas por SUNAT`
     : fueraDePlazo
     ? 'FUERA DE PLAZO - No se puede anular oficialmente'
-    : 'Anulacion via Comunicacion de Baja';
+    : `Anulacion via ${mecanismo}`;
 
   const alertDescription = noAceptada ? (
     <Paragraph style={{ margin: 0 }}>
       El documento esta en estado <strong>{doc.estado_sunat}</strong>. SUNAT solo permite la
-      Comunicacion de Baja de comprobantes que fueron previamente aceptados.
+      anulacion de comprobantes que fueron previamente aceptados.
     </Paragraph>
   ) : fueraDePlazo ? (
     <Paragraph style={{ margin: 0 }}>
       Han pasado <strong>{diasTranscurridos} dias</strong> desde la emision. SUNAT solo permite
-      anulacion via Comunicacion de Baja dentro de los <strong>7 dias</strong> posteriores a
-      la emision. Este documento no puede anularse.
+      anulacion oficial dentro de los <strong>{plazoMaximo} dias</strong> posteriores a la
+      emision. Este documento no puede anularse.
+    </Paragraph>
+  ) : esNotaDeBoleta ? (
+    <Paragraph style={{ margin: 0 }}>
+      Esta nota esta vinculada a una <strong>boleta</strong>. SUNAT exige anularla con un{' '}
+      <strong>Resumen Diario (tipo {mecanismoTipo})</strong>, no con Comunicacion de Baja.
+      Dias restantes: <strong>{diasRestantes}</strong>. Despues de crear el resumen, puedes
+      enviarlo a SUNAT desde este mismo dialog.
     </Paragraph>
   ) : (
     <Paragraph style={{ margin: 0 }}>
-      Se generara una <strong>Comunicacion de Baja (tipo RA)</strong> con este documento.
-      Dias restantes para anular: <strong>{diasRestantes}</strong>. Despues de crearla, puedes
-      enviarla a SUNAT directamente desde este mismo dialog.
+      Se generara una <strong>Comunicacion de Baja (tipo {mecanismoTipo})</strong> con este
+      documento. Dias restantes para anular: <strong>{diasRestantes}</strong>. Despues de
+      crearla, puedes enviarla a SUNAT directamente desde este mismo dialog.
     </Paragraph>
   );
 
@@ -208,13 +267,13 @@ export default function AnularDocumentoDialog({
       width={640}
       destroyOnHidden
       footer={
-        voidedCreated ? (
+        docCreado ? (
           <Space>
             <Button onClick={onClose}>Cerrar</Button>
             <Button
               type="primary"
               icon={<CloudUploadOutlined />}
-              loading={sendMutation.isPending}
+              loading={sending}
               onClick={handleEnviar}
             >
               Enviar a SUNAT
@@ -268,27 +327,31 @@ export default function AnularDocumentoDialog({
 
         <Alert type={alertType} showIcon message={alertMessage} description={alertDescription} />
 
-        {voidedCreated && (
+        {docCreado && (
           <Alert
             type="success"
             showIcon
-            message={`Comunicacion ${voidedCreated.numero_completo} creada correctamente`}
-            description="Pulsa 'Enviar a SUNAT' para completar el proceso de anulacion, o 'Cerrar' si prefieres enviarla mas tarde desde la pagina de Anulaciones."
+            message={`${mecanismo} ${docCreado.numero_completo} creado correctamente`}
+            description={
+              esNotaDeBoleta
+                ? "Pulsa 'Enviar a SUNAT' para procesar el resumen, o 'Cerrar' si prefieres enviarlo mas tarde desde Anulaciones."
+                : "Pulsa 'Enviar a SUNAT' para completar el proceso de anulacion, o 'Cerrar' si prefieres enviarlo mas tarde desde Anulaciones."
+            }
           />
         )}
 
-        {!voidedCreated && (
+        {!docCreado && (
           <Form layout="vertical">
             <Form.Item
               label="Motivo de anulacion"
               required
-              help={`${motivo.length}/250 caracteres`}
+              help={`${motivo.length}/100 caracteres`}
             >
               <Input.TextArea
                 placeholder="Ej: Error en el monto / Error en datos del cliente / Duplicado"
                 value={motivo}
                 onChange={(e) => setMotivo(e.target.value)}
-                maxLength={250}
+                maxLength={100}
                 rows={2}
                 disabled={!puedeAnular}
               />

@@ -85,6 +85,7 @@ export default function DebitNoteListPage() {
   const toAnulable = (nd: DebitNote): AnulableDocumento => ({
     id: nd.id,
     tipo_documento: '08',
+    tipo_doc_afectado: nd.tipo_doc_afectado, // '03' rutea a Resumen Diario, '01' a Comunicacion de Baja
     company_id: nd.company_id,
     branch_id: nd.branch_id,
     numero_completo: nd.numero_completo,

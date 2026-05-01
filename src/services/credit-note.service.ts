@@ -29,6 +29,46 @@ export const creditNoteService = {
   },
 
   /**
+   * Anular NC vinculada a boleta (tipo_doc_afectado=03, serie BC*) via Resumen Diario.
+   * Devuelve el summary creado; despues hay que llamar a dailySummaryService.sendToSunat(summary.id).
+   * NO usar para NC de factura: SUNAT solo acepta BC* en RC, no en RA.
+   */
+  anularOficialmente: async (payload: {
+    company_id: number;
+    branch_id: number;
+    nota_credito_ids: number[];
+    motivo_anulacion: string;
+    usuario_id?: number;
+  }): Promise<{
+    summary: {
+      id: number;
+      numero_completo: string;
+      fecha_resumen: string;
+      fecha_generacion: string;
+      correlativo: string;
+      estado_proceso: string;
+      estado_sunat: string;
+    };
+    notas_count: number;
+    notas_ids: number[];
+  }> => {
+    const response = await apiClient.post<ApiResponse<{
+      summary: {
+        id: number;
+        numero_completo: string;
+        fecha_resumen: string;
+        fecha_generacion: string;
+        correlativo: string;
+        estado_proceso: string;
+        estado_sunat: string;
+      };
+      notas_count: number;
+      notas_ids: number[];
+    }>>('/v1/credit-notes/anular-oficialmente', payload);
+    return response.data.data;
+  },
+
+  /**
    * Exporta notas de credito filtradas a XLSX.
    */
   exportToExcel: async (params?: CreditNoteListParams): Promise<void> => {

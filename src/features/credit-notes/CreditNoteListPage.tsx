@@ -85,6 +85,7 @@ export default function CreditNoteListPage() {
   const toAnulable = (nc: CreditNote): AnulableDocumento => ({
     id: nc.id,
     tipo_documento: '07',
+    tipo_doc_afectado: nc.tipo_doc_afectado, // '03' rutea a Resumen Diario, '01' a Comunicacion de Baja
     company_id: nc.company_id,
     branch_id: nc.branch_id,
     numero_completo: nc.numero_completo,
