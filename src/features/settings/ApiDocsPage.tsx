@@ -339,6 +339,73 @@ Content-Type: application/json`}
                         <li><strong>Formato B (motivo individual):</strong> <code>{'{ boletas: [{id, motivo}, ...] }'}</code> — cada boleta con su propio motivo (recomendado para auditoria)</li>
                       </ul>
                     </div>
+
+                    <Divider plain style={{ margin: '24px 0 12px' }}>Anulacion de NC / ND vinculadas a boleta (BC*, BD*)</Divider>
+                    <div style={{ fontSize: 13, marginBottom: 12 }}>
+                      Las <strong>notas de credito</strong> con serie <code>BC*</code> y las <strong>notas de debito</strong> con serie <code>BD*</code> (es decir, vinculadas a boleta, <code>tipo_doc_afectado=03</code>) <strong>NO se pueden anular con Comunicacion de Baja (RA)</strong>: SUNAT rechaza con error <code>2310</code>. Se anulan con un Resumen Diario <code>RC</code> (estado=3), igual que las boletas, pero con <code>tipo_documento=07</code>/<code>08</code> y referencia a la boleta original. El sistema arma todo automaticamente.
+                    </div>
+                    <EndpointGroup
+                      endpoints={[
+                        { method: 'POST', path: '/v1/credit-notes/anular-oficialmente', desc: 'Crear RC para anular NC vinculadas a boleta (BC*)' },
+                        { method: 'POST', path: '/v1/debit-notes/anular-oficialmente', desc: 'Crear RC para anular ND vinculadas a boleta (BD*)' },
+                        { method: 'POST', path: '/v1/daily-summaries/{id}/send-sunat', desc: 'Enviar RC a SUNAT (mismo flujo que boletas, paso 2)' },
+                        { method: 'POST', path: '/v1/daily-summaries/{id}/check-status', desc: 'Re-consultar estado por ticket' },
+                      ]}
+                    />
+
+                    <div style={{ marginTop: 16, padding: 12, background: '#fff1f0', border: '1px solid #ffa39e', borderRadius: 4, fontSize: 13 }}>
+                      <strong>Restricciones (validadas antes de crear el RC):</strong>
+                      <ul style={{ margin: '6px 0 0', paddingLeft: 20 }}>
+                        <li><strong>Solo notas de boleta:</strong> <code>tipo_doc_afectado</code> debe ser <code>03</code>. Si es <code>01</code> (factura), usar Comunicacion de Baja (seccion anterior)</li>
+                        <li><strong>Plazo:</strong> 3 dias calendario desde <code>fecha_emision</code> de la nota</li>
+                        <li><strong>Estado:</strong> la nota debe tener <code>estado_sunat = ACEPTADO</code></li>
+                        <li><strong>No anulada:</strong> ni localmente ni en proceso (<code>estado_anulacion = sin_anular</code>)</li>
+                        <li><strong>Misma fecha:</strong> todas las notas del mismo request comparten <code>fecha_emision</code></li>
+                      </ul>
+                    </div>
+
+                    <div style={{ marginTop: 12, padding: 12, background: '#e6f7ff', border: '1px solid #91d5ff', borderRadius: 4, fontSize: 13 }}>
+                      <strong>Flujo (identico al de boletas a partir del paso 2):</strong>
+                      <ol style={{ margin: '6px 0 0', paddingLeft: 20 }}>
+                        <li><code>POST /v1/credit-notes/anular-oficialmente</code> (o <code>debit-notes</code>) -&gt; <code>summary.id</code>, RC en <code>PENDIENTE</code>, notas en <code>pendiente_anulacion</code></li>
+                        <li><code>POST /v1/daily-summaries/{'{id}'}/send-sunat</code> -&gt; tipicamente <code>ACEPTADO</code> en segundos</li>
+                        <li>Cuando <code>ACEPTADO</code>: las notas pasan a <code>estado_sunat=ANULADO</code> + <code>estado_anulacion=anulada</code></li>
+                        <li>Si SUNAT <strong>rechaza</strong>: las notas vuelven a <code>sin_anular</code> y se desligan del summary, asi puedes corregir el motivo y reintentar</li>
+                      </ol>
+                    </div>
+
+                    <div style={{ marginTop: 12, padding: 12, background: '#fff2e8', border: '1px solid #ffbb96', borderRadius: 4, fontSize: 13 }}>
+                      <strong>Dos formatos soportados:</strong>
+                      <ul style={{ margin: '6px 0 0', paddingLeft: 20 }}>
+                        <li><strong>Motivo unico:</strong> <code>{'{ nota_credito_ids: [42,43], motivo_anulacion: "..." }'}</code> (o <code>nota_debito_ids</code>)</li>
+                        <li><strong>Motivo individual:</strong> <code>{'{ notas: [{id, motivo}, ...] }'}</code></li>
+                      </ul>
+                    </div>
+
+                    <div style={{ marginTop: 12, background: '#fafafa', border: '1px solid #e8e8e8', borderRadius: 4, padding: 12 }}>
+                      <div style={{ fontSize: 12, color: '#888', marginBottom: 6 }}>Ejemplo cURL — Anular NC de boleta</div>
+                      <pre style={{ margin: 0, fontSize: 12, whiteSpace: 'pre-wrap' }}>{`# 1. Crear RC de anulacion (la NC debe ser BC*, ACEPTADA, dentro de 3 dias)
+curl -X POST https://api.syncrofact.net.pe/api/v1/credit-notes/anular-oficialmente \\
+  -H "Authorization: Bearer TU_TOKEN" \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "company_id": 1,
+    "branch_id": 1,
+    "nota_credito_ids": [42],
+    "motivo_anulacion": "Error en items"
+  }'
+
+# Respuesta: { data: { summary: { id: 28, ... } } }
+
+# 2. Enviar a SUNAT (auto check-status incluido)
+curl -X POST https://api.syncrofact.net.pe/api/v1/daily-summaries/28/send-sunat \\
+  -H "Authorization: Bearer TU_TOKEN"
+
+# 3. Verificar estado de la NC
+curl https://api.syncrofact.net.pe/api/v1/credit-notes/42 \\
+  -H "Authorization: Bearer TU_TOKEN"
+# Esperado tras aceptar SUNAT: estado_sunat=ANULADO, estado_anulacion=anulada`}</pre>
+                    </div>
                   </div>
                 ),
               },
