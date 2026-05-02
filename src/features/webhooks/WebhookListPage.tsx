@@ -16,12 +16,28 @@ export default function WebhookListPage() {
   const { data, isLoading } = useQuery({ queryKey: ['webhooks', getQueryParams()], queryFn: () => webhookService.getAll(getQueryParams()) });
   const deleteMut = useMutation({ mutationFn: (id: number) => webhookService.delete(id), onSuccess: () => qc.invalidateQueries({ queryKey: ['webhooks'] }) });
   const testMut = useMutation({ mutationFn: (id: number) => webhookService.test(id) });
+  const toggleMut = useMutation({
+    mutationFn: ({ id, active }: { id: number; active: boolean }) => webhookService.update(id, { active }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['webhooks'] }),
+  });
 
   const columns: ColumnsType<Webhook> = [
     { title: 'Nombre', dataIndex: 'name', ellipsis: true },
     { title: 'URL', dataIndex: 'url', ellipsis: true, responsive: ['lg'] },
     { title: 'Eventos', dataIndex: 'events', width: 100, render: (e: string[]) => <Tag>{e?.length || 0} eventos</Tag> },
-    { title: 'Activo', key: 'active', width: 70, render: (_, r) => <Switch checked={r.active} disabled size="small" /> },
+    { title: 'Activo', key: 'active', width: 70, render: (_, r) => (
+      <Switch
+        checked={r.active}
+        size="small"
+        loading={toggleMut.isPending && toggleMut.variables?.id === r.id}
+        onChange={async (checked) => {
+          try {
+            await toggleMut.mutateAsync({ id: r.id, active: checked });
+            message.success(checked ? 'Webhook activado' : 'Webhook desactivado');
+          } catch { message.error('Error'); }
+        }}
+      />
+    ) },
     { title: 'OK/Fail', key: 'stats', width: 100, render: (_, r) => <span><Tag color="green">{r.success_count}</Tag><Tag color="red">{r.failure_count}</Tag></span> },
     { title: 'Ultimo', dataIndex: 'last_triggered_at', width: 150, responsive: ['xl'], render: (d: string) => <DateCell value={d} withTime /> },
     {
