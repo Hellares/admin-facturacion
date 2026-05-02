@@ -55,8 +55,9 @@ export const webhookService = {
     return response.data;
   },
   getDeliveries: async (id: number): Promise<WebhookDelivery[]> => {
-    const response = await apiClient.get<ApiResponse<WebhookDelivery[]>>(`/v1/webhooks/${id}/deliveries`);
-    return response.data.data;
+    const response = await apiClient.get<ApiResponse<{ data: WebhookDelivery[] } | WebhookDelivery[]>>(`/v1/webhooks/${id}/deliveries`);
+    const payload = response.data.data;
+    return Array.isArray(payload) ? payload : payload.data ?? [];
   },
   retryDelivery: async (deliveryId: number): Promise<void> => {
     await apiClient.post(`/v1/webhooks/deliveries/${deliveryId}/retry`);
