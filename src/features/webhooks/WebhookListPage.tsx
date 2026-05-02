@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { Card, Table, Space, Button, Tag, Switch, message } from 'antd';
-import { EyeOutlined, DeleteOutlined, ThunderboltOutlined } from '@ant-design/icons';
+import { EyeOutlined, EditOutlined, DeleteOutlined, ThunderboltOutlined } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import PageHeader from '@/components/common/PageHeader';
@@ -25,10 +25,11 @@ export default function WebhookListPage() {
     { title: 'OK/Fail', key: 'stats', width: 100, render: (_, r) => <span><Tag color="green">{r.success_count}</Tag><Tag color="red">{r.failure_count}</Tag></span> },
     { title: 'Ultimo', dataIndex: 'last_triggered_at', width: 150, responsive: ['xl'], render: (d: string) => <DateCell value={d} withTime /> },
     {
-      title: 'Acciones', key: 'actions', width: 180,
+      title: 'Acciones', key: 'actions', width: 230,
       render: (_, record) => (
         <Space size={4}>
           <Button size="small" icon={<EyeOutlined />} style={{ color: '#1677ff' }} onClick={() => navigate(`/webhooks/${record.id}`)}>Ver</Button>
+          <Button size="small" icon={<EditOutlined />} onClick={() => navigate(`/webhooks/${record.id}/edit`)}>Editar</Button>
           <Button size="small" icon={<ThunderboltOutlined />} loading={testMut.isPending} onClick={async () => { try { await testMut.mutateAsync(record.id); message.success('Test enviado'); } catch { message.error('Error'); } }}>Test</Button>
           <Button size="small" danger icon={<DeleteOutlined />} onClick={() => showDeleteConfirm(async () => { await deleteMut.mutateAsync(record.id); message.success('Eliminado'); })} />
         </Space>

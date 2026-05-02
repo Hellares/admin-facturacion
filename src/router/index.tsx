@@ -176,6 +176,7 @@ export const router = createBrowserRouter([
       { path: 'config/gre-credentials', element: <PermissionRoute permission="config.manage"><Suspense fallback={<Loading />}><GreCredentialsPage /></Suspense></PermissionRoute> },
       { path: 'webhooks', element: <PermissionRoute permission="config.manage"><Suspense fallback={<Loading />}><WebhookListPage /></Suspense></PermissionRoute> },
       { path: 'webhooks/new', element: <PermissionRoute permission="config.manage"><Suspense fallback={<Loading />}><WebhookFormPage /></Suspense></PermissionRoute> },
+      { path: 'webhooks/:id/edit', element: <PermissionRoute permission="config.manage"><Suspense fallback={<Loading />}><WebhookFormPage /></Suspense></PermissionRoute> },
       { path: 'webhooks/:id', element: <PermissionRoute permission="config.manage"><Suspense fallback={<Loading />}><WebhookDetailPage /></Suspense></PermissionRoute> },
       { path: 'catalogs', element: <Suspense fallback={<Loading />}><CatalogPage /></Suspense> },
       { path: 'system-settings', element: <PermissionRoute permission="system.config"><Suspense fallback={<Loading />}><SystemSettingsPage /></Suspense></PermissionRoute> },

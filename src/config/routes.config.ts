@@ -82,6 +82,7 @@ export const ROUTES = {
   WEBHOOKS: '/webhooks',
   WEBHOOK_NEW: '/webhooks/new',
   WEBHOOK_DETAIL: '/webhooks/:id',
+  WEBHOOK_EDIT: '/webhooks/:id/edit',
   CATALOGS: '/catalogs',
   CONFIG: '/config',
   GRE_CREDENTIALS: '/config/gre-credentials',

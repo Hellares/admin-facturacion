@@ -1,6 +1,6 @@
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { Card, Descriptions, Table, Tag, Space, Button, message } from 'antd';
-import { ThunderboltOutlined, ReloadOutlined } from '@ant-design/icons';
+import { ThunderboltOutlined, ReloadOutlined, EditOutlined } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import PageHeader from '@/components/common/PageHeader';
@@ -10,6 +10,7 @@ import { webhookService, type WebhookDelivery } from '@/services/webhook.service
 
 export default function WebhookDetailPage() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const qc = useQueryClient();
   const { data: webhook, isLoading } = useQuery({ queryKey: ['webhook', Number(id)], queryFn: () => webhookService.getById(Number(id)) });
   const { data: deliveries, isLoading: loadingDel } = useQuery({ queryKey: ['webhook-deliveries', Number(id)], queryFn: () => webhookService.getDeliveries(Number(id)) });
@@ -32,7 +33,7 @@ export default function WebhookDetailPage() {
   return (
     <div>
       <PageHeader title={webhook.name} showBack breadcrumbs={[{ title: 'Webhooks', path: '/webhooks' }, { title: webhook.name }]}
-        extra={<Button icon={<ThunderboltOutlined />} loading={testMut.isPending} onClick={async () => { try { await testMut.mutateAsync(); message.success('Test enviado'); } catch { message.error('Error'); } }}>Test</Button>} />
+        extra={<Space><Button icon={<EditOutlined />} onClick={() => navigate(`/webhooks/${id}/edit`)}>Editar</Button><Button icon={<ThunderboltOutlined />} loading={testMut.isPending} onClick={async () => { try { await testMut.mutateAsync(); message.success('Test enviado'); } catch { message.error('Error'); } }}>Test</Button></Space>} />
       <Space direction="vertical" size="middle" style={{ width: '100%' }}>
         <Card>
           <Descriptions column={{ xs: 1, sm: 2 }}>
