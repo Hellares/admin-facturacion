@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { Card, Form, Input, Select, DatePicker, Space, Button, Divider, Row, Col, Tag, Alert, message } from 'antd';
 import { FileTextOutlined, UserOutlined, ShoppingCartOutlined, DollarOutlined, SendOutlined } from '@ant-design/icons';
+import { useEffect } from 'react';
 import { useForm, FormProvider, Controller, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import dayjs from '@/lib/dayjs';
@@ -70,10 +71,21 @@ export default function InvoiceFormPage() {
     },
   });
 
-  const { handleSubmit, control, formState: { errors } } = methods;
+  const { handleSubmit, control, setValue, formState: { errors } } = methods;
 
   // DueDate solo aplica a Credito (SUNAT rechaza Factura Contado con vencimiento, error 0306).
   const formaPagoTipo = useWatch({ control, name: 'forma_pago_tipo' });
+  const cuotas = useWatch({ control, name: 'forma_pago_cuotas' });
+
+  // En Credito el vencimiento del documento = fecha de la ultima cuota (se recalcula al editar cuotas).
+  // Las fechas estan en formato YYYY-MM-DD, asi que el orden lexicografico coincide con el cronologico.
+  useEffect(() => {
+    if (formaPagoTipo !== 'Credito') return;
+    const fechas = (cuotas ?? []).map((c) => c?.fecha_pago).filter(Boolean) as string[];
+    if (fechas.length === 0) return;
+    const ultima = fechas.reduce((a, b) => (a > b ? a : b));
+    setValue('fecha_vencimiento', ultima);
+  }, [cuotas, formaPagoTipo, setValue]);
 
   const onValidationError = (formErrors: Record<string, unknown>) => {
     const fieldNames = Object.keys(formErrors);
