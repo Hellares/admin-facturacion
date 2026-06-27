@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { Card, Form, Input, Select, DatePicker, Space, Button, Divider, Row, Col, Tag, Alert, message } from 'antd';
 import { FileTextOutlined, UserOutlined, ShoppingCartOutlined, DollarOutlined, SendOutlined } from '@ant-design/icons';
-import { useForm, FormProvider, Controller } from 'react-hook-form';
+import { useForm, FormProvider, Controller, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import dayjs from '@/lib/dayjs';
 import { devLog } from '@/lib/logger';
@@ -72,6 +72,9 @@ export default function InvoiceFormPage() {
 
   const { handleSubmit, control, formState: { errors } } = methods;
 
+  // DueDate solo aplica a Credito (SUNAT rechaza Factura Contado con vencimiento, error 0306).
+  const formaPagoTipo = useWatch({ control, name: 'forma_pago_tipo' });
+
   const onValidationError = (formErrors: Record<string, unknown>) => {
     const fieldNames = Object.keys(formErrors);
     devLog.error('Form validation errors:', formErrors);
@@ -84,7 +87,8 @@ export default function InvoiceFormPage() {
         ...values,
         company_id: selectedCompanyId || values.company_id,
         branch_id: selectedBranchId || values.branch_id,
-        fecha_vencimiento: values.fecha_vencimiento || undefined,
+        // En Contado no se manda vencimiento: el backend lo ignoraria igual, pero asi el payload es coherente.
+        fecha_vencimiento: values.forma_pago_tipo === 'Credito' ? (values.fecha_vencimiento || undefined) : undefined,
         forma_pago_cuotas: values.forma_pago_tipo === 'Credito' ? values.forma_pago_cuotas : undefined,
         detraccion: values.detraccion?.codigo_bien_servicio ? values.detraccion : undefined,
         medios_pago: values.medios_pago && values.medios_pago.length > 0 ? values.medios_pago : undefined,
@@ -140,13 +144,15 @@ export default function InvoiceFormPage() {
                           )} />
                         </Form.Item>
                       </Col>
-                      <Col xs={12} sm={6} md={5}>
-                        <Form.Item label="Vencimiento" style={{ marginBottom: 8 }}>
-                          <Controller name="fecha_vencimiento" control={control} render={({ field }) => (
-                            <DatePicker value={field.value ? dayjs(field.value) : null} onChange={(d) => field.onChange(d?.format('YYYY-MM-DD') || '')} format="DD/MM/YYYY" style={{ width: '100%' }} />
-                          )} />
-                        </Form.Item>
-                      </Col>
+                      {formaPagoTipo === 'Credito' && (
+                        <Col xs={12} sm={6} md={5}>
+                          <Form.Item label="Vencimiento" style={{ marginBottom: 8 }}>
+                            <Controller name="fecha_vencimiento" control={control} render={({ field }) => (
+                              <DatePicker value={field.value ? dayjs(field.value) : null} onChange={(d) => field.onChange(d?.format('YYYY-MM-DD') || '')} format="DD/MM/YYYY" style={{ width: '100%' }} />
+                            )} />
+                          </Form.Item>
+                        </Col>
+                      )}
                       <Col xs={12} sm={6} md={4}>
                         <Form.Item label="Moneda" style={{ marginBottom: 8 }}>
                           <Controller name="moneda" control={control} render={({ field }) => (
