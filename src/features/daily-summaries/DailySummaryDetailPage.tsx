@@ -10,6 +10,7 @@ import { useDailySummary, useSendDailySummaryToSunat, useCheckDailySummaryStatus
 import { showSendSunatConfirm } from '@/components/common/ConfirmModal';
 import { formatDate } from '@/utils/format';
 import { downloadFile } from '@/utils/download';
+import { formatSunatInfo } from '@/utils/sunat';
 
 export default function DailySummaryDetailPage() {
   const { id } = useParams();
@@ -70,7 +71,7 @@ export default function DailySummaryDetailPage() {
             <Descriptions.Item label="Ticket">{summary.ticket || '-'}</Descriptions.Item>
             <Descriptions.Item label="Cantidad Boletas">{summary.cantidad_boletas}</Descriptions.Item>
             <Descriptions.Item label="Total"><MoneyDisplay amount={summary.total} strong size="large" /></Descriptions.Item>
-            {summary.respuesta_sunat && <Descriptions.Item label="Respuesta SUNAT" span={3}>{summary.respuesta_sunat}</Descriptions.Item>}
+            {formatSunatInfo(summary.respuesta_sunat) && <Descriptions.Item label="Respuesta SUNAT" span={3}>{formatSunatInfo(summary.respuesta_sunat)}</Descriptions.Item>}
           </Descriptions>
         </Card>
       </Space>

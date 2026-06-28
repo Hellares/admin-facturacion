@@ -1,25 +1,9 @@
-import type { SunatStatus, TipoDocumentoCliente, TipoAfectacionIGV } from '@/types/common.types';
+import type { TipoDocumentoCliente, TipoAfectacionIGV } from '@/types/common.types';
 
 // === Estados SUNAT ===
-export const SUNAT_STATUS_LABELS: Record<SunatStatus, string> = {
-  PENDIENTE: 'Pendiente',
-  ENVIANDO: 'Enviando',
-  ENVIADO: 'Enviado',
-  PROCESANDO: 'Procesando',
-  ACEPTADO: 'Aceptado',
-  RECHAZADO: 'Rechazado',
-  ERROR: 'Error',
-};
-
-export const SUNAT_STATUS_COLORS: Record<SunatStatus, string> = {
-  PENDIENTE: 'orange',
-  ENVIANDO: 'blue',
-  ENVIADO: 'geekblue',
-  PROCESANDO: 'cyan',
-  ACEPTADO: 'green',
-  RECHAZADO: 'red',
-  ERROR: 'red',
-};
+// Fuente única en constants/sunat-statuses. Se re-exportan aquí para no romper
+// los imports existentes (`@/utils/constants`).
+export { SUNAT_STATUS_LABELS, SUNAT_STATUS_COLORS } from '@/constants/sunat-statuses';
 
 // === Tipos de Documento de Identidad ===
 export const TIPO_DOCUMENTO_OPTIONS: { value: TipoDocumentoCliente; label: string }[] = [

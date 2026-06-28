@@ -6,11 +6,14 @@ import type { SunatStatus } from '@/types/common.types';
  */
 export const SUNAT_STATUS = {
   PENDIENTE: 'PENDIENTE',
+  EN_COLA: 'EN_COLA',
   ENVIANDO: 'ENVIANDO',
   ENVIADO: 'ENVIADO',
   PROCESANDO: 'PROCESANDO',
   ACEPTADO: 'ACEPTADO',
   RECHAZADO: 'RECHAZADO',
+  ANULADO: 'ANULADO',
+  NO_EMITIDO: 'NO_EMITIDO',
   ERROR: 'ERROR',
 } as const satisfies Record<SunatStatus, SunatStatus>;
 
@@ -24,6 +27,7 @@ export const SUNAT_STATUS_VALUES: SunatStatus[] = Object.values(SUNAT_STATUS);
  */
 export const SUNAT_STATUS_IN_PROGRESS: SunatStatus[] = [
   SUNAT_STATUS.PENDIENTE,
+  SUNAT_STATUS.EN_COLA,
   SUNAT_STATUS.ENVIANDO,
   SUNAT_STATUS.ENVIADO,
   SUNAT_STATUS.PROCESANDO,
@@ -42,12 +46,32 @@ export const SUNAT_STATUS_ERROR: SunatStatus[] = [
  */
 export const SUNAT_STATUS_LABELS: Record<SunatStatus, string> = {
   PENDIENTE: 'Pendiente',
+  EN_COLA: 'En cola',
   ENVIANDO: 'Enviando',
   ENVIADO: 'Enviado',
   PROCESANDO: 'Procesando',
   ACEPTADO: 'Aceptado',
   RECHAZADO: 'Rechazado',
+  ANULADO: 'Anulado',
+  NO_EMITIDO: 'No emitido',
   ERROR: 'Error',
+};
+
+/**
+ * Color del Tag (Ant Design) por estado. Fuente única — consumido por
+ * `SunatStatusBadge` (vía re-export en utils/constants).
+ */
+export const SUNAT_STATUS_COLORS: Record<SunatStatus, string> = {
+  PENDIENTE: 'orange',
+  EN_COLA: 'gold',
+  ENVIANDO: 'blue',
+  ENVIADO: 'geekblue',
+  PROCESANDO: 'cyan',
+  ACEPTADO: 'green',
+  RECHAZADO: 'red',
+  ANULADO: 'volcano',
+  NO_EMITIDO: 'default',
+  ERROR: 'red',
 };
 
 /**

@@ -9,6 +9,7 @@ import DateCell from '@/components/common/DateCell';
 import DocumentActions from '@/components/common/DocumentActions';
 import { useRetention } from './hooks/useRetentions';
 import { formatDate, formatMoney } from '@/utils/format';
+import { formatSunatInfo } from '@/utils/sunat';
 import type { RetentionDetail } from '@/types/retention.types';
 
 export default function RetentionDetailPage() {
@@ -43,7 +44,7 @@ export default function RetentionDetailPage() {
             <Descriptions.Item label="Fecha">{formatDate(ret.fecha_emision)}</Descriptions.Item>
             <Descriptions.Item label="Estado"><SunatStatusBadge status={ret.estado_sunat} /></Descriptions.Item>
             <Descriptions.Item label="Regimen">{ret.regimen} ({ret.tasa}%)</Descriptions.Item>
-            {ret.respuesta_sunat && <Descriptions.Item label="Respuesta SUNAT" span={4}>{ret.respuesta_sunat}</Descriptions.Item>}
+            {formatSunatInfo(ret.respuesta_sunat) && <Descriptions.Item label="Respuesta SUNAT" span={4}>{formatSunatInfo(ret.respuesta_sunat)}</Descriptions.Item>}
           </Descriptions>
         </Card>
         <Card title="Proveedor" size="small">

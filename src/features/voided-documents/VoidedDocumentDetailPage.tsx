@@ -14,6 +14,7 @@ import { voidedDocumentService } from '@/services/voided-document.service';
 import { showApiError } from '@/lib/api-error';
 import { downloadFile } from '@/utils/download';
 import { formatDate } from '@/utils/format';
+import { formatSunatInfo } from '@/utils/sunat';
 import type { VoidedDocItem } from '@/types/voided-document.types';
 
 const TIPO_DOC_LABELS: Record<string, string> = {
@@ -173,9 +174,9 @@ export default function VoidedDocumentDetailPage() {
             <Descriptions.Item label="Documentos Anulados">
               {voided.documentos?.length ?? 0}
             </Descriptions.Item>
-            {voided.respuesta_sunat && (
+            {formatSunatInfo(voided.respuesta_sunat) && (
               <Descriptions.Item label="Respuesta SUNAT" span={3}>
-                {voided.respuesta_sunat}
+                {formatSunatInfo(voided.respuesta_sunat)}
               </Descriptions.Item>
             )}
           </Descriptions>

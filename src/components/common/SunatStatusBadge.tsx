@@ -2,19 +2,11 @@ import { Tag, Tooltip } from 'antd';
 import { InfoCircleOutlined } from '@ant-design/icons';
 import type { SunatStatus } from '@/types/common.types';
 import { SUNAT_STATUS_LABELS, SUNAT_STATUS_COLORS } from '@/utils/constants';
+import { parseSunatInfo } from '@/utils/sunat';
+import type { SunatInfo } from '@/utils/sunat';
 
-/**
- * Informacion resumida de la respuesta SUNAT (codigo + descripcion).
- * Se usa para mostrar tooltip con motivo del rechazo o error.
- *
- * Acepta tanto la estructura moderna `{ codigo, descripcion }` como
- * la leyenda simple (string) de algunos endpoints legacy.
- */
-export interface SunatInfo {
-  codigo?: string | number | null;
-  descripcion?: string | null;
-  notas?: string[] | null;
-}
+// Re-export para compatibilidad con consumidores existentes (DocumentPdfViewer).
+export type { SunatInfo };
 
 interface SunatStatusBadgeProps {
   status: SunatStatus;
@@ -26,21 +18,12 @@ interface SunatStatusBadgeProps {
   sunatInfo?: SunatInfo | string | null;
 }
 
-function normalizeSunatInfo(info: SunatInfo | string | null | undefined): SunatInfo | null {
-  if (!info) return null;
-  if (typeof info === 'string') {
-    return info.trim() ? { descripcion: info } : null;
-  }
-  if (!info.codigo && !info.descripcion) return null;
-  return info;
-}
-
 export default function SunatStatusBadge({ status, sunatInfo }: SunatStatusBadgeProps) {
   if (!status) return <Tag color="default">-</Tag>;
 
   const color = SUNAT_STATUS_COLORS[status] || 'default';
   const label = SUNAT_STATUS_LABELS[status] || status;
-  const normalized = normalizeSunatInfo(sunatInfo);
+  const normalized = parseSunatInfo(sunatInfo);
   const isProblem = status === 'RECHAZADO' || status === 'ERROR';
 
   // Solo mostramos tooltip cuando hay info y el estado es problematico

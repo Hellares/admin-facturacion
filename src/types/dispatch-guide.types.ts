@@ -48,6 +48,8 @@ export interface DispatchGuide {
   num_bultos?: number;
   estado_sunat: SunatStatus;
   respuesta_sunat?: string;
+  /** Bloque SUNAT parseado que expone el endpoint (DispatchGuideController). */
+  sunat?: { codigo?: string; descripcion?: string; notas?: string[] };
   destinatario: ClienteDocumento;
   partida: DireccionEnvio;
   llegada: DireccionEnvio;

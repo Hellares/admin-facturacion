@@ -1,11 +1,15 @@
 // === Estados SUNAT ===
+// Fuente de verdad: valores de `estado_sunat` que emite el backend Laravel.
 export type SunatStatus =
   | 'PENDIENTE'
+  | 'EN_COLA'
   | 'ENVIANDO'
   | 'ENVIADO'
   | 'PROCESANDO'
   | 'ACEPTADO'
   | 'RECHAZADO'
+  | 'ANULADO'
+  | 'NO_EMITIDO'
   | 'ERROR';
 
 // === Moneda ===
