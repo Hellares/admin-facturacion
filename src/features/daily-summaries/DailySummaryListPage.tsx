@@ -117,7 +117,7 @@ export default function DailySummaryListPage() {
         <Space wrap style={{ marginBottom: 16 }}>
           <DateRangeFilter value={dateRange} onChange={setDateRange} />
           <Select allowClear placeholder="Estado SUNAT" style={{ width: 150 }} value={statusFilter} onChange={setStatusFilter} options={[
-            { value: 'PENDIENTE', label: 'Pendiente' }, { value: 'PROCESANDO', label: 'Procesando' }, { value: 'ACEPTADO', label: 'Aceptado' }, { value: 'RECHAZADO', label: 'Rechazado' },
+            { value: 'PENDIENTE', label: 'Pendiente' }, { value: 'PROCESANDO', label: 'Procesando' }, { value: 'ACEPTADO', label: 'Validado' }, { value: 'RECHAZADO', label: 'Rechazado' },
           ]} />
         </Space>
         <Table columns={columns} dataSource={data?.data} rowKey="id" loading={isLoading} scroll={{ x: 1000 }} pagination={{

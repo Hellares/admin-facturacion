@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { Card, Table, Space, Button, Input, InputNumber, Tooltip, Segmented, Row, Col, Tag, Select, message } from 'antd';
+import { Card, Table, Space, Button, Input, InputNumber, Tooltip, Segmented, Row, Col, Select, message } from 'antd';
 import OrigenTag from '@/components/common/OrigenTag';
 import { EyeOutlined, StopOutlined, FileExcelOutlined, ReloadOutlined, SyncOutlined } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
@@ -165,9 +165,8 @@ export default function InvoiceListPage() {
       dataIndex: 'estado_sunat',
       key: 'estado_sunat',
       width: 110,
-      render: (status: SunatStatus, record) => record.anulado
-        ? <Tag color="red">Anulado</Tag>
-        : <SunatStatusBadge status={status} sunatInfo={record.sunat ?? record.respuesta_sunat} />,
+      render: (status: SunatStatus, record) =>
+        <SunatStatusBadge status={status} anulado={record.anulado} sunatInfo={record.sunat ?? record.respuesta_sunat} />,
     },
     {
       title: 'Acciones',

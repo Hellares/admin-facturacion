@@ -112,7 +112,7 @@ export default function DebitNoteListPage() {
     { title: 'Cliente', key: 'cliente', ellipsis: true, responsive: ['lg'], render: (_, r) => <span style={{ fontSize: 12 }}>{r.cliente?.razon_social}</span> },
     { title: 'Total', key: 'total', width: 120, align: 'right', render: (_: unknown, r: DebitNote) => <MoneyDisplay amount={r.totales?.total ?? 0} moneda={r.moneda as Moneda} strong fontSize={12} /> },
     { title: 'Origen', dataIndex: 'origen', width: 70, responsive: ['md'], render: (origen: 'web' | 'api' | undefined) => <OrigenTag origen={origen} /> },
-    { title: 'Estado', dataIndex: 'estado_sunat', width: 110, render: (s: SunatStatus, record: DebitNote) => <SunatStatusBadge status={s} sunatInfo={record.sunat ?? record.respuesta_sunat} /> },
+    { title: 'Estado', dataIndex: 'estado_sunat', width: 110, render: (s: SunatStatus, record: DebitNote) => <SunatStatusBadge status={s} anulado={record.anulado} sunatInfo={record.sunat ?? record.respuesta_sunat} /> },
     {
       title: 'Acciones',
       key: 'actions',

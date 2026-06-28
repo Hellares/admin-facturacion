@@ -50,9 +50,9 @@ export const SUNAT_STATUS_LABELS: Record<SunatStatus, string> = {
   ENVIANDO: 'Enviando',
   ENVIADO: 'Enviado',
   PROCESANDO: 'Procesando',
-  ACEPTADO: 'Aceptado',
+  ACEPTADO: 'Validado',
   RECHAZADO: 'Rechazado',
-  ANULADO: 'Anulado',
+  ANULADO: 'Dado de baja',
   NO_EMITIDO: 'No emitido',
   ERROR: 'Error',
 };

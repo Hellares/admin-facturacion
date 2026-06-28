@@ -16,9 +16,18 @@ interface SunatStatusBadgeProps {
    * en un Tooltip con hover. Retrocompatible: sin prop funciona igual que antes.
    */
   sunatInfo?: SunatInfo | string | null;
+  /**
+   * Si el documento fue dado de baja/anulado. La anulacion se rastrea aparte
+   * (`estado_anulacion`/`anulado`) y suele dejar `estado_sunat` en ACEPTADO, por
+   * lo que prevalece sobre el estado SUNAT — coincide con el filtro "Dado de baja".
+   */
+  anulado?: boolean;
 }
 
-export default function SunatStatusBadge({ status, sunatInfo }: SunatStatusBadgeProps) {
+export default function SunatStatusBadge({ status, sunatInfo, anulado }: SunatStatusBadgeProps) {
+  if (anulado) {
+    return <Tag color={SUNAT_STATUS_COLORS.ANULADO}>{SUNAT_STATUS_LABELS.ANULADO}</Tag>;
+  }
   if (!status) return <Tag color="default">-</Tag>;
 
   const color = SUNAT_STATUS_COLORS[status] || 'default';

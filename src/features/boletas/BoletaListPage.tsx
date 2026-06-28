@@ -151,7 +151,7 @@ export default function BoletaListPage() {
       key: 'estado_sunat',
       width: 110,
       render: (status: SunatStatus, record) => (
-        <SunatStatusBadge status={status} sunatInfo={record.sunat ?? record.respuesta_sunat} />
+        <SunatStatusBadge status={status} anulado={record.estado_anulacion === 'anulada' || record.anulada_localmente} sunatInfo={record.sunat ?? record.respuesta_sunat} />
       ),
     },
     {
