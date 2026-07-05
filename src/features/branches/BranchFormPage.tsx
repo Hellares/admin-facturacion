@@ -15,7 +15,10 @@ const branchSchema = z.object({
   codigo: z.string().min(1, 'Requerido').max(10),
   nombre: z.string().min(1, 'Requerido').max(255),
   direccion: z.string().min(1, 'Requerido').max(255),
-  ubigeo: z.string().length(6, 'Ubigeo debe tener 6 digitos').optional().or(z.literal('')),
+  // Requerido: el backend (StoreBranchRequest) exige ubigeo de 6 dígitos.
+  // Antes era optional y el input NI EXISTÍA en el form → crear sucursal
+  // desde la web siempre fallaba con "El ubigeo es requerido".
+  ubigeo: z.string().regex(/^\d{6}$/, 'Ubigeo debe tener 6 digitos numericos'),
   distrito: z.string().optional(),
   provincia: z.string().optional(),
   departamento: z.string().optional(),
@@ -101,6 +104,7 @@ export default function BranchFormPage() {
       codigo: '',
       nombre: '',
       direccion: '',
+      ubigeo: '',
       series_factura: [],
       series_factura_api: [],
       series_boleta: [],
@@ -201,6 +205,17 @@ export default function BranchFormPage() {
               </Form.Item>
 
               <Space size="middle">
+                <Form.Item
+                  label="Ubigeo"
+                  validateStatus={errors.ubigeo ? 'error' : ''}
+                  help={errors.ubigeo?.message}
+                  required
+                  tooltip="Codigo INEI de 6 digitos del distrito (ej: 140101 = Chiclayo)"
+                >
+                  <Controller name="ubigeo" control={control} render={({ field }) => (
+                    <Input {...field} maxLength={6} placeholder="140101" style={{ width: 110 }} />
+                  )} />
+                </Form.Item>
                 <Form.Item label="Departamento">
                   <Controller name="departamento" control={control} render={({ field }) => <Input {...field} />} />
                 </Form.Item>
