@@ -20,7 +20,7 @@ import type { SunatStatus } from '@/types/common.types';
 
 export default function RetentionListPage() {
   const navigate = useNavigate();
-  const { dateRange, setDateRange, page, perPage, handlePageChange, getQueryParams } = useTableFilters();
+  const { dateRange, setDateRange, page, setPage, perPage, handlePageChange, getQueryParams } = useTableFilters();
   const selectedCompanyId = useCompanyContextStore((s) => s.selectedCompanyId);
   const branches = useCompanyContextStore((s) => s.branches);
 
@@ -120,7 +120,7 @@ export default function RetentionListPage() {
             <span style={{ fontSize: 18, fontWeight: 600 }}>Retenciones Emitidas</span>
             <Segmented
               value={estadoFilter}
-              onChange={(v) => setEstadoFilter(v as EstadoUI)}
+              onChange={(v) => { setEstadoFilter(v as EstadoUI); setPage(1); }}
               options={[
                 { label: 'Todos', value: 'todos' },
                 { label: 'Pendiente', value: 'pendiente' },
