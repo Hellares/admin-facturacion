@@ -53,6 +53,7 @@ export default function BoletaDetailPage() {
             documentId={boleta.id}
             documentNumber={boleta.numero_completo}
             status={boleta.estado_sunat}
+            sunatCode={boleta.sunat?.codigo}
             onStatusChange={() => refetch()}
             onViewPdf={() => setPdfOpen(true)}
           />

@@ -10,6 +10,7 @@ import { showSendSunatConfirm } from './ConfirmModal';
 import { downloadFile, openPdfInNewTab } from '@/utils/download';
 import apiClient from '@/lib/axios';
 import { showApiError } from '@/lib/api-error';
+import { isRechazoReenviable } from '@/utils/sunat';
 import type { SunatStatus } from '@/types/common.types';
 
 interface DocumentActionsProps {
@@ -17,6 +18,8 @@ interface DocumentActionsProps {
   documentId: number;
   documentNumber: string;
   status: SunatStatus;
+  /** Código de la respuesta SUNAT: decide si un RECHAZADO se puede reenviar. */
+  sunatCode?: string | number | null;
   onStatusChange?: () => void;
   compact?: boolean;
   /**
@@ -32,6 +35,7 @@ export default function DocumentActions({
   documentId,
   documentNumber,
   status,
+  sunatCode,
   onStatusChange,
   compact = false,
   onViewPdf,
@@ -39,7 +43,8 @@ export default function DocumentActions({
   const [sendLoading, setSendLoading] = useState(false);
   const [pdfLoading, setPdfLoading] = useState(false);
 
-  const canSend = status === 'PENDIENTE' || status === 'ERROR';
+  const canSend = status === 'PENDIENTE' || status === 'ERROR'
+    || (status === 'RECHAZADO' && isRechazoReenviable(sunatCode));
   const hasSentFiles = status === 'ACEPTADO';
 
   const handleSend = () => {

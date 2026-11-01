@@ -14,6 +14,7 @@ import { useInvoice } from './hooks/useInvoices';
 import { useDocumentAnulacionInfo } from '@/hooks/useDocumentAnulacionInfo';
 import { formatDate, formatMoney } from '@/utils/format';
 import { calculateItemTotals } from '@/utils/tax-calculator';
+import { isRechazoReenviable } from '@/utils/sunat';
 import type { DetalleItem } from '@/types/common.types';
 import type { Moneda } from '@/types/common.types';
 
@@ -88,6 +89,7 @@ export default function InvoiceDetailPage() {
             documentId={invoice.id}
             documentNumber={invoice.numero_completo}
             status={invoice.estado_sunat}
+            sunatCode={invoice.sunat?.codigo}
             onStatusChange={() => refetch()}
             onViewPdf={() => setPdfOpen(true)}
           />
@@ -119,8 +121,8 @@ export default function InvoiceDetailPage() {
                   </ul>
                 )}
                 <div style={{ marginTop: 8, fontSize: 12, color: '#888' }}>
-                  {invoice.estado_sunat === 'ERROR'
-                    ? 'Error tecnico (conectividad, certificado, etc). Puedes reintentar el envio.'
+                  {invoice.estado_sunat === 'ERROR' || isRechazoReenviable(invoice.sunat.codigo)
+                    ? 'Error tecnico (conectividad, credenciales SOL, etc). No llego a validarse en SUNAT: puedes reintentar el envio con el mismo numero.'
                     : 'SUNAT rechazo por validacion. Corregir y emitir un documento NUEVO; no se puede reenviar el mismo.'}
                 </div>
               </div>

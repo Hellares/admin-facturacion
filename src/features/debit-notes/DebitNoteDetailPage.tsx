@@ -50,6 +50,7 @@ export default function DebitNoteDetailPage() {
             documentId={nd.id}
             documentNumber={nd.numero_completo}
             status={nd.estado_sunat}
+            sunatCode={nd.sunat?.codigo}
             onStatusChange={() => refetch()}
             onViewPdf={() => setPdfOpen(true)}
           />

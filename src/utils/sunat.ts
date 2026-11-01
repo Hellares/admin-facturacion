@@ -49,6 +49,20 @@ export function parseSunatInfo(
 }
 
 /**
+ * ¿Se puede reenviar el mismo comprobante tras un RECHAZADO?
+ * Solo los rechazos por validación de SUNAT (2000–3999) obligan a emitir uno
+ * nuevo. Cortes de conexión ("HTTP"), excepciones (0100–1999, ej. 0110 usuario
+ * SOL) y errores internos no llegaron a validarse: el número no se quemó.
+ * Sin código no se sabe, así que no se ofrece.
+ */
+export function isRechazoReenviable(codigo: string | number | null | undefined): boolean {
+  if (codigo == null || String(codigo).trim() === '') return false;
+  const n = Number(codigo);
+  if (!Number.isInteger(n)) return true;
+  return n < 2000 || n > 3999;
+}
+
+/**
  * Texto de una línea para mostrar la respuesta SUNAT (ej. "SUNAT 2335: ...").
  */
 export function formatSunatInfo(

@@ -126,6 +126,7 @@ export default function CreditNoteListPage() {
             documentId={record.id}
             documentNumber={record.numero_completo}
             status={record.estado_sunat}
+            sunatCode={record.sunat?.codigo}
             onStatusChange={() => refetch()}
             onViewPdf={() => setPdfTarget(record)}
             compact

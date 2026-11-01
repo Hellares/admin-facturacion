@@ -50,6 +50,7 @@ export default function CreditNoteDetailPage() {
             documentId={nc.id}
             documentNumber={nc.numero_completo}
             status={nc.estado_sunat}
+            sunatCode={nc.sunat?.codigo}
             onStatusChange={() => refetch()}
             onViewPdf={() => setPdfOpen(true)}
           />

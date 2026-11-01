@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { parseSunatInfo, formatSunatInfo } from './sunat';
+import { parseSunatInfo, formatSunatInfo, isRechazoReenviable } from './sunat';
 
 describe('parseSunatInfo', () => {
   it('devuelve null para vacío/null/undefined', () => {
@@ -60,5 +60,28 @@ describe('formatSunatInfo', () => {
     expect(formatSunatInfo(null)).toBeNull();
     expect(formatSunatInfo('')).toBeNull();
     expect(formatSunatInfo({ codigo: '5' })).toBeNull(); // sin descripción
+  });
+});
+
+describe('isRechazoReenviable', () => {
+  it('rechazo por validación SUNAT (2000-3999) NO se reenvía', () => {
+    expect(isRechazoReenviable('2324')).toBe(false);
+    expect(isRechazoReenviable(3105)).toBe(false);
+    expect(isRechazoReenviable('2000')).toBe(false);
+    expect(isRechazoReenviable('3999')).toBe(false);
+  });
+
+  it('corte de conexión, excepción o error interno SÍ se reenvía', () => {
+    expect(isRechazoReenviable('HTTP')).toBe(true);
+    expect(isRechazoReenviable('EXCEPTION')).toBe(true);
+    expect(isRechazoReenviable('0110')).toBe(true);
+    expect(isRechazoReenviable('00104')).toBe(true);
+    expect(isRechazoReenviable('1033')).toBe(true);
+  });
+
+  it('sin código no se ofrece', () => {
+    expect(isRechazoReenviable(null)).toBe(false);
+    expect(isRechazoReenviable(undefined)).toBe(false);
+    expect(isRechazoReenviable('')).toBe(false);
   });
 });
