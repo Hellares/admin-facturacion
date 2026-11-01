@@ -55,7 +55,7 @@ export default function DailySummaryDetailPage() {
             )}
             <Button onClick={() => downloadFile(`/v1/daily-summaries/${summary.id}/download-xml`, `${summary.numero_completo}.xml`).catch(() => message.error('Error'))}>XML</Button>
             {summary.estado_sunat === 'ACEPTADO' && (
-              <Button onClick={() => downloadFile(`/v1/daily-summaries/${summary.id}/download-cdr`, `CDR-${summary.numero_completo}.xml`).catch(() => message.error('Error'))}>CDR</Button>
+              <Button onClick={() => downloadFile(`/v1/daily-summaries/${summary.id}/download-cdr`, `R-${summary.numero_completo}.zip`).catch(() => message.error('Error'))}>CDR</Button>
             )}
           </Space>
         }

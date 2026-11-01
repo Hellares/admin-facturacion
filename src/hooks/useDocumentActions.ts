@@ -31,7 +31,7 @@ export function useDocumentActions(documentType: DocType) {
 
   const downloadCdr = async (id: number, docNumber: string) => {
     try {
-      await downloadFile(`/v1/${documentType}/${id}/download-cdr`, `CDR-${docNumber}.xml`);
+      await downloadFile(`/v1/${documentType}/${id}/download-cdr`, `R-${docNumber}.zip`);
     } catch {
       message.error('Error al descargar CDR');
     }

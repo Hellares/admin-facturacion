@@ -74,7 +74,7 @@ export default function VoidedDocumentDetailPage() {
     try {
       await downloadFile(
         `/v1/voided-documents/${voided.id}/download-cdr`,
-        `CDR-${voided.numero_completo}.xml`
+        `R-${voided.numero_completo}.zip`
       );
     } catch (err) {
       showApiError(err, 'Error al descargar CDR');

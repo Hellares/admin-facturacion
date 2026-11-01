@@ -75,7 +75,7 @@ export default function DocumentActions({
 
   const handleDownloadCdr = async () => {
     try {
-      await downloadFile(`/v1/${documentType}/${documentId}/download-cdr`, `CDR-${documentNumber}.xml`);
+      await downloadFile(`/v1/${documentType}/${documentId}/download-cdr`, `R-${documentNumber}.zip`);
     } catch (err) {
       showApiError(err, 'Error al descargar CDR');
     }
