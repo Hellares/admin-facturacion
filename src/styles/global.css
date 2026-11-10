@@ -180,6 +180,27 @@ code, pre, .ant-typography code, [style*="monospace"] {
   letter-spacing: 0.3px;
 }
 
+.form-comprobante .ant-table-wrapper .ant-table {
+  border: 1px solid #e2e7ee !important;
+}
+
+.form-comprobante .ant-table-thead > tr > th {
+  color: #4a525c !important;
+  font-size: 12px;
+  font-weight: 600 !important;
+  text-transform: uppercase;
+  border-bottom: 1px solid #e2e7ee !important;
+  padding: 10px 8px !important;
+}
+
+.form-comprobante .ant-table-tbody > tr > td {
+  padding: 8px !important;
+}
+
+.form-comprobante .ant-table-wrapper .ant-table-tbody > tr.ant-table-row:hover > td {
+  background-color: #f7f9fb !important;
+}
+
 
 .ant-menu-item,
 .ant-menu-submenu-title,
