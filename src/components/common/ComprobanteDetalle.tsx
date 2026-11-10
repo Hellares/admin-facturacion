@@ -94,7 +94,7 @@ export default function ComprobanteDetalle(p: ComprobanteDetalleProps) {
             </div>
 
             <div style={{ padding: '14px 22px', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '10px 20px', background: '#f8fafc', borderBottom: '1px solid #e2e7ee' }}>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}><span style={ETIQUETA}>CLIENTE</span><span style={{ fontWeight: 600 }}>{p.cliente?.razon_social || '-'}</span></div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}><span style={ETIQUETA}>CLIENTE</span><span style={{ fontWeight: 500 }}>{p.cliente?.razon_social || '-'}</span></div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}><span style={ETIQUETA}>{p.cliente?.tipo_documento === '6' ? 'RUC' : 'DOCUMENTO'}</span><span>{p.cliente?.numero_documento || '-'}</span></div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}><span style={ETIQUETA}>DIRECCIÓN</span><span>{p.cliente?.direccion || '-'}</span></div>
             </div>
@@ -138,7 +138,7 @@ export default function ComprobanteDetalle(p: ComprobanteDetalleProps) {
                     <span>{label}</span><span>{formatMoney(valor ?? 0, p.moneda)}</span>
                   </div>
                 ))}
-                <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 12px', background: ACENTO, color: '#fff', fontWeight: 700 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 12px', background: ACENTO, color: '#fff', fontWeight: 500 }}>
                   <span>TOTAL</span><span>{formatMoney(t.total ?? 0, p.moneda)}</span>
                 </div>
               </div>
@@ -159,12 +159,12 @@ export default function ComprobanteDetalle(p: ComprobanteDetalleProps) {
             <ol style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 8 }}>
               <li style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
                 <span style={{ width: 8, height: 8, borderRadius: 4, background: '#1677ff' }} />
-                <span style={{ flexGrow: 1 }}>Creada</span>
+                <span style={{ flexGrow: 1, fontSize: 12 }}>Creada</span>
                 <span style={{ color: '#5b6573', fontSize: 11 }}>{p.creadoEn ? `${formatDate(p.creadoEn)} ${hora(p.creadoEn)}` : '-'}</span>
               </li>
               <li style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
                 <span style={{ width: 8, height: 8, borderRadius: 4, background: final ? v.color : '#d5dbe2' }} />
-                <span style={{ flexGrow: 1, fontWeight: final ? 500 : 400 }}>{final ? 'Última actualización' : 'Esperando respuesta de SUNAT'}</span>
+                <span style={{ flexGrow: 1, fontSize: 12, fontWeight: final ? 500 : 400 }}>{final ? 'Última actualización' : 'Esperando respuesta de SUNAT'}</span>
                 <span style={{ color: '#5b6573', fontSize: 11 }}>{final && p.actualizadoEn ? `${formatDate(p.actualizadoEn)} ${hora(p.actualizadoEn)}` : ''}</span>
               </li>
             </ol>
