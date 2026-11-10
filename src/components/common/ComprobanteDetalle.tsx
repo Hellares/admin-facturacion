@@ -104,7 +104,7 @@ export default function ComprobanteDetalle(p: ComprobanteDetalleProps) {
                 <thead>
                   <tr style={{ ...ETIQUETA, textAlign: 'left', borderBottom: '1px solid #e2e7ee' }}>
                     <th style={{ padding: '6px 4px', width: 30 }}>#</th>
-                    <th style={{ padding: '6px 4px', width: 90 }}>CÓDIGO</th>
+                    <th style={{ padding: '6px 4px', width: 120 }}>CÓDIGO</th>
                     <th style={{ padding: '6px 4px' }}>DESCRIPCIÓN</th>
                     <th style={{ padding: '6px 4px', width: 60 }}>UND</th>
                     <th style={{ padding: '6px 4px', width: 70, textAlign: 'right' }}>CANT.</th>
@@ -118,7 +118,7 @@ export default function ComprobanteDetalle(p: ComprobanteDetalleProps) {
                     return (
                       <tr key={i} style={{ borderBottom: '1px solid #f0f2f5' }}>
                         <td style={{ padding: '8px 4px', color: '#5b6573' }}>{i + 1}</td>
-                        <td style={{ padding: '8px 4px', color: '#5b6573' }}>{d.codigo || '-'}</td>
+                        <td style={{ padding: '8px 4px', color: '#5b6573', whiteSpace: 'nowrap' }}>{d.codigo || '-'}</td>
                         <td style={{ padding: '8px 4px', fontWeight: 500 }}>{d.descripcion}</td>
                         <td style={{ padding: '8px 4px' }}>{d.unidad}</td>
                         <td style={{ padding: '8px 4px', textAlign: 'right' }}>{d.cantidad}</td>
@@ -164,7 +164,7 @@ export default function ComprobanteDetalle(p: ComprobanteDetalleProps) {
               </li>
               <li style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
                 <span style={{ width: 8, height: 8, borderRadius: 4, background: final ? v.color : '#d5dbe2' }} />
-                <span style={{ flexGrow: 1, fontWeight: final ? 600 : 400 }}>{final ? 'Respuesta de SUNAT' : 'Esperando respuesta de SUNAT'}</span>
+                <span style={{ flexGrow: 1, fontWeight: final ? 600 : 400 }}>{final ? 'Última actualización' : 'Esperando respuesta de SUNAT'}</span>
                 <span style={{ color: '#5b6573' }}>{final && p.actualizadoEn ? `${formatDate(p.actualizadoEn)} ${hora(p.actualizadoEn)}` : ''}</span>
               </li>
             </ol>

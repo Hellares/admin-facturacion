@@ -42,7 +42,7 @@ describe('ComprobanteDetalle', () => {
     montar('ACEPTADO', 'La Boleta numero B001-2, ha sido aceptado');
     expect(screen.getByText('Aceptada por SUNAT')).toBeTruthy();
     expect(screen.getByText('La Boleta numero B001-2, ha sido aceptado')).toBeTruthy();
-    expect(screen.getByText('Respuesta de SUNAT')).toBeTruthy();
+    expect(screen.getByText('Última actualización')).toBeTruthy();
     expect(screen.getAllByText('S/ 17.80').length).toBeGreaterThan(0);
     expect(screen.getByText('ANA PEREZ')).toBeTruthy();
     expect(screen.getByText('YrQ4+PJv5Of5aVAT83ETCFQHrAk=')).toBeTruthy();
