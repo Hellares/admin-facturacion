@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Input, Select, Space, Form, Button, Divider, message } from 'antd';
 import { SearchOutlined, PlusOutlined } from '@ant-design/icons';
 import { Controller, useFormContext } from 'react-hook-form';
@@ -38,9 +38,8 @@ export default function ClientSelector({ prefix = 'client', documentType }: Clie
     return err as { message?: string };
   };
 
-  const handleSearchByDocument = async (doc: string) => {
+  const handleSearchByDocument = async (doc: string, tipoDoc: string = watch(`${p}tipo_documento`) as string) => {
     if (!doc) return;
-    const tipoDoc = watch(`${p}tipo_documento`) as string;
     const isDni = tipoDoc === '1' && doc.length === 8;
     const isRuc = tipoDoc === '6' && doc.length === 11;
 
@@ -134,6 +133,37 @@ export default function ClientSelector({ prefix = 'client', documentType }: Clie
     }
   }, [documentType, currentTipoDoc]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Búsqueda automática: al completar 8 dígitos (DNI) u 11 (RUC) busca sola, una vez por número.
+  const ultimaBusqueda = useRef('');
+  const permiteTipo = (v: string) => filteredTipoDocOptions.some((o) => o.value === v);
+  const numeroActual = (watch(`${p}numero_documento`) as string | undefined) ?? '';
+
+  const onNumeroChange = (raw: string, onChange: (v: string) => void) => {
+    let tipo = currentTipoDoc;
+    if (/^\d{8}$/.test(raw) && (!tipo || tipo === '0') && permiteTipo('1')) tipo = '1';
+    if (/^\d{11}$/.test(raw) && (!tipo || tipo === '0' || tipo === '1') && permiteTipo('6')) tipo = '6';
+    if (tipo !== currentTipoDoc) setValue(`${p}tipo_documento`, tipo);
+
+    const valor = tipo === '1' || tipo === '6' ? raw.replace(/\D/g, '') : raw;
+    onChange(valor);
+
+    const largo = tipo === '1' ? 8 : tipo === '6' ? 11 : 0;
+    if (largo && valor.length === largo && valor !== ultimaBusqueda.current) {
+      ultimaBusqueda.current = valor;
+      handleSearchByDocument(valor, tipo);
+    }
+  };
+
+  const avisoNumero = (() => {
+    if (documentType === 'factura' && /^\d{8}$/.test(numeroActual)) {
+      return 'La factura requiere RUC (11 dígitos). Para un DNI emita boleta.';
+    }
+    if (documentType === 'boleta' && /^(10|15|17|20)\d{9}$/.test(numeroActual)) {
+      return 'Parece un RUC: para un RUC emita factura.';
+    }
+    return undefined;
+  })();
+
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 2 }}>
@@ -166,8 +196,8 @@ export default function ClientSelector({ prefix = 'client', documentType }: Clie
 
         <Form.Item
           label="Nro. Documento"
-          validateStatus={getError('numero_documento') ? 'error' : ''}
-          help={getError('numero_documento')?.message}
+          validateStatus={getError('numero_documento') ? 'error' : avisoNumero ? 'warning' : ''}
+          help={getError('numero_documento')?.message ?? avisoNumero}
           required
         >
           <Controller
@@ -176,11 +206,15 @@ export default function ClientSelector({ prefix = 'client', documentType }: Clie
             render={({ field }) => (
               <Input.Search
                 {...field}
-                style={{ width: 200 }}
+                onChange={(e) => onNumeroChange(e.target.value, field.onChange)}
+                style={{ width: 240 }}
                 enterButton={<SearchOutlined />}
                 loading={searching}
-                onSearch={handleSearchByDocument}
-                placeholder="Buscar..."
+                onSearch={(v) => handleSearchByDocument(v)}
+                inputMode={currentTipoDoc === '1' || currentTipoDoc === '6' ? 'numeric' : undefined}
+                // 11 también con DNI: así se puede escribir un RUC y ver el aviso de "emita factura"
+                maxLength={currentTipoDoc === '1' || currentTipoDoc === '6' ? 11 : 20}
+                placeholder={currentTipoDoc === '6' ? 'RUC: 11 dígitos' : currentTipoDoc === '1' ? 'DNI: 8 dígitos' : 'Número'}
               />
             )}
           />
