@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { Form, Input, Select, DatePicker, Collapse, Alert, message } from 'antd';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useForm, FormProvider, Controller, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import dayjs from '@/lib/dayjs';
@@ -11,7 +11,6 @@ import PaymentTermsForm from '@/components/forms/PaymentTermsForm';
 import DetraccionForm from '@/components/forms/DetraccionForm';
 import MediosPagoForm from '@/components/forms/MediosPagoForm';
 import ComprobanteFormLayout, { FormSection } from '@/components/forms/ComprobanteFormLayout';
-import IgvDocumentoInput from '@/components/forms/IgvDocumentoInput';
 import { invoiceSchema, type InvoiceFormValues } from '@/schemas/invoice.schema';
 import { useCreateInvoice } from './hooks/useInvoices';
 import { useCompanyContextStore } from '@/stores/company-context.store';
@@ -61,9 +60,6 @@ export default function InvoiceFormPage() {
       numero_orden_compra: '',
     },
   });
-
-  // IGV % del comprobante: se aplica a los productos gravados
-  const [igv, setIgv] = useState(18);
 
   const { handleSubmit, control, setValue, formState: { errors } } = methods;
 
@@ -140,7 +136,6 @@ export default function InvoiceFormPage() {
                     <Select {...field} options={MONEDA_OPTIONS.map((m) => ({ value: m.value, label: m.label }))} />
                   )} />
                 </Form.Item>
-                <IgvDocumentoInput value={igv} onChange={setIgv} />
               </div>
             </Form>
           </FormSection>
@@ -152,7 +147,7 @@ export default function InvoiceFormPage() {
           </FormSection>
 
           <FormSection title="Productos">
-            <ItemsTable compacto igvPorDefecto={igv} />
+            <ItemsTable compacto />
             {errors.detalles && typeof errors.detalles.message === 'string' && (
               <Alert type="error" message={errors.detalles.message} showIcon />
             )}
