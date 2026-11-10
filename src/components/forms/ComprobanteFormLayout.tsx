@@ -19,7 +19,7 @@ export function FormSection({ title, extra, children }: FormSectionProps) {
   return (
     <section
       style={{
-        background: '#fff', border: '1px solid #e2e7ee', borderRadius: 12,
+        background: '#fff', border: '1px solid #e2e7ee', borderRadius: 8,
         padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: 12,
       }}
     >
@@ -54,7 +54,7 @@ export default function ComprobanteFormLayout({ tipo, children, submitting, erro
         components: { Table: { headerBg: '#f4f6f8', headerColor: '#4a525c' }, Segmented: { itemSelectedColor: ACENTO } },
       }}
     >
-    <div className="form-comprobante" style={{ display: 'flex', flexDirection: 'column', gap: 16, background: '#f4f6f8', borderRadius: 14, padding: 20 }}>
+    <div className="form-comprobante" style={{ display: 'flex', flexDirection: 'column', gap: 16, background: '#f4f6f8', borderRadius: 8, padding: 20 }}>
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, alignItems: 'center', justifyContent: 'space-between' }}>
         <div>
           <Typography.Text type="secondary" style={{ fontSize: 13 }}>Comprobantes / Nuevo</Typography.Text>
@@ -85,11 +85,11 @@ export default function ComprobanteFormLayout({ tipo, children, submitting, erro
             loading={submitting}
             icon={<SendOutlined />}
             block
-            style={{ height: 56, fontSize: 16, fontWeight: 700, borderRadius: 12, background: '#1e7a4c', borderColor: '#1e7a4c' }}
+            style={{ height: 56, fontSize: 16, fontWeight: 700, borderRadius: 8, background: '#1e7a4c', borderColor: '#1e7a4c' }}
           >
             Emitir {nombre}
           </Button>
-          <Button block size="large" style={{ borderRadius: 10 }} onClick={() => navigate(tipo === 'boleta' ? ROUTES.BOLETAS : ROUTES.INVOICES)}>
+          <Button block size="large" style={{ borderRadius: 8 }} onClick={() => navigate(tipo === 'boleta' ? ROUTES.BOLETAS : ROUTES.INVOICES)}>
             Cancelar
           </Button>
         </aside>

@@ -276,7 +276,7 @@ export default function ItemsTable({ name = 'detalles', simplified = false, comp
           rowKey="id"
           pagination={false}
           scroll={{ x: 860 }}
-          style={{ border: '1px solid #e2e7ee', borderRadius: 10, overflow: 'hidden' }}
+          style={{ border: '1px solid #e2e7ee', borderRadius: 8, overflow: 'hidden' }}
           locale={{ emptyText: 'Sin productos. Use "Agregar producto"' }}
         />
         {allowAdd && (

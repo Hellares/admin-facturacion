@@ -23,7 +23,7 @@ export default function TotalesResumen() {
   ];
 
   return (
-    <div style={{ background: '#fff', border: '1px solid #e2e7ee', borderRadius: 12, overflow: 'hidden' }}>
+    <div style={{ background: '#fff', border: '1px solid #e2e7ee', borderRadius: 8, overflow: 'hidden' }}>
       <div style={{ padding: '14px 18px', display: 'flex', flexDirection: 'column', gap: 6 }}>
         {filas.filter(([, , ver]) => ver).map(([label, valor]) => (
           <div key={label} style={{ display: 'flex', justifyContent: 'space-between', color: '#4a525c' }}>

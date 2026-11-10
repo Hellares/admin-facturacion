@@ -210,24 +210,25 @@ export default function ClientSelector({ prefix = 'client', documentType }: Clie
           </Form.Item>
         </div>
 
-        <div style={{ background: '#f4f6f8', borderRadius: 10, padding: '12px 14px', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '4px 14px' }}>
+        {/* Nombre, celular y email en una fila (se apilan en pantallas angostas); dirección debajo */}
+        <div style={{ background: '#f4f6f8', borderRadius: 8, padding: '12px 14px', display: 'flex', flexWrap: 'wrap', gap: '4px 14px' }}>
           <Form.Item
             label={documentType === 'factura' ? 'Razón social' : 'Nombre'}
             required
             validateStatus={getError('razon_social') ? 'error' : ''}
             help={getError('razon_social')?.message}
-            style={{ marginBottom: 8, gridColumn: '1 / -1' }}
+            style={{ marginBottom: 8, flex: '2 1 280px' }}
           >
             <Controller name={`${p}razon_social`} control={control} render={({ field }) => <Input {...field} style={{ fontWeight: 600 }} />} />
           </Form.Item>
-          <Form.Item label="Dirección" style={{ marginBottom: 8, gridColumn: '1 / -1' }}>
-            <Controller name={`${p}direccion`} control={control} render={({ field }) => <Input {...field} />} />
-          </Form.Item>
-          <Form.Item label="Celular" style={{ marginBottom: 4 }}>
+          <Form.Item label="Celular" style={{ marginBottom: 8, flex: '1 1 150px' }}>
             <Controller name={`${p}telefono`} control={control} render={({ field }) => <Input {...field} inputMode="tel" />} />
           </Form.Item>
-          <Form.Item label="Email" style={{ marginBottom: 4 }}>
+          <Form.Item label="Email" style={{ marginBottom: 8, flex: '1 1 200px' }}>
             <Controller name={`${p}email`} control={control} render={({ field }) => <Input {...field} type="email" />} />
+          </Form.Item>
+          <Form.Item label="Dirección" style={{ marginBottom: 4, flex: '1 1 100%' }}>
+            <Controller name={`${p}direccion`} control={control} render={({ field }) => <Input {...field} />} />
           </Form.Item>
         </div>
       </div>
