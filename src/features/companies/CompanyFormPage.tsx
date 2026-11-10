@@ -7,6 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import PageHeader from '@/components/common/PageHeader';
 import CertificateUpload from '@/components/common/CertificateUpload';
+import LogoUpload from '@/components/common/LogoUpload';
 import { useCompany, useCreateCompany, useUpdateCompany } from './hooks/useCompanies';
 import { lookupService } from '@/services/lookup.service';
 import type { CompanyFormData } from '@/types/company.types';
@@ -366,6 +367,11 @@ export default function CompanyFormPage() {
       label: 'PDF',
       children: (
         <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+          {isEdit && (
+            <Form.Item label="Logo del PDF">
+              <LogoUpload companyId={Number(id)} hasLogo={!!company?.logo_path} />
+            </Form.Item>
+          )}
           <Row gutter={[16, 16]}>
             <Col span={12}>
               <Form.Item label="Mostrar cuentas bancarias en PDF">
