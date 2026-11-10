@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Form, Input, Select, DatePicker, Collapse, Radio, Alert, message } from 'antd';
 import { useForm, FormProvider, Controller } from 'react-hook-form';
@@ -10,6 +11,7 @@ import PaymentTermsForm from '@/components/forms/PaymentTermsForm';
 import DetraccionForm from '@/components/forms/DetraccionForm';
 import MediosPagoForm from '@/components/forms/MediosPagoForm';
 import ComprobanteFormLayout, { FormSection } from '@/components/forms/ComprobanteFormLayout';
+import IgvDocumentoInput from '@/components/forms/IgvDocumentoInput';
 import { boletaSchema, type BoletaFormValues } from '@/schemas/boleta.schema';
 import { useCreateBoleta } from './hooks/useBoletas';
 import { useCompanyContextStore } from '@/stores/company-context.store';
@@ -56,6 +58,9 @@ export default function BoletaFormPage() {
       observaciones: '',
     },
   });
+
+  // IGV % del comprobante: se aplica a los productos gravados
+  const [igv, setIgv] = useState(18);
 
   const { handleSubmit, control, formState: { errors } } = methods;
 
@@ -109,6 +114,7 @@ export default function BoletaFormPage() {
                     <Select {...field} options={MONEDA_OPTIONS.map((m) => ({ value: m.value, label: m.label }))} />
                   )} />
                 </Form.Item>
+                <IgvDocumentoInput value={igv} onChange={setIgv} />
               </div>
             </Form>
           </FormSection>
@@ -120,7 +126,7 @@ export default function BoletaFormPage() {
           </FormSection>
 
           <FormSection title="Productos">
-            <ItemsTable compacto />
+            <ItemsTable compacto igvPorDefecto={igv} />
             {errors.detalles && typeof errors.detalles.message === 'string' && (
               <Alert type="error" message={errors.detalles.message} showIcon />
             )}

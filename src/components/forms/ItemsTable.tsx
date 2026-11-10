@@ -23,8 +23,10 @@ export interface ItemsTableRestrictions {
 interface ItemsTableProps {
   name?: string; // field array name, default 'detalles'
   simplified?: boolean; // for dispatch guides - less columns
-  /** Boleta/factura (diseño A): código bajo la descripción, sin columnas IGV % ni IGV, controles normales. */
+  /** Boleta/factura (diseño A): código en su columna, sin columnas IGV % ni IGV (el % va en el documento). */
   compacto?: boolean;
+  /** % de IGV para productos gravados nuevos o que pasan a gravado (default 18). */
+  igvPorDefecto?: number;
   restrictions?: ItemsTableRestrictions;
 }
 
@@ -39,7 +41,7 @@ interface ItemRow {
   porcentaje_igv: number;
 }
 
-export default function ItemsTable({ name = 'detalles', simplified = false, compacto = false, restrictions }: ItemsTableProps) {
+export default function ItemsTable({ name = 'detalles', simplified = false, compacto = false, igvPorDefecto = 18, restrictions }: ItemsTableProps) {
   const tam = compacto ? undefined : 'small';
   const { control, setValue } = useFormContext();
   const { fields, append, remove } = useFieldArray({ control, name });
@@ -63,7 +65,7 @@ export default function ItemsTable({ name = 'detalles', simplified = false, comp
       mto_precio_unitario: 0,
       mto_valor_unitario: undefined,
       tip_afe_igv: '10',
-      porcentaje_igv: 18,
+      porcentaje_igv: igvPorDefecto,
     });
   };
 
@@ -187,7 +189,7 @@ export default function ItemsTable({ name = 'detalles', simplified = false, comp
               // Auto-set IGV percentage
               if (val >= '20' && val <= '21') setValue(`${name}.${index}.porcentaje_igv`, 0);
               else if (val >= '30') setValue(`${name}.${index}.porcentaje_igv`, 0);
-              else setValue(`${name}.${index}.porcentaje_igv`, 18);
+              else setValue(`${name}.${index}.porcentaje_igv`, igvPorDefecto);
             }}
             options={IGV_AFECTACION_OPTIONS.map((o) => ({ value: o.value, label: `${o.value} - ${o.label}` }))}
             style={{ width: '100%' }}
@@ -198,7 +200,7 @@ export default function ItemsTable({ name = 'detalles', simplified = false, comp
     );
   }
 
-  if (!simplified) {
+  if (!simplified && !compacto) {
     columns.push(
       {
         title: 'IGV %',
@@ -270,7 +272,7 @@ export default function ItemsTable({ name = 'detalles', simplified = false, comp
           dataSource={fields as (ItemRow & { id: string })[]}
           rowKey="id"
           pagination={false}
-          scroll={{ x: 1140 }}
+          scroll={{ x: 1060 }}
           style={{ border: '1px solid #e2e7ee', borderRadius: 8, overflow: 'hidden' }}
           locale={{ emptyText: 'Sin productos. Use "Agregar producto"' }}
         />
