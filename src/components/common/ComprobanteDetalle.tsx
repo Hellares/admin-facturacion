@@ -152,7 +152,7 @@ export default function ComprobanteDetalle(p: ComprobanteDetalleProps) {
             <div style={{ display: 'flex', gap: 10, alignItems: 'center', background: v.fondo, borderRadius: 8, padding: '10px 12px' }}>
               <span style={{ width: 28, height: 28, borderRadius: 14, background: v.color, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>{v.icono}</span>
               <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
-                <span style={{ fontWeight: 700, color: v.color }}>{v.titulo}</span>
+                <span style={{ fontWeight: 500, color: v.color }}>{v.titulo}</span>
                 {p.respuestaSunat && <span style={{ fontSize: 12, color: '#4a525c' }}>{p.respuestaSunat}</span>}
               </div>
             </div>
@@ -160,12 +160,12 @@ export default function ComprobanteDetalle(p: ComprobanteDetalleProps) {
               <li style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
                 <span style={{ width: 8, height: 8, borderRadius: 4, background: '#1677ff' }} />
                 <span style={{ flexGrow: 1 }}>Creada</span>
-                <span style={{ color: '#5b6573' }}>{p.creadoEn ? `${formatDate(p.creadoEn)} ${hora(p.creadoEn)}` : '-'}</span>
+                <span style={{ color: '#5b6573', fontSize: 11 }}>{p.creadoEn ? `${formatDate(p.creadoEn)} ${hora(p.creadoEn)}` : '-'}</span>
               </li>
               <li style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
                 <span style={{ width: 8, height: 8, borderRadius: 4, background: final ? v.color : '#d5dbe2' }} />
-                <span style={{ flexGrow: 1, fontWeight: final ? 600 : 400 }}>{final ? 'Última actualización' : 'Esperando respuesta de SUNAT'}</span>
-                <span style={{ color: '#5b6573' }}>{final && p.actualizadoEn ? `${formatDate(p.actualizadoEn)} ${hora(p.actualizadoEn)}` : ''}</span>
+                <span style={{ flexGrow: 1, fontWeight: final ? 500 : 400 }}>{final ? 'Última actualización' : 'Esperando respuesta de SUNAT'}</span>
+                <span style={{ color: '#5b6573', fontSize: 11 }}>{final && p.actualizadoEn ? `${formatDate(p.actualizadoEn)} ${hora(p.actualizadoEn)}` : ''}</span>
               </li>
             </ol>
           </section>
