@@ -174,7 +174,7 @@ code, pre, .ant-typography code, [style*="monospace"] {
 /* Formulario de boleta/factura (diseño A): etiquetas grises en mayúsculas, no azules */
 .form-comprobante .ant-form-item-label > label {
   color: #4a525c !important;
-  font-size: 12px;
+  font-size: 10px;
   font-weight: 600 !important;
   text-transform: uppercase;
   letter-spacing: 0.3px;
@@ -186,7 +186,7 @@ code, pre, .ant-typography code, [style*="monospace"] {
 
 .form-comprobante .ant-table-thead > tr > th {
   color: #4a525c !important;
-  font-size: 12px;
+  font-size: 10px;
   font-weight: 600 !important;
   text-transform: uppercase;
   border-bottom: 1px solid #e2e7ee !important;
@@ -194,7 +194,8 @@ code, pre, .ant-typography code, [style*="monospace"] {
 }
 
 .form-comprobante .ant-table-tbody > tr > td {
-  padding: 8px !important;
+  padding: 6px 8px !important;
+  font-size: 11px !important;
 }
 
 .form-comprobante .ant-table-wrapper .ant-table-tbody > tr.ant-table-row:hover > td {

@@ -24,7 +24,7 @@ export default function TotalesResumen() {
 
   return (
     <div style={{ background: '#fff', border: '1px solid #e2e7ee', borderRadius: 8, overflow: 'hidden' }}>
-      <div style={{ padding: '14px 18px', display: 'flex', flexDirection: 'column', gap: 6 }}>
+      <div style={{ padding: '14px 18px', display: 'flex', flexDirection: 'column', gap: 6, fontSize: 12 }}>
         {filas.filter(([, , ver]) => ver).map(([label, valor]) => (
           <div key={label} style={{ display: 'flex', justifyContent: 'space-between', color: '#4a525c' }}>
             <span>{label}</span>
@@ -33,8 +33,8 @@ export default function TotalesResumen() {
         ))}
       </div>
       <div style={{ background: ACENTO, color: '#fff', padding: '14px 18px', display: 'flex', flexDirection: 'column' }}>
-        <span style={{ fontSize: 12, fontWeight: 600, letterSpacing: 1 }}>TOTAL A PAGAR</span>
-        <span style={{ fontSize: 30, fontWeight: 700, lineHeight: 1.2 }}>{formatMoney(totals.mto_imp_venta, moneda)}</span>
+        <span style={{ fontSize: 10, fontWeight: 600, letterSpacing: 1 }}>TOTAL A PAGAR</span>
+        <span style={{ fontSize: 28, fontWeight: 700, lineHeight: 1.2 }}>{formatMoney(totals.mto_imp_venta, moneda)}</span>
       </div>
     </div>
   );
