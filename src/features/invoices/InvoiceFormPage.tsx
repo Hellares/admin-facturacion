@@ -161,7 +161,7 @@ export default function InvoiceFormPage() {
               items={[{
                 key: 'mas',
                 forceRender: true,
-                label: <span style={{ fontWeight: 600, color: '#1f3a5f' }}>Más opciones: orden de compra, observaciones, tipo de operación, detracción</span>,
+                label: <span style={{ fontWeight: 500, color: '#1f3a5f' }}>Más opciones: orden de compra, observaciones, tipo de operación, detracción</span>,
                 children: (
                   <Form layout="vertical" component="div">
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 12 }}>

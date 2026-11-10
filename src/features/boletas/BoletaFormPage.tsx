@@ -134,7 +134,7 @@ export default function BoletaFormPage() {
               items={[{
                 key: 'mas',
                 forceRender: true,
-                label: <span style={{ fontWeight: 600, color: '#1f3a5f' }}>Más opciones: observaciones, envío a SUNAT, detracción</span>,
+                label: <span style={{ fontWeight: 500, color: '#1f3a5f' }}>Más opciones: observaciones, envío a SUNAT, detracción</span>,
                 children: (
                   <Form layout="vertical" component="div">
                     <Form.Item label="Observaciones" style={{ marginBottom: 12 }}>

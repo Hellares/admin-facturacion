@@ -24,7 +24,7 @@ export function FormSection({ title, extra, children }: FormSectionProps) {
       }}
     >
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, alignItems: 'center', justifyContent: 'space-between' }}>
-        <h2 style={{ margin: 0, fontSize: 14, fontWeight: 700, color: '#1f2328' }}>{title}</h2>
+        <h2 style={{ margin: 0, fontSize: 14, fontWeight: 500, color: '#333' }}>{title}</h2>
         {extra}
       </div>
       {children}
