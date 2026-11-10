@@ -1,4 +1,3 @@
-import type { CSSProperties } from 'react';
 import { Button, Table, InputNumber, Input, Select, Tooltip } from 'antd';
 import { PlusOutlined, DeleteOutlined } from '@ant-design/icons';
 import { useFieldArray, useFormContext, useWatch } from 'react-hook-form';
@@ -68,21 +67,24 @@ export default function ItemsTable({ name = 'detalles', simplified = false, comp
     });
   };
 
-  const codigoInput = (index: number, style?: CSSProperties) => (
+  const codigoInput = (index: number) => (
     <Input
-      size={compacto ? 'small' : tam}
+      size={tam}
       value={watchedItems?.[index]?.codigo}
       onChange={(e) => setValue(`${name}.${index}.codigo`, e.target.value)}
-      placeholder={compacto ? 'Código (opcional)' : 'COD'}
+      placeholder={compacto ? 'Código' : 'COD'}
       disabled={lockCodigo}
-      style={style}
     />
   );
 
-  const columnaDescripcionCompacta = {
-    title: 'Descripción',
-    render: (_: unknown, __: unknown, index: number) => (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+  // Compacto: código y descripción en la misma fila; la tabla se desplaza a los lados si no entra
+  const columnasInicio: ColumnsType<ItemRow & { id: string }> = compacto ? [
+    { title: '#', width: 40, render: (_, __, index) => index + 1 },
+    { title: 'Código', width: 120, render: (_, __, index) => codigoInput(index) },
+    {
+      title: 'Descripción',
+      width: 300,
+      render: (_, __, index) => (
         <Input
           value={watchedItems?.[index]?.descripcion}
           onChange={(e) => setValue(`${name}.${index}.descripcion`, e.target.value)}
@@ -90,14 +92,8 @@ export default function ItemsTable({ name = 'detalles', simplified = false, comp
           disabled={lockDescripcion}
           style={{ fontWeight: 500 }}
         />
-        {codigoInput(index, { maxWidth: 180, color: '#5b6573' })}
-      </div>
-    ),
-  };
-
-  const columnasInicio: ColumnsType<ItemRow & { id: string }> = compacto ? [
-    { title: '#', width: 40, render: (_, __, index) => index + 1 },
-    columnaDescripcionCompacta,
+      ),
+    },
   ] : [
     {
       title: '#',
@@ -275,7 +271,7 @@ export default function ItemsTable({ name = 'detalles', simplified = false, comp
           dataSource={fields as (ItemRow & { id: string })[]}
           rowKey="id"
           pagination={false}
-          scroll={{ x: 860 }}
+          scroll={{ x: 1060 }}
           style={{ border: '1px solid #e2e7ee', borderRadius: 8, overflow: 'hidden' }}
           locale={{ emptyText: 'Sin productos. Use "Agregar producto"' }}
         />
