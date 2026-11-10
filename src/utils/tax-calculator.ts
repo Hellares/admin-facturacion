@@ -47,7 +47,24 @@ function isGratuito(tip: TipoAfectacionIGV): boolean {
   return gratuitos.includes(tip);
 }
 
+// Igual que el backend (DocumentService::calculateTotals): todo con decimales completos y se
+// redondea solo al mostrar. Redondear el valor unitario antes mostraba 2 x 8.90 = 17.79.
 export function calculateItemTotals(item: Partial<DetalleItem>): ItemTotals {
+  const raw = calculateItemRaw(item);
+  return {
+    mto_valor_unitario: raw.mto_valor_unitario,
+    mto_precio_unitario: raw.mto_precio_unitario,
+    mto_valor_venta: round2(raw.mto_valor_venta),
+    mto_base_igv: round2(raw.mto_base_igv),
+    igv: round2(raw.igv),
+    isc: round2(raw.isc),
+    icbper: round2(raw.icbper),
+    total_impuestos: round2(raw.total_impuestos),
+    total_item: round2(raw.total_item),
+  };
+}
+
+function calculateItemRaw(item: Partial<DetalleItem>): ItemTotals {
   const cantidad = item.cantidad || 0;
   const porcentajeIgv = item.porcentaje_igv ?? IGV_PORCENTAJE_DEFAULT;
   const tipAfeIgv = item.tip_afe_igv || '10';
@@ -63,29 +80,29 @@ export function calculateItemTotals(item: Partial<DetalleItem>): ItemTotals {
   } else if (item.mto_precio_unitario != null && item.mto_precio_unitario > 0) {
     mtoPrecioUnitario = item.mto_precio_unitario;
     mtoValorUnitario = isGravado(tipAfeIgv)
-      ? round2(mtoPrecioUnitario / (1 + porcentajeIgv / 100))
+      ? mtoPrecioUnitario / (1 + porcentajeIgv / 100)
       : mtoPrecioUnitario;
   } else {
     mtoValorUnitario = 0;
     mtoPrecioUnitario = 0;
   }
 
-  const mtoValorVenta = round2(mtoValorUnitario * cantidad);
+  const mtoValorVenta = mtoValorUnitario * cantidad;
   const mtoBaseIgv = mtoValorVenta;
 
-  const igv = isGravado(tipAfeIgv) ? round2(mtoBaseIgv * porcentajeIgv / 100) : 0;
+  const igv = isGravado(tipAfeIgv) ? mtoBaseIgv * porcentajeIgv / 100 : 0;
 
   const isc = item.porcentaje_isc
-    ? round2(mtoValorVenta * item.porcentaje_isc / 100)
+    ? mtoValorVenta * item.porcentaje_isc / 100
     : 0;
 
   const icbper = item.factor_icbper
-    ? round2(item.factor_icbper * cantidad)
+    ? item.factor_icbper * cantidad
     : 0;
 
-  const totalImpuestos = round2(igv + isc + icbper);
+  const totalImpuestos = igv + isc + icbper;
 
-  const totalItem = isGratuito(tipAfeIgv) ? 0 : round2(mtoValorVenta + totalImpuestos);
+  const totalItem = isGratuito(tipAfeIgv) ? 0 : mtoValorVenta + totalImpuestos;
 
   return {
     mto_valor_unitario: mtoValorUnitario,
@@ -116,28 +133,29 @@ export function calculateDocumentTotals(items: Partial<DetalleItem>[]): Document
 
   for (const item of items) {
     const tipAfeIgv = item.tip_afe_igv || '10';
-    const itemTotals = calculateItemTotals(item);
+    const itemTotals = calculateItemRaw(item);
 
     if (isGratuito(tipAfeIgv)) {
-      totals.mto_oper_gratuitas = round2(totals.mto_oper_gratuitas + itemTotals.mto_valor_venta);
+      totals.mto_oper_gratuitas += itemTotals.mto_valor_venta;
     } else if (isGravado(tipAfeIgv)) {
-      totals.mto_oper_gravadas = round2(totals.mto_oper_gravadas + itemTotals.mto_valor_venta);
+      totals.mto_oper_gravadas += itemTotals.mto_valor_venta;
     } else if (isExonerado(tipAfeIgv)) {
-      totals.mto_oper_exoneradas = round2(totals.mto_oper_exoneradas + itemTotals.mto_valor_venta);
+      totals.mto_oper_exoneradas += itemTotals.mto_valor_venta;
     } else if (isInafecto(tipAfeIgv)) {
-      totals.mto_oper_inafectas = round2(totals.mto_oper_inafectas + itemTotals.mto_valor_venta);
+      totals.mto_oper_inafectas += itemTotals.mto_valor_venta;
     }
 
-    totals.mto_igv = round2(totals.mto_igv + itemTotals.igv);
-    totals.mto_isc = round2(totals.mto_isc + itemTotals.isc);
-    totals.mto_icbper = round2(totals.mto_icbper + itemTotals.icbper);
+    totals.mto_igv += itemTotals.igv;
+    totals.mto_isc += itemTotals.isc;
+    totals.mto_icbper += itemTotals.icbper;
   }
 
-  totals.valor_venta = round2(
-    totals.mto_oper_gravadas + totals.mto_oper_exoneradas + totals.mto_oper_inafectas
-  );
-  totals.sub_total = round2(totals.valor_venta + totals.mto_igv + totals.mto_isc);
-  totals.mto_imp_venta = round2(totals.sub_total + totals.mto_icbper);
+  totals.valor_venta = totals.mto_oper_gravadas + totals.mto_oper_exoneradas + totals.mto_oper_inafectas;
+  totals.sub_total = totals.valor_venta + totals.mto_igv + totals.mto_isc;
+  totals.mto_imp_venta = totals.sub_total + totals.mto_icbper;
 
+  for (const key of Object.keys(totals) as (keyof DocumentTotals)[]) {
+    totals[key] = round2(totals[key]);
+  }
   return totals;
 }
