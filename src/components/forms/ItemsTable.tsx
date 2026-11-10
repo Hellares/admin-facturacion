@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react';
 import { Button, Table, InputNumber, Input, Select, Tooltip } from 'antd';
 import { PlusOutlined, DeleteOutlined } from '@ant-design/icons';
 import { useFieldArray, useFormContext, useWatch } from 'react-hook-form';
@@ -23,6 +24,8 @@ export interface ItemsTableRestrictions {
 interface ItemsTableProps {
   name?: string; // field array name, default 'detalles'
   simplified?: boolean; // for dispatch guides - less columns
+  /** Boleta/factura (diseño A): código bajo la descripción, sin columnas IGV % ni IGV, controles normales. */
+  compacto?: boolean;
   restrictions?: ItemsTableRestrictions;
 }
 
@@ -37,7 +40,8 @@ interface ItemRow {
   porcentaje_igv: number;
 }
 
-export default function ItemsTable({ name = 'detalles', simplified = false, restrictions }: ItemsTableProps) {
+export default function ItemsTable({ name = 'detalles', simplified = false, compacto = false, restrictions }: ItemsTableProps) {
+  const tam = compacto ? undefined : 'small';
   const { control, setValue } = useFormContext();
   const { fields, append, remove } = useFieldArray({ control, name });
   const watchedItems = useWatch({ control, name }) as ItemRow[] | undefined;
@@ -64,7 +68,37 @@ export default function ItemsTable({ name = 'detalles', simplified = false, rest
     });
   };
 
-  const columns: ColumnsType<ItemRow & { id: string }> = [
+  const codigoInput = (index: number, style?: CSSProperties) => (
+    <Input
+      size={compacto ? 'small' : tam}
+      value={watchedItems?.[index]?.codigo}
+      onChange={(e) => setValue(`${name}.${index}.codigo`, e.target.value)}
+      placeholder={compacto ? 'Código (opcional)' : 'COD'}
+      disabled={lockCodigo}
+      style={style}
+    />
+  );
+
+  const columnaDescripcionCompacta = {
+    title: 'Descripción',
+    render: (_: unknown, __: unknown, index: number) => (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+        <Input
+          value={watchedItems?.[index]?.descripcion}
+          onChange={(e) => setValue(`${name}.${index}.descripcion`, e.target.value)}
+          placeholder="Producto o servicio"
+          disabled={lockDescripcion}
+          style={{ fontWeight: 500 }}
+        />
+        {codigoInput(index, { maxWidth: 180, color: '#5b6573' })}
+      </div>
+    ),
+  };
+
+  const columnasInicio: ColumnsType<ItemRow & { id: string }> = compacto ? [
+    { title: '#', width: 40, render: (_, __, index) => index + 1 },
+    columnaDescripcionCompacta,
+  ] : [
     {
       title: '#',
       width: 40,
@@ -73,21 +107,13 @@ export default function ItemsTable({ name = 'detalles', simplified = false, rest
     {
       title: 'Codigo',
       width: 100,
-      render: (_, __, index) => (
-        <Input
-          size="small"
-          value={watchedItems?.[index]?.codigo}
-          onChange={(e) => setValue(`${name}.${index}.codigo`, e.target.value)}
-          placeholder="COD"
-          disabled={lockCodigo}
-        />
-      ),
+      render: (_, __, index) => codigoInput(index),
     },
     {
       title: 'Descripcion',
       render: (_, __, index) => (
         <Input
-          size="small"
+          size={tam}
           value={watchedItems?.[index]?.descripcion}
           onChange={(e) => setValue(`${name}.${index}.descripcion`, e.target.value)}
           placeholder="Descripcion del producto o servicio"
@@ -95,12 +121,16 @@ export default function ItemsTable({ name = 'detalles', simplified = false, rest
         />
       ),
     },
+  ];
+
+  const columns: ColumnsType<ItemRow & { id: string }> = [
+    ...columnasInicio,
     {
       title: 'Und',
       width: 90,
       render: (_, __, index) => (
         <Select
-          size="small"
+          size={tam}
           value={watchedItems?.[index]?.unidad}
           onChange={(val) => setValue(`${name}.${index}.unidad`, val)}
           options={UNIDAD_MEDIDA_OPTIONS.map((u) => ({ value: u.value, label: u.value }))}
@@ -114,7 +144,7 @@ export default function ItemsTable({ name = 'detalles', simplified = false, rest
       width: 80,
       render: (_, __, index) => (
         <InputNumber
-          size="small"
+          size={tam}
           value={watchedItems?.[index]?.cantidad}
           onChange={(val) => setValue(`${name}.${index}.cantidad`, val || 0)}
           min={0.001}
@@ -129,7 +159,7 @@ export default function ItemsTable({ name = 'detalles', simplified = false, rest
       width: 130,
       render: (_, __, index) => (
         <InputNumber
-          size="small"
+          size={tam}
           value={watchedItems?.[index]?.mto_precio_unitario}
           onChange={(val) => {
             setValue(`${name}.${index}.mto_precio_unitario`, val || 0);
@@ -148,11 +178,11 @@ export default function ItemsTable({ name = 'detalles', simplified = false, rest
   if (!simplified) {
     columns.push(
       {
-        title: 'Afect. IGV',
-        width: 220,
+        title: compacto ? 'Afectación' : 'Afect. IGV',
+        width: compacto ? 190 : 220,
         render: (_, __, index) => (
           <Select
-            size="small"
+            size={tam}
             showSearch
             optionFilterProp="label"
             value={watchedItems?.[index]?.tip_afe_igv}
@@ -169,12 +199,18 @@ export default function ItemsTable({ name = 'detalles', simplified = false, rest
           />
         ),
       },
+    );
+  }
+
+  // El % de IGV se fija solo con la afectación; en modo compacto no se muestra
+  if (!simplified && !compacto) {
+    columns.push(
       {
         title: 'IGV %',
         width: 70,
         render: (_, __, index) => (
           <InputNumber
-            size="small"
+            size={tam}
             value={watchedItems?.[index]?.porcentaje_igv}
             onChange={(val) => setValue(`${name}.${index}.porcentaje_igv`, val || 0)}
             min={0}
@@ -188,8 +224,8 @@ export default function ItemsTable({ name = 'detalles', simplified = false, rest
   }
 
   // Calculated columns
-  columns.push(
-    {
+  if (!compacto) {
+    columns.push({
       title: 'IGV',
       width: 80,
       align: 'right',
@@ -199,7 +235,9 @@ export default function ItemsTable({ name = 'detalles', simplified = false, rest
         const totals = calculateItemTotals(item as unknown as Partial<DetalleItem>);
         return formatNumber(totals.igv);
       },
-    },
+    });
+  }
+  columns.push(
     {
       title: 'Total',
       width: 100,
@@ -218,7 +256,7 @@ export default function ItemsTable({ name = 'detalles', simplified = false, rest
         allowDelete ? (
           <Tooltip title="Eliminar">
             <Button
-              size="small"
+              size={tam}
               type="text"
               danger
               icon={<DeleteOutlined />}
@@ -228,6 +266,27 @@ export default function ItemsTable({ name = 'detalles', simplified = false, rest
         ) : null,
     },
   );
+
+  if (compacto) {
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+        <Table
+          columns={columns}
+          dataSource={fields as (ItemRow & { id: string })[]}
+          rowKey="id"
+          pagination={false}
+          scroll={{ x: 860 }}
+          style={{ border: '1px solid #e2e7ee', borderRadius: 10, overflow: 'hidden' }}
+          locale={{ emptyText: 'Sin productos. Use "Agregar producto"' }}
+        />
+        {allowAdd && (
+          <Button type="dashed" block size="large" icon={<PlusOutlined />} onClick={addItem} style={{ fontWeight: 600 }}>
+            Agregar producto
+          </Button>
+        )}
+      </div>
+    );
+  }
 
   return (
     <div>

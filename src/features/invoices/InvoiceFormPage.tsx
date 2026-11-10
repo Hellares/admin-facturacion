@@ -147,7 +147,7 @@ export default function InvoiceFormPage() {
           </FormSection>
 
           <FormSection title="Productos">
-            <ItemsTable />
+            <ItemsTable compacto />
             {errors.detalles && typeof errors.detalles.message === 'string' && (
               <Alert type="error" message={errors.detalles.message} showIcon />
             )}

@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Alert, Button, Segmented, Typography } from 'antd';
+import { Alert, Button, ConfigProvider, Segmented, Typography } from 'antd';
 import { SendOutlined } from '@ant-design/icons';
 import TotalesResumen from './TotalesResumen';
 import { ROUTES } from '@/config/routes.config';
@@ -48,7 +48,13 @@ export default function ComprobanteFormLayout({ tipo, children, submitting, erro
   const nombre = tipo === 'boleta' ? 'boleta' : 'factura';
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+    <ConfigProvider
+      theme={{
+        token: { colorPrimary: ACENTO, borderRadius: 8, controlHeight: 38 },
+        components: { Table: { headerBg: '#f4f6f8', headerColor: '#4a525c' }, Segmented: { itemSelectedColor: ACENTO } },
+      }}
+    >
+    <div className="form-comprobante" style={{ display: 'flex', flexDirection: 'column', gap: 16, background: '#f4f6f8', borderRadius: 14, padding: 20 }}>
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, alignItems: 'center', justifyContent: 'space-between' }}>
         <div>
           <Typography.Text type="secondary" style={{ fontSize: 13 }}>Comprobantes / Nuevo</Typography.Text>
@@ -89,5 +95,6 @@ export default function ComprobanteFormLayout({ tipo, children, submitting, erro
         </aside>
       </div>
     </div>
+    </ConfigProvider>
   );
 }

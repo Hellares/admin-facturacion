@@ -164,6 +164,77 @@ export default function ClientSelector({ prefix = 'client', documentType }: Clie
     return undefined;
   })();
 
+  const campoNumero = (
+    <Controller
+      name={`${p}numero_documento`}
+      control={control}
+      render={({ field }) => (
+        <Input.Search
+          {...field}
+          onChange={(e) => onNumeroChange(e.target.value, field.onChange)}
+          size="large"
+          enterButton="Buscar"
+          loading={searching}
+          onSearch={(v) => handleSearchByDocument(v)}
+          inputMode={currentTipoDoc === '1' || currentTipoDoc === '6' ? 'numeric' : undefined}
+          // 11 también con DNI: así se puede escribir un RUC y ver el aviso de "emita factura"
+          maxLength={currentTipoDoc === '1' || currentTipoDoc === '6' ? 11 : 20}
+          placeholder={currentTipoDoc === '6' ? 'RUC: 11 dígitos' : currentTipoDoc === '1' ? 'DNI: 8 dígitos' : 'Número'}
+          style={{ fontWeight: 600 }}
+        />
+      )}
+    />
+  );
+
+  // Boleta y factura: diseño A (buscador grande y los datos del cliente en un recuadro gris)
+  if (documentType === 'boleta' || documentType === 'factura') {
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, alignItems: 'flex-start' }}>
+          <Form.Item label="Tipo" required style={{ marginBottom: 0, width: 170 }}>
+            <Controller
+              name={`${p}tipo_documento`}
+              control={control}
+              render={({ field }) => (
+                <Select {...field} size="large" options={filteredTipoDocOptions} disabled={tipoDocDisabled} />
+              )}
+            />
+          </Form.Item>
+          <Form.Item
+            label={documentType === 'factura' ? 'RUC del cliente' : 'Documento del cliente'}
+            required
+            validateStatus={getError('numero_documento') ? 'error' : avisoNumero ? 'warning' : ''}
+            help={getError('numero_documento')?.message ?? avisoNumero ?? 'Se busca solo al completar los dígitos'}
+            style={{ marginBottom: 0, flex: '1 1 260px' }}
+          >
+            {campoNumero}
+          </Form.Item>
+        </div>
+
+        <div style={{ background: '#f4f6f8', borderRadius: 10, padding: '12px 14px', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '4px 14px' }}>
+          <Form.Item
+            label={documentType === 'factura' ? 'Razón social' : 'Nombre'}
+            required
+            validateStatus={getError('razon_social') ? 'error' : ''}
+            help={getError('razon_social')?.message}
+            style={{ marginBottom: 8, gridColumn: '1 / -1' }}
+          >
+            <Controller name={`${p}razon_social`} control={control} render={({ field }) => <Input {...field} style={{ fontWeight: 600 }} />} />
+          </Form.Item>
+          <Form.Item label="Dirección" style={{ marginBottom: 8, gridColumn: '1 / -1' }}>
+            <Controller name={`${p}direccion`} control={control} render={({ field }) => <Input {...field} />} />
+          </Form.Item>
+          <Form.Item label="Celular" style={{ marginBottom: 4 }}>
+            <Controller name={`${p}telefono`} control={control} render={({ field }) => <Input {...field} inputMode="tel" />} />
+          </Form.Item>
+          <Form.Item label="Email" style={{ marginBottom: 4 }}>
+            <Controller name={`${p}email`} control={control} render={({ field }) => <Input {...field} type="email" />} />
+          </Form.Item>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 2 }}>
