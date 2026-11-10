@@ -198,8 +198,7 @@ export default function ItemsTable({ name = 'detalles', simplified = false, comp
     );
   }
 
-  // El % de IGV se fija solo con la afectación; en modo compacto no se muestra
-  if (!simplified && !compacto) {
+  if (!simplified) {
     columns.push(
       {
         title: 'IGV %',
@@ -271,7 +270,7 @@ export default function ItemsTable({ name = 'detalles', simplified = false, comp
           dataSource={fields as (ItemRow & { id: string })[]}
           rowKey="id"
           pagination={false}
-          scroll={{ x: 1060 }}
+          scroll={{ x: 1140 }}
           style={{ border: '1px solid #e2e7ee', borderRadius: 8, overflow: 'hidden' }}
           locale={{ emptyText: 'Sin productos. Use "Agregar producto"' }}
         />
