@@ -62,7 +62,6 @@ export default function ComprobanteFormLayout({ tipo, children, submitting, erro
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, alignItems: 'center', justifyContent: 'space-between' }}>
         <div>
           <Typography.Text type="secondary" style={{ fontSize: 12 }}>Comprobantes / Nuevo</Typography.Text>
-          <h1 style={{ margin: 0, fontSize: 21, fontWeight: 700 }}>Nuevo comprobante</h1>
         </div>
         <Segmented
           size="large"
