@@ -50,7 +50,7 @@ export default function ComprobanteFormLayout({ tipo, children, submitting, erro
   return (
     <ConfigProvider
       theme={{
-        token: { colorPrimary: ACENTO, borderRadius: 8, controlHeight: 38 },
+        token: { colorPrimary: ACENTO, borderRadius: 8, controlHeight: 33 },
         components: { Table: { headerBg: '#f4f6f8', headerColor: '#4a525c' }, Segmented: { itemSelectedColor: ACENTO } },
       }}
     >
