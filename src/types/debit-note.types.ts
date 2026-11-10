@@ -1,4 +1,5 @@
 import type {
+  EmpresaDocumento,
   SunatStatus, Moneda, DetalleItem, ClienteDocumento, Leyenda,
 } from './common.types';
 
@@ -20,6 +21,7 @@ export interface DebitNote {
   estado_sunat: SunatStatus;
   respuesta_sunat?: string;
   cliente: ClienteDocumento;
+  empresa?: EmpresaDocumento;
   detalles: DetalleItem[];
   leyendas?: Leyenda[];
   // Totales (nested from backend)

@@ -1,4 +1,5 @@
 import type {
+  EmpresaDocumento,
   SunatStatus, Moneda, FormaPagoTipo, DetalleItem, Cuota, MedioPago,
   ClienteDocumento, Detraccion, DescuentoGlobal, Leyenda, BancarizacionData,
 } from './common.types';
@@ -26,6 +27,7 @@ export interface Boleta {
   forma_pago_tipo: FormaPagoTipo;
   forma_pago_cuotas?: Cuota[];
   cliente: ClienteDocumento;
+  empresa?: EmpresaDocumento;
   detalles: DetalleItem[];
   leyendas?: Leyenda[];
   detraccion?: Detraccion;

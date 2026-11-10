@@ -1,4 +1,5 @@
 import type {
+  EmpresaDocumento,
   SunatStatus, Moneda, FormaPagoTipo, DetalleItem, Cuota, MedioPago,
   ClienteDocumento, Detraccion, Percepcion, RetencionDoc, DescuentoGlobal,
   Anticipo, DocumentoRelacionado, Leyenda, BancarizacionData,
@@ -29,6 +30,7 @@ export interface Invoice {
   forma_pago_tipo: FormaPagoTipo;
   forma_pago_cuotas?: Cuota[];
   cliente: ClienteDocumento;
+  empresa?: EmpresaDocumento;
   detalles: DetalleItem[];
   leyendas?: Leyenda[];
   detraccion?: Detraccion;

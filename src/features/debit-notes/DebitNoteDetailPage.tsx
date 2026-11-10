@@ -9,6 +9,7 @@ import SunatStatusBadge from '@/components/common/SunatStatusBadge';
 import OrigenTag from '@/components/common/OrigenTag';
 import MoneyDisplay from '@/components/common/MoneyDisplay';
 import DocumentActions from '@/components/common/DocumentActions';
+import WhatsAppShareButton from '@/components/common/WhatsAppShareButton';
 import DocumentPdfViewer from '@/components/common/DocumentPdfViewer';
 import { useDebitNote } from './hooks/useDebitNotes';
 import { useDocumentAnulacionInfo } from '@/hooks/useDocumentAnulacionInfo';
@@ -45,15 +46,26 @@ export default function DebitNoteDetailPage() {
         showBack
         breadcrumbs={[{ title: 'Notas de Debito', path: '/debit-notes' }, { title: nd.numero_completo }]}
         extra={
-          <DocumentActions
-            documentType="debit-notes"
-            documentId={nd.id}
-            documentNumber={nd.numero_completo}
-            status={nd.estado_sunat}
-            sunatCode={nd.sunat?.codigo}
-            onStatusChange={() => refetch()}
-            onViewPdf={() => setPdfOpen(true)}
-          />
+          <Space wrap>
+            <DocumentActions
+              documentType="debit-notes"
+              documentId={nd.id}
+              documentNumber={nd.numero_completo}
+              status={nd.estado_sunat}
+              sunatCode={nd.sunat?.codigo}
+              onStatusChange={() => refetch()}
+              onViewPdf={() => setPdfOpen(true)}
+            />
+            <WhatsAppShareButton
+              tipo="08"
+              numero={nd.numero_completo}
+              status={nd.estado_sunat}
+              empresa={nd.empresa}
+              cliente={nd.cliente}
+              total={nd.totales?.total ?? nd.mto_imp_venta}
+              moneda={moneda}
+            />
+          </Space>
         }
       />
       <Space direction="vertical" size="middle" style={{ width: '100%' }}>

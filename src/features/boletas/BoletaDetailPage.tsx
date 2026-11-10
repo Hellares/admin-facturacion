@@ -10,6 +10,7 @@ import OrigenTag from '@/components/common/OrigenTag';
 import EstadoBadge from '@/components/common/EstadoBadge';
 import MoneyDisplay from '@/components/common/MoneyDisplay';
 import DocumentActions from '@/components/common/DocumentActions';
+import WhatsAppShareButton from '@/components/common/WhatsAppShareButton';
 import DocumentPdfViewer from '@/components/common/DocumentPdfViewer';
 import { useBoleta } from './hooks/useBoletas';
 import { useDocumentAnulacionInfo } from '@/hooks/useDocumentAnulacionInfo';
@@ -48,15 +49,26 @@ export default function BoletaDetailPage() {
         showBack
         breadcrumbs={[{ title: 'Boletas', path: '/boletas' }, { title: boleta.numero_completo }]}
         extra={
-          <DocumentActions
-            documentType="boletas"
-            documentId={boleta.id}
-            documentNumber={boleta.numero_completo}
-            status={boleta.estado_sunat}
-            sunatCode={boleta.sunat?.codigo}
-            onStatusChange={() => refetch()}
-            onViewPdf={() => setPdfOpen(true)}
-          />
+          <Space wrap>
+            <DocumentActions
+              documentType="boletas"
+              documentId={boleta.id}
+              documentNumber={boleta.numero_completo}
+              status={boleta.estado_sunat}
+              sunatCode={boleta.sunat?.codigo}
+              onStatusChange={() => refetch()}
+              onViewPdf={() => setPdfOpen(true)}
+            />
+            <WhatsAppShareButton
+              tipo="03"
+              numero={boleta.numero_completo}
+              status={boleta.estado_sunat}
+              empresa={boleta.empresa}
+              cliente={boleta.cliente}
+              total={boleta.totales?.total ?? boleta.mto_imp_venta}
+              moneda={moneda}
+            />
+          </Space>
         }
       />
 

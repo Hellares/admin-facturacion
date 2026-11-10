@@ -138,6 +138,13 @@ export interface TotalesDocumento {
   mto_imp_venta: number;
 }
 
+// === Empresa emisora embebida en el detalle de un documento ===
+export interface EmpresaDocumento {
+  ruc: string;
+  razon_social?: string;
+  nombre_comercial?: string | null;
+}
+
 // === Cliente embebido en documento ===
 export interface ClienteDocumento {
   tipo_documento: TipoDocumentoCliente;

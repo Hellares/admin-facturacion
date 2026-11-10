@@ -9,6 +9,7 @@ import SunatStatusBadge from '@/components/common/SunatStatusBadge';
 import OrigenTag from '@/components/common/OrigenTag';
 import MoneyDisplay from '@/components/common/MoneyDisplay';
 import DocumentActions from '@/components/common/DocumentActions';
+import WhatsAppShareButton from '@/components/common/WhatsAppShareButton';
 import DocumentPdfViewer from '@/components/common/DocumentPdfViewer';
 import { useInvoice } from './hooks/useInvoices';
 import { useDocumentAnulacionInfo } from '@/hooks/useDocumentAnulacionInfo';
@@ -84,15 +85,26 @@ export default function InvoiceDetailPage() {
           { title: invoice.numero_completo },
         ]}
         extra={
-          <DocumentActions
-            documentType="invoices"
-            documentId={invoice.id}
-            documentNumber={invoice.numero_completo}
-            status={invoice.estado_sunat}
-            sunatCode={invoice.sunat?.codigo}
-            onStatusChange={() => refetch()}
-            onViewPdf={() => setPdfOpen(true)}
-          />
+          <Space wrap>
+            <DocumentActions
+              documentType="invoices"
+              documentId={invoice.id}
+              documentNumber={invoice.numero_completo}
+              status={invoice.estado_sunat}
+              sunatCode={invoice.sunat?.codigo}
+              onStatusChange={() => refetch()}
+              onViewPdf={() => setPdfOpen(true)}
+            />
+            <WhatsAppShareButton
+              tipo="01"
+              numero={invoice.numero_completo}
+              status={invoice.estado_sunat}
+              empresa={invoice.empresa}
+              cliente={invoice.cliente}
+              total={invoice.totales?.total ?? invoice.mto_imp_venta}
+              moneda={moneda}
+            />
+          </Space>
         }
       />
 

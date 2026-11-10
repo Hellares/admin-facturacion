@@ -9,6 +9,7 @@ import SunatStatusBadge from '@/components/common/SunatStatusBadge';
 import OrigenTag from '@/components/common/OrigenTag';
 import MoneyDisplay from '@/components/common/MoneyDisplay';
 import DocumentActions from '@/components/common/DocumentActions';
+import WhatsAppShareButton from '@/components/common/WhatsAppShareButton';
 import DocumentPdfViewer from '@/components/common/DocumentPdfViewer';
 import { useCreditNote } from './hooks/useCreditNotes';
 import { useDocumentAnulacionInfo } from '@/hooks/useDocumentAnulacionInfo';
@@ -45,15 +46,26 @@ export default function CreditNoteDetailPage() {
         showBack
         breadcrumbs={[{ title: 'Notas de Credito', path: '/credit-notes' }, { title: nc.numero_completo }]}
         extra={
-          <DocumentActions
-            documentType="credit-notes"
-            documentId={nc.id}
-            documentNumber={nc.numero_completo}
-            status={nc.estado_sunat}
-            sunatCode={nc.sunat?.codigo}
-            onStatusChange={() => refetch()}
-            onViewPdf={() => setPdfOpen(true)}
-          />
+          <Space wrap>
+            <DocumentActions
+              documentType="credit-notes"
+              documentId={nc.id}
+              documentNumber={nc.numero_completo}
+              status={nc.estado_sunat}
+              sunatCode={nc.sunat?.codigo}
+              onStatusChange={() => refetch()}
+              onViewPdf={() => setPdfOpen(true)}
+            />
+            <WhatsAppShareButton
+              tipo="07"
+              numero={nc.numero_completo}
+              status={nc.estado_sunat}
+              empresa={nc.empresa}
+              cliente={nc.cliente}
+              total={nc.totales?.total ?? nc.mto_imp_venta}
+              moneda={moneda}
+            />
+          </Space>
         }
       />
       <Space direction="vertical" size="middle" style={{ width: '100%' }}>

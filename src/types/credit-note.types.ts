@@ -1,4 +1,5 @@
 import type {
+  EmpresaDocumento,
   SunatStatus, Moneda, FormaPagoTipo, DetalleItem, Cuota, MedioPago,
   ClienteDocumento, Leyenda,
 } from './common.types';
@@ -23,6 +24,7 @@ export interface CreditNote {
   forma_pago_tipo: FormaPagoTipo;
   forma_pago_cuotas?: Cuota[];
   cliente: ClienteDocumento;
+  empresa?: EmpresaDocumento;
   detalles: DetalleItem[];
   leyendas?: Leyenda[];
   medios_pago?: MedioPago[];
