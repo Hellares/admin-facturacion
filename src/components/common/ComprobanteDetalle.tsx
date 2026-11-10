@@ -94,9 +94,9 @@ export default function ComprobanteDetalle(p: ComprobanteDetalleProps) {
             </div>
 
             <div style={{ padding: '14px 22px', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '10px 20px', background: '#f8fafc', borderBottom: '1px solid #e2e7ee' }}>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}><span style={ETIQUETA}>CLIENTE</span><span style={{ fontWeight: 500 }}>{p.cliente?.razon_social || '-'}</span></div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}><span style={ETIQUETA}>{p.cliente?.tipo_documento === '6' ? 'RUC' : 'DOCUMENTO'}</span><span>{p.cliente?.numero_documento || '-'}</span></div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}><span style={ETIQUETA}>DIRECCIÓN</span><span>{p.cliente?.direccion || '-'}</span></div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}><span style={ETIQUETA}>CLIENTE</span><span style={{ fontWeight: 500, fontSize: 13 }}>{p.cliente?.razon_social || '-'}</span></div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}><span style={ETIQUETA}>{p.cliente?.tipo_documento === '6' ? 'RUC' : 'DOCUMENTO'}</span><span style={{ fontSize: 13 }}>{p.cliente?.numero_documento || '-'}</span></div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}><span style={ETIQUETA}>DIRECCIÓN</span><span style={{ fontSize: 13 }}>{p.cliente?.direccion || '-'}</span></div>
             </div>
 
             <div style={{ padding: '12px 22px', overflowX: 'auto' }}>
@@ -112,7 +112,7 @@ export default function ComprobanteDetalle(p: ComprobanteDetalleProps) {
                     <th style={{ padding: '6px 4px', width: 110, textAlign: 'right' }}>TOTAL</th>
                   </tr>
                 </thead>
-                <tbody>
+                <tbody style={{ fontSize: 13 }}>
                   {p.detalles.map((d, i) => {
                     const it = calculateItemTotals(d);
                     return (
