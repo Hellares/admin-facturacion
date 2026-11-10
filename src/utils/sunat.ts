@@ -73,3 +73,25 @@ export function formatSunatInfo(
   const codigo = info.codigo != null ? String(info.codigo) : '';
   return codigo ? `SUNAT ${codigo}: ${info.descripcion}` : info.descripcion;
 }
+
+// --- Actualización automática del estado SUNAT ---------------------------------
+// El envío a SUNAT corre en segundo plano: mientras el documento esté en estos estados,
+// la pantalla vuelve a consultar sola. PENDIENTE no: espera un resumen diario o un envío manual.
+const SE_ACTUALIZA_SOLO: string[] = ['EN_COLA', 'ENVIANDO', 'ENVIADO', 'PROCESANDO'];
+const INTERVALO_MS = 3000;
+const MAX_CONSULTAS = 40; // ~2 minutos; si SUNAT tarda más, basta con recargar
+
+type EstadoQuery<T> = { state: { data?: T; dataUpdateCount: number } };
+
+/** refetchInterval para el detalle de un comprobante. */
+export function refrescarMientrasSeEnvia(query: EstadoQuery<{ estado_sunat?: string }>): number | false {
+  const { data, dataUpdateCount } = query.state;
+  return SE_ACTUALIZA_SOLO.includes(data?.estado_sunat ?? '') && dataUpdateCount < MAX_CONSULTAS ? INTERVALO_MS : false;
+}
+
+/** refetchInterval para una lista: mientras alguna fila esté en envío. */
+export function refrescarListaMientrasSeEnvia(query: EstadoQuery<{ data?: { estado_sunat?: string }[] }>): number | false {
+  const { data, dataUpdateCount } = query.state;
+  const hayEnEnvio = (data?.data ?? []).some((d) => SE_ACTUALIZA_SOLO.includes(d.estado_sunat ?? ''));
+  return hayEnEnvio && dataUpdateCount < MAX_CONSULTAS ? INTERVALO_MS : false;
+}

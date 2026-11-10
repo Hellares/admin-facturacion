@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { refrescarMientrasSeEnvia, refrescarListaMientrasSeEnvia } from '@/utils/sunat';
 import { boletaService } from '@/services/boleta.service';
 import { useCompanyContextStore } from '@/stores/company-context.store';
 import type { BoletaFormData, BoletaListParams } from '@/types/boleta.types';
@@ -7,6 +8,7 @@ export function useBoletas(params: BoletaListParams) {
   return useQuery({
     queryKey: ['boletas', params],
     queryFn: () => boletaService.getAll(params),
+    refetchInterval: refrescarListaMientrasSeEnvia,
   });
 }
 
@@ -15,6 +17,7 @@ export function useBoleta(id: number) {
     queryKey: ['boleta', id],
     queryFn: () => boletaService.getById(id),
     enabled: !!id,
+    refetchInterval: refrescarMientrasSeEnvia,
   });
 }
 

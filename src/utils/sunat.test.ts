@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { parseSunatInfo, formatSunatInfo, isRechazoReenviable } from './sunat';
+import { parseSunatInfo, formatSunatInfo, isRechazoReenviable, refrescarMientrasSeEnvia, refrescarListaMientrasSeEnvia } from './sunat';
 
 describe('parseSunatInfo', () => {
   it('devuelve null para vacío/null/undefined', () => {
@@ -83,5 +83,26 @@ describe('isRechazoReenviable', () => {
     expect(isRechazoReenviable(null)).toBe(false);
     expect(isRechazoReenviable(undefined)).toBe(false);
     expect(isRechazoReenviable('')).toBe(false);
+  });
+});
+
+describe('refrescar mientras se envía a SUNAT', () => {
+  const q = <T,>(data: T, dataUpdateCount = 1) => ({ state: { data, dataUpdateCount } });
+
+  it('detalle: consulta cada 3 s mientras está en cola o enviando', () => {
+    expect(refrescarMientrasSeEnvia(q({ estado_sunat: 'EN_COLA' }))).toBe(3000);
+    expect(refrescarMientrasSeEnvia(q({ estado_sunat: 'ENVIANDO' }))).toBe(3000);
+  });
+
+  it('detalle: se detiene con un estado final, en PENDIENTE o tras ~2 minutos', () => {
+    expect(refrescarMientrasSeEnvia(q({ estado_sunat: 'ACEPTADO' }))).toBe(false);
+    expect(refrescarMientrasSeEnvia(q({ estado_sunat: 'RECHAZADO' }))).toBe(false);
+    expect(refrescarMientrasSeEnvia(q({ estado_sunat: 'PENDIENTE' }))).toBe(false);
+    expect(refrescarMientrasSeEnvia(q({ estado_sunat: 'EN_COLA' }, 40))).toBe(false);
+  });
+
+  it('lista: consulta mientras alguna fila está en envío', () => {
+    expect(refrescarListaMientrasSeEnvia(q({ data: [{ estado_sunat: 'ACEPTADO' }, { estado_sunat: 'EN_COLA' }] }))).toBe(3000);
+    expect(refrescarListaMientrasSeEnvia(q({ data: [{ estado_sunat: 'ACEPTADO' }] }))).toBe(false);
   });
 });

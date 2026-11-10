@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { refrescarMientrasSeEnvia, refrescarListaMientrasSeEnvia } from '@/utils/sunat';
 import { creditNoteService } from '@/services/credit-note.service';
 import type { CreditNoteFormData, CreditNoteListParams } from '@/types/credit-note.types';
 
@@ -6,6 +7,7 @@ export function useCreditNotes(params: CreditNoteListParams) {
   return useQuery({
     queryKey: ['credit-notes', params],
     queryFn: () => creditNoteService.getAll(params),
+    refetchInterval: refrescarListaMientrasSeEnvia,
   });
 }
 
@@ -14,6 +16,7 @@ export function useCreditNote(id: number) {
     queryKey: ['credit-note', id],
     queryFn: () => creditNoteService.getById(id),
     enabled: !!id,
+    refetchInterval: refrescarMientrasSeEnvia,
   });
 }
 

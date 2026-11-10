@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { refrescarMientrasSeEnvia, refrescarListaMientrasSeEnvia } from '@/utils/sunat';
 import { invoiceService } from '@/services/invoice.service';
 import type { InvoiceFormData, InvoiceListParams } from '@/types/invoice.types';
 
@@ -6,6 +7,7 @@ export function useInvoices(params: InvoiceListParams) {
   return useQuery({
     queryKey: ['invoices', params],
     queryFn: () => invoiceService.getAll(params),
+    refetchInterval: refrescarListaMientrasSeEnvia,
   });
 }
 
@@ -14,6 +16,7 @@ export function useInvoice(id: number) {
     queryKey: ['invoice', id],
     queryFn: () => invoiceService.getById(id),
     enabled: !!id,
+    refetchInterval: refrescarMientrasSeEnvia,
   });
 }
 

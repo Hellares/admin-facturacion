@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { refrescarMientrasSeEnvia, refrescarListaMientrasSeEnvia } from '@/utils/sunat';
 import { debitNoteService } from '@/services/debit-note.service';
 import type { DebitNoteFormData, DebitNoteListParams } from '@/types/debit-note.types';
 
@@ -6,6 +7,7 @@ export function useDebitNotes(params: DebitNoteListParams) {
   return useQuery({
     queryKey: ['debit-notes', params],
     queryFn: () => debitNoteService.getAll(params),
+    refetchInterval: refrescarListaMientrasSeEnvia,
   });
 }
 
@@ -14,6 +16,7 @@ export function useDebitNote(id: number) {
     queryKey: ['debit-note', id],
     queryFn: () => debitNoteService.getById(id),
     enabled: !!id,
+    refetchInterval: refrescarMientrasSeEnvia,
   });
 }
 
