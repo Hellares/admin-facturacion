@@ -58,6 +58,8 @@ export default function CreditNoteDetailPage() {
             />
             <WhatsAppShareButton
               tipo="07"
+              documentType="credit-notes"
+              documentId={nc.id}
               numero={nc.numero_completo}
               status={nc.estado_sunat}
               empresa={nc.empresa}

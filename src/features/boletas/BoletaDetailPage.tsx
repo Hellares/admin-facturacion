@@ -61,6 +61,8 @@ export default function BoletaDetailPage() {
             />
             <WhatsAppShareButton
               tipo="03"
+              documentType="boletas"
+              documentId={boleta.id}
               numero={boleta.numero_completo}
               status={boleta.estado_sunat}
               empresa={boleta.empresa}

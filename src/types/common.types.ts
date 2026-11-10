@@ -143,6 +143,8 @@ export interface EmpresaDocumento {
   ruc: string;
   razon_social?: string;
   nombre_comercial?: string | null;
+  /** La empresa tiene WhatsApp conectado (Evolution API) para enviar el PDF directo. */
+  whatsapp_directo?: boolean;
 }
 
 // === Cliente embebido en documento ===

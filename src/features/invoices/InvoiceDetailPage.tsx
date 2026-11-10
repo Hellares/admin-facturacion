@@ -97,6 +97,8 @@ export default function InvoiceDetailPage() {
             />
             <WhatsAppShareButton
               tipo="01"
+              documentType="invoices"
+              documentId={invoice.id}
               numero={invoice.numero_completo}
               status={invoice.estado_sunat}
               empresa={invoice.empresa}

@@ -58,6 +58,8 @@ export default function DebitNoteDetailPage() {
             />
             <WhatsAppShareButton
               tipo="08"
+              documentType="debit-notes"
+              documentId={nd.id}
               numero={nd.numero_completo}
               status={nd.estado_sunat}
               empresa={nd.empresa}
