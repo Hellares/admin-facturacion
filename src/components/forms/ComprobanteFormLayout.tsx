@@ -51,7 +51,11 @@ export default function ComprobanteFormLayout({ tipo, children, submitting, erro
     <ConfigProvider
       theme={{
         token: { colorPrimary: ACENTO, borderRadius: 4, controlHeight: 24, fontSize: 13 },
-        components: { Table: { headerBg: '#f4f6f8', headerColor: '#4a525c' }, Segmented: { itemSelectedColor: ACENTO } },
+        components: {
+          Table: { headerBg: '#f4f6f8', headerColor: '#4a525c' },
+          Segmented: { itemSelectedColor: ACENTO },
+          Form: { verticalLabelPadding: '0 0 3px' }, // etiqueta pegada a su campo (antes 8 px)
+        },
       }}
     >
     <div className="form-comprobante" style={{ display: 'flex', flexDirection: 'column', gap: 16, background: '#f4f6f8', borderRadius: 8, padding: 20 }}>
