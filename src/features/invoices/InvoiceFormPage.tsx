@@ -109,7 +109,44 @@ export default function InvoiceFormPage() {
   return (
     <FormProvider {...methods}>
       <form onSubmit={handleSubmit(onSubmit, onValidationError)}>
-        <ComprobanteFormLayout tipo="factura" submitting={createMutation.isPending} errorFields={Object.keys(errors)}>
+        <ComprobanteFormLayout tipo="factura" submitting={createMutation.isPending} errorFields={Object.keys(errors)}
+          debajoDeBotones={(
+                <FormSection title="Pago">
+                  <PaymentTermsForm />
+                  <MediosPagoForm />
+                  <Collapse
+                    ghost
+                    items={[{
+                      key: 'mas',
+                      forceRender: true,
+                      label: <span style={{ fontWeight: 500, color: '#1f3a5f' }}>Más opciones: orden de compra, observaciones, tipo de operación, detracción</span>,
+                      children: (
+                        <Form layout="vertical" component="div">
+                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 12 }}>
+                            <Form.Item label="Orden de compra" style={{ marginBottom: 12 }}>
+                              <Controller name="numero_orden_compra" control={control} render={({ field }) => (
+                                <Input {...field} placeholder="Opcional" />
+                              )} />
+                            </Form.Item>
+                            <Form.Item label="Tipo de operación" style={{ marginBottom: 12 }}>
+                              <Controller name="tipo_operacion" control={control} render={({ field }) => (
+                                <Select {...field} options={TIPO_OPERACION_OPTIONS.map((t) => ({ value: t.value, label: `${t.value} - ${t.label}` }))} />
+                              )} />
+                            </Form.Item>
+                          </div>
+                          <Form.Item label="Observaciones" style={{ marginBottom: 12 }}>
+                            <Controller name="observaciones" control={control} render={({ field }) => (
+                              <Input.TextArea {...field} rows={2} placeholder="Opcional" />
+                            )} />
+                          </Form.Item>
+                          <DetraccionForm />
+                        </Form>
+                      ),
+                    }]}
+                  />
+                </FormSection>
+          )}
+        >
 
           <FormSection title="Documento">
             <Form layout="vertical" component="div">
@@ -153,40 +190,6 @@ export default function InvoiceFormPage() {
             )}
           </FormSection>
 
-          <FormSection title="Pago">
-            <PaymentTermsForm />
-            <MediosPagoForm />
-            <Collapse
-              ghost
-              items={[{
-                key: 'mas',
-                forceRender: true,
-                label: <span style={{ fontWeight: 500, color: '#1f3a5f' }}>Más opciones: orden de compra, observaciones, tipo de operación, detracción</span>,
-                children: (
-                  <Form layout="vertical" component="div">
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 12 }}>
-                      <Form.Item label="Orden de compra" style={{ marginBottom: 12 }}>
-                        <Controller name="numero_orden_compra" control={control} render={({ field }) => (
-                          <Input {...field} placeholder="Opcional" />
-                        )} />
-                      </Form.Item>
-                      <Form.Item label="Tipo de operación" style={{ marginBottom: 12 }}>
-                        <Controller name="tipo_operacion" control={control} render={({ field }) => (
-                          <Select {...field} options={TIPO_OPERACION_OPTIONS.map((t) => ({ value: t.value, label: `${t.value} - ${t.label}` }))} />
-                        )} />
-                      </Form.Item>
-                    </div>
-                    <Form.Item label="Observaciones" style={{ marginBottom: 12 }}>
-                      <Controller name="observaciones" control={control} render={({ field }) => (
-                        <Input.TextArea {...field} rows={2} placeholder="Opcional" />
-                      )} />
-                    </Form.Item>
-                    <DetraccionForm />
-                  </Form>
-                ),
-              }]}
-            />
-          </FormSection>
 
         </ComprobanteFormLayout>
       </form>

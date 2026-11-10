@@ -89,7 +89,40 @@ export default function BoletaFormPage() {
   return (
     <FormProvider {...methods}>
       <form onSubmit={handleSubmit(onSubmit, onValidationError)}>
-        <ComprobanteFormLayout tipo="boleta" submitting={createMutation.isPending} errorFields={Object.keys(errors)}>
+        <ComprobanteFormLayout tipo="boleta" submitting={createMutation.isPending} errorFields={Object.keys(errors)}
+          debajoDeBotones={(
+                <FormSection title="Pago">
+                  <PaymentTermsForm />
+                  <MediosPagoForm />
+                  <Collapse
+                    ghost
+                    items={[{
+                      key: 'mas',
+                      forceRender: true,
+                      label: <span style={{ fontWeight: 500, color: '#1f3a5f' }}>Más opciones: observaciones, envío a SUNAT, detracción</span>,
+                      children: (
+                        <Form layout="vertical" component="div">
+                          <Form.Item label="Observaciones" style={{ marginBottom: 12 }}>
+                            <Controller name="observaciones" control={control} render={({ field }) => (
+                              <Input.TextArea {...field} rows={2} placeholder="Opcional" />
+                            )} />
+                          </Form.Item>
+                          <Form.Item label="Envío a SUNAT" style={{ marginBottom: 12 }}>
+                            <Controller name="metodo_envio" control={control} render={({ field }) => (
+                              <Radio.Group {...field}>
+                                <Radio.Button value="individual">Individual (automático)</Radio.Button>
+                                <Radio.Button value="resumen_diario">Resumen diario</Radio.Button>
+                              </Radio.Group>
+                            )} />
+                          </Form.Item>
+                          <DetraccionForm />
+                        </Form>
+                      ),
+                    }]}
+                  />
+                </FormSection>
+          )}
+        >
 
           <FormSection title="Documento">
             <Form layout="vertical" component="div">
@@ -126,36 +159,6 @@ export default function BoletaFormPage() {
             )}
           </FormSection>
 
-          <FormSection title="Pago">
-            <PaymentTermsForm />
-            <MediosPagoForm />
-            <Collapse
-              ghost
-              items={[{
-                key: 'mas',
-                forceRender: true,
-                label: <span style={{ fontWeight: 500, color: '#1f3a5f' }}>Más opciones: observaciones, envío a SUNAT, detracción</span>,
-                children: (
-                  <Form layout="vertical" component="div">
-                    <Form.Item label="Observaciones" style={{ marginBottom: 12 }}>
-                      <Controller name="observaciones" control={control} render={({ field }) => (
-                        <Input.TextArea {...field} rows={2} placeholder="Opcional" />
-                      )} />
-                    </Form.Item>
-                    <Form.Item label="Envío a SUNAT" style={{ marginBottom: 12 }}>
-                      <Controller name="metodo_envio" control={control} render={({ field }) => (
-                        <Radio.Group {...field}>
-                          <Radio.Button value="individual">Individual (automático)</Radio.Button>
-                          <Radio.Button value="resumen_diario">Resumen diario</Radio.Button>
-                        </Radio.Group>
-                      )} />
-                    </Form.Item>
-                    <DetraccionForm />
-                  </Form>
-                ),
-              }]}
-            />
-          </FormSection>
 
         </ComprobanteFormLayout>
       </form>

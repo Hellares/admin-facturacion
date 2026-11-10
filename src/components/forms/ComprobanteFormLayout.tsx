@@ -40,13 +40,15 @@ interface ComprobanteFormLayoutProps {
   children: ReactNode;
   submitting: boolean;
   errorFields: string[];
+  /** Va en la columna derecha, debajo de Emitir y Cancelar (p. ej. la tarjeta de Pago). */
+  debajoDeBotones?: ReactNode;
 }
 
 /**
  * Diseño A del formulario de boleta/factura: secciones a la izquierda y, a la derecha
  * y fija, el total grande con el botón de emitir. Debe ir dentro del <form>.
  */
-export default function ComprobanteFormLayout({ tipo, children, submitting, errorFields }: ComprobanteFormLayoutProps) {
+export default function ComprobanteFormLayout({ tipo, children, submitting, errorFields, debajoDeBotones }: ComprobanteFormLayoutProps) {
   const navigate = useNavigate();
   const nombre = tipo === 'boleta' ? 'boleta' : 'factura';
 
@@ -103,6 +105,7 @@ export default function ComprobanteFormLayout({ tipo, children, submitting, erro
           <Button block size="large" style={{ borderRadius: 8 }} onClick={() => navigate(tipo === 'boleta' ? ROUTES.BOLETAS : ROUTES.INVOICES)}>
             Cancelar
           </Button>
+          {debajoDeBotones}
         </aside>
       </div>
     </div>
