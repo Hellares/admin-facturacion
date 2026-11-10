@@ -190,7 +190,7 @@ code, pre, .ant-typography code, [style*="monospace"] {
   font-weight: 600 !important;
   text-transform: uppercase;
   border-bottom: 1px solid #e2e7ee !important;
-  padding: 10px 8px !important;
+  padding: 6px 8px !important;
 }
 
 .form-comprobante .ant-table-tbody > tr > td {
