@@ -172,7 +172,6 @@ export default function ClientSelector({ prefix = 'client', documentType }: Clie
         <Input.Search
           {...field}
           onChange={(e) => onNumeroChange(e.target.value, field.onChange)}
-          size="large"
           enterButton="Buscar"
           loading={searching}
           onSearch={(v) => handleSearchByDocument(v)}
@@ -196,7 +195,7 @@ export default function ClientSelector({ prefix = 'client', documentType }: Clie
               name={`${p}tipo_documento`}
               control={control}
               render={({ field }) => (
-                <Select {...field} size="large" options={filteredTipoDocOptions} disabled={tipoDocDisabled} />
+                <Select {...field} options={filteredTipoDocOptions} disabled={tipoDocDisabled} />
               )}
             />
           </Form.Item>

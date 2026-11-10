@@ -96,17 +96,17 @@ export default function BoletaFormPage() {
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 12 }}>
                 <Form.Item label="Serie" required validateStatus={errors.serie ? 'error' : ''} style={{ marginBottom: 0 }}>
                   <Controller name="serie" control={control} render={({ field }) => (
-                    <Select {...field} size="large" options={seriesBoleta.map((s) => ({ value: s, label: s }))} placeholder="B001" />
+                    <Select {...field} options={seriesBoleta.map((s) => ({ value: s, label: s }))} placeholder="B001" />
                   )} />
                 </Form.Item>
                 <Form.Item label="Emisión" required style={{ marginBottom: 0 }}>
                   <Controller name="fecha_emision" control={control} render={({ field }) => (
-                    <DatePicker size="large" value={field.value ? dayjs(field.value) : null} onChange={(d) => field.onChange(d?.format('YYYY-MM-DD') || '')} format="DD/MM/YYYY" style={{ width: '100%' }} />
+                    <DatePicker value={field.value ? dayjs(field.value) : null} onChange={(d) => field.onChange(d?.format('YYYY-MM-DD') || '')} format="DD/MM/YYYY" style={{ width: '100%' }} />
                   )} />
                 </Form.Item>
                 <Form.Item label="Moneda" style={{ marginBottom: 0 }}>
                   <Controller name="moneda" control={control} render={({ field }) => (
-                    <Select {...field} size="large" options={MONEDA_OPTIONS.map((m) => ({ value: m.value, label: m.label }))} />
+                    <Select {...field} options={MONEDA_OPTIONS.map((m) => ({ value: m.value, label: m.label }))} />
                   )} />
                 </Form.Item>
               </div>
