@@ -85,7 +85,7 @@ export default function ComprobanteFormLayout({ tipo, children, submitting, erro
           {children}
         </div>
 
-        <aside style={{ flex: '1 1 300px', maxWidth: 380, position: 'sticky', top: 16, display: 'flex', flexDirection: 'column', gap: 12 }}>
+        <aside style={{ flex: '1 1 300px', position: 'sticky', top: 16, display: 'flex', flexDirection: 'column', gap: 12 }}>
           <TotalesResumen />
           {errorFields.length > 0 && (
             <Alert type="error" showIcon message="Revise los campos marcados" description={errorFields.join(', ')} />
