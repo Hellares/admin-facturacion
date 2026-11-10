@@ -61,7 +61,12 @@ export default function InvoiceFormPage() {
     },
   });
 
-  const { handleSubmit, control, setValue, formState: { errors } } = methods;
+  const { handleSubmit, control, setValue, getValues, formState: { errors } } = methods;
+
+  // Las sucursales pueden cargar después de abrir el formulario: completar la serie cuando estén
+  useEffect(() => {
+    if (!seriesFactura.includes(getValues('serie'))) setValue('serie', seriesFactura[0] || '');
+  }, [seriesFactura.join(','), setValue, getValues]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // DueDate solo aplica a Credito (SUNAT rechaza Factura Contado con vencimiento, error 0306).
   const formaPagoTipo = useWatch({ control, name: 'forma_pago_tipo' });

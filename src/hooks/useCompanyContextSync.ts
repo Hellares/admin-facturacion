@@ -64,8 +64,10 @@ export function useCompanyContextSync() {
         );
         const data = response.data.data;
         setBranches(data);
-        if (data.length === 1) {
-          setSelectedBranch(data[0].id);
+        // Conservar la sucursal elegida si sigue existiendo; si no, la única o ninguna
+        const actual = useCompanyContextStore.getState().selectedBranchId;
+        if (!data.some((b) => b.id === actual)) {
+          setSelectedBranch(data.length === 1 ? data[0].id : null);
         }
       } catch {
         setBranches([]);

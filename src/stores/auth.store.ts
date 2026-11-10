@@ -31,15 +31,15 @@ export const useAuthStore = create<AuthState>()(
 
       setAuth: (user, token) => {
         localStorage.setItem('auth_token', token);
-        // Al cambiar de usuario, limpiamos el contexto de empresa/sucursal persistido
-        // para evitar que IDs de una sesion anterior contaminen la nueva sesion.
-        useCompanyContextStore.getState().reset();
+        // Si entra otro usuario se limpia la empresa/sucursal guardada; si es el mismo
+        // (p. ej. tras vencer la sesion) se conserva su eleccion.
+        useCompanyContextStore.getState().asegurarDueno(user.id);
         set({ user, token, isAuthenticated: true });
       },
 
       logout: () => {
         localStorage.removeItem('auth_token');
-        useCompanyContextStore.getState().reset();
+        // No se borra la empresa/sucursal: setAuth la limpia si el que entra es otro usuario
         set({ user: null, token: null, isAuthenticated: false });
       },
 

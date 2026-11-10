@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Form, Input, Select, DatePicker, Collapse, Radio, Alert, message } from 'antd';
 import { useForm, FormProvider, Controller } from 'react-hook-form';
@@ -57,7 +58,12 @@ export default function BoletaFormPage() {
     },
   });
 
-  const { handleSubmit, control, formState: { errors } } = methods;
+  const { handleSubmit, control, setValue, getValues, formState: { errors } } = methods;
+
+  // Las sucursales pueden cargar después de abrir el formulario: completar la serie cuando estén
+  useEffect(() => {
+    if (!seriesBoleta.includes(getValues('serie'))) setValue('serie', seriesBoleta[0] || '');
+  }, [seriesBoleta.join(','), setValue, getValues]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const onValidationError = (formErrors: Record<string, unknown>) => {
     const fieldNames = Object.keys(formErrors);
