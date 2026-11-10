@@ -73,6 +73,7 @@ export interface Invoice {
   // Nested objects from backend
   forma_pago?: { tipo?: string; cuotas?: Cuota[] };
   sunat?: { codigo?: string; descripcion?: string; notas?: string[] };
+  hash?: string;
   // Notas de credito y debito asociadas
   credit_notes?: Array<{
     id: number;

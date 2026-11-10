@@ -64,6 +64,7 @@ export interface Boleta {
   // Nested objects from backend
   forma_pago?: { tipo?: string; cuotas?: Cuota[] };
   sunat?: { codigo?: string; descripcion?: string; notas?: string[] };
+  hash?: string;
   // Anulacion
   anulada_localmente: boolean;
   estado_anulacion: EstadoAnulacion;
