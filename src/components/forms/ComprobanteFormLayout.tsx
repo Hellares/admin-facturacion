@@ -58,7 +58,7 @@ export default function ComprobanteFormLayout({ tipo, children, submitting, erro
         },
       }}
     >
-    <div className="form-comprobante" style={{ display: 'flex', flexDirection: 'column', gap: 16, background: '#f4f6f8', borderRadius: 8, padding: 20 }}>
+    <div className="form-comprobante" style={{ display: 'flex', flexDirection: 'column', gap: 8, background: '#f4f6f8', borderRadius: 8, padding: '10px 20px 20px' }}>
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, alignItems: 'center', justifyContent: 'space-between' }}>
         <div>
           <Typography.Text type="secondary" style={{ fontSize: 12 }}>Comprobantes / Nuevo</Typography.Text>
