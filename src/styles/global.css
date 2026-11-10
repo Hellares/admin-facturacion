@@ -173,7 +173,7 @@ code, pre, .ant-typography code, [style*="monospace"] {
 
 /* Formulario de boleta/factura (diseño A): etiquetas grises en mayúsculas, no azules */
 .form-comprobante .ant-form-item-label > label {
-  color: #4a525c !important;
+  color: #1677ff !important; /* mismo azul que las etiquetas del detalle */
   font-size: 11px;
   font-weight: 600 !important;
   text-transform: uppercase;
