@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Button, Table, InputNumber, Input, Select, Tooltip } from 'antd';
 import { PlusOutlined, DeleteOutlined } from '@ant-design/icons';
 import { useFieldArray, useFormContext, useWatch } from 'react-hook-form';
@@ -44,6 +45,14 @@ export default function ItemsTable({ name = 'detalles', simplified = false, comp
   const { control, setValue } = useFormContext();
   const { fields, append, remove } = useFieldArray({ control, name });
   const watchedItems = useWatch({ control, name }) as ItemRow[] | undefined;
+
+  // Compacto: Afectación e IGV % ocultas para ganar espacio; se muestran a pedido
+  // o solas si algún producto no es el caso normal (gravado al 18 %).
+  const [verImpuestos, setVerImpuestos] = useState(false);
+  const hayImpuestoDistinto = (watchedItems ?? []).some(
+    (it) => (it?.tip_afe_igv ?? '10') !== '10' || Number(it?.porcentaje_igv ?? 18) !== 18,
+  );
+  const mostrarImpuestos = !compacto || verImpuestos || hayImpuestoDistinto;
 
   const allowAdd = restrictions?.allowAdd ?? true;
   const allowDelete = restrictions?.allowDelete ?? true;
@@ -171,7 +180,7 @@ export default function ItemsTable({ name = 'detalles', simplified = false, comp
     },
   ];
 
-  if (!simplified) {
+  if (!simplified && mostrarImpuestos) {
     columns.push(
       {
         title: compacto ? 'Afectación' : 'Afect. IGV',
@@ -198,7 +207,7 @@ export default function ItemsTable({ name = 'detalles', simplified = false, comp
     );
   }
 
-  if (!simplified) {
+  if (!simplified && mostrarImpuestos) {
     columns.push(
       {
         title: 'IGV %',
@@ -270,15 +279,25 @@ export default function ItemsTable({ name = 'detalles', simplified = false, comp
           dataSource={fields as (ItemRow & { id: string })[]}
           rowKey="id"
           pagination={false}
-          scroll={{ x: 1140 }}
+          scroll={{ x: mostrarImpuestos ? 1140 : 820 }}
           style={{ border: '1px solid #e2e7ee', borderRadius: 8, overflow: 'hidden' }}
           locale={{ emptyText: 'Sin productos. Use "Agregar producto"' }}
         />
-        {allowAdd && (
-          <Button type="dashed" block size="large" icon={<PlusOutlined />} onClick={addItem} style={{ fontWeight: 600 }}>
-            Agregar producto
+        <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+          {allowAdd && (
+            <Button type="dashed" size="large" icon={<PlusOutlined />} onClick={addItem} style={{ fontWeight: 600, flex: 1 }}>
+              Agregar producto
+            </Button>
+          )}
+          <Button
+            type="link"
+            disabled={hayImpuestoDistinto}
+            onClick={() => setVerImpuestos((v) => !v)}
+            title={hayImpuestoDistinto ? 'Hay productos que no son gravados al 18 %' : undefined}
+          >
+            {mostrarImpuestos ? 'Ocultar afectación e IGV' : 'Mostrar afectación e IGV'}
           </Button>
-        )}
+        </div>
       </div>
     );
   }
