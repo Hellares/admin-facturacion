@@ -8,8 +8,8 @@ import { ROUTES } from '@/config/routes.config';
 /** Color de acento del diseño A (el mismo del PDF). */
 export const ACENTO = '#1f3a5f';
 const FOCO = '#2f6fed';
-const FOCO_HOVER = '#7ea3f2';
-const FOCO_HALO = '0 0 0 3px rgba(47, 111, 237, 0.18)';
+const BORDE = '#7ea3f2'; // borde azul claro siempre visible
+const FOCO_HALO = '0 0 0 3px rgba(47, 111, 237, 0.12)'; // sombra celeste suave al enfocar
 
 interface FormSectionProps {
   title: string;
@@ -60,11 +60,11 @@ export default function ComprobanteFormLayout({ tipo, children, submitting, erro
           Table: { headerBg: '#f4f6f8', headerColor: '#4a525c' },
           Segmented: { itemSelectedColor: ACENTO },
           Form: { verticalLabelPadding: '0 0 3px' }, // etiqueta pegada a su campo (antes 8 px)
-          // Foco en azul vivo: el azul marino con transparencia se veía gris
-          Input: { activeBorderColor: FOCO, hoverBorderColor: FOCO_HOVER, activeShadow: FOCO_HALO },
-          InputNumber: { activeBorderColor: FOCO, hoverBorderColor: FOCO_HOVER, activeShadow: FOCO_HALO },
-          DatePicker: { activeBorderColor: FOCO, hoverBorderColor: FOCO_HOVER, activeShadow: FOCO_HALO },
-          Select: { activeBorderColor: FOCO, hoverBorderColor: FOCO_HOVER, activeOutlineColor: 'rgba(47, 111, 237, 0.18)' },
+          // Borde azul claro siempre; al enfocar, azul vivo con sombra celeste suave
+          Input: { colorBorder: BORDE, hoverBorderColor: FOCO, activeBorderColor: FOCO, activeShadow: FOCO_HALO },
+          InputNumber: { colorBorder: BORDE, hoverBorderColor: FOCO, activeBorderColor: FOCO, activeShadow: FOCO_HALO },
+          DatePicker: { colorBorder: BORDE, hoverBorderColor: FOCO, activeBorderColor: FOCO, activeShadow: FOCO_HALO },
+          Select: { colorBorder: BORDE, hoverBorderColor: FOCO, activeBorderColor: FOCO, activeOutlineColor: 'rgba(47, 111, 237, 0.12)' },
         },
       }}
     >
