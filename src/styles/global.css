@@ -180,6 +180,14 @@ code, pre, .ant-typography code, [style*="monospace"] {
   letter-spacing: 0.3px;
 }
 
+/* Texto de campos y desplegables en el azul del total */
+.form-comprobante .ant-input,
+.form-comprobante .ant-input-number-input,
+.form-comprobante .ant-select-selection-item,
+.form-comprobante .ant-picker-input > input {
+  color: #1f3a5f;
+}
+
 .form-comprobante .ant-table-wrapper .ant-table {
   border: 1px solid #e2e7ee !important;
 }

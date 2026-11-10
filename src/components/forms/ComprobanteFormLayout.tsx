@@ -7,6 +7,9 @@ import { ROUTES } from '@/config/routes.config';
 
 /** Color de acento del diseño A (el mismo del PDF). */
 export const ACENTO = '#1f3a5f';
+const FOCO = '#2f6fed';
+const FOCO_HOVER = '#7ea3f2';
+const FOCO_HALO = '0 0 0 3px rgba(47, 111, 237, 0.18)';
 
 interface FormSectionProps {
   title: string;
@@ -55,6 +58,11 @@ export default function ComprobanteFormLayout({ tipo, children, submitting, erro
           Table: { headerBg: '#f4f6f8', headerColor: '#4a525c' },
           Segmented: { itemSelectedColor: ACENTO },
           Form: { verticalLabelPadding: '0 0 3px' }, // etiqueta pegada a su campo (antes 8 px)
+          // Foco en azul vivo: el azul marino con transparencia se veía gris
+          Input: { activeBorderColor: FOCO, hoverBorderColor: FOCO_HOVER, activeShadow: FOCO_HALO },
+          InputNumber: { activeBorderColor: FOCO, hoverBorderColor: FOCO_HOVER, activeShadow: FOCO_HALO },
+          DatePicker: { activeBorderColor: FOCO, hoverBorderColor: FOCO_HOVER, activeShadow: FOCO_HALO },
+          Select: { activeBorderColor: FOCO, hoverBorderColor: FOCO_HOVER, activeOutlineColor: 'rgba(47, 111, 237, 0.18)' },
         },
       }}
     >
