@@ -1,4 +1,4 @@
-import { Button, DatePicker, InputNumber, Select, Space, Table, Radio } from 'antd';
+import { Button, DatePicker, InputNumber, Select, Table, Radio } from 'antd';
 import { PlusOutlined, DeleteOutlined } from '@ant-design/icons';
 import { useFieldArray, useFormContext, useWatch, Controller } from 'react-hook-form';
 import type { ColumnsType } from 'antd/es/table';
@@ -84,19 +84,19 @@ export default function PaymentTermsForm() {
 
   return (
     <div>
-      <Space style={{ marginBottom: 12 }}>
+      <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 8, marginBottom: 12 }}>
         <span style={{ fontWeight: 500 }}>Forma de Pago:</span>
         <Controller
           name="forma_pago_tipo"
           control={control}
           render={({ field }) => (
-            <Radio.Group {...field}>
+            <Radio.Group {...field} style={{ display: 'inline-flex', whiteSpace: 'nowrap' }}>
               <Radio.Button value="Contado">Contado</Radio.Button>
               <Radio.Button value="Credito">Credito</Radio.Button>
             </Radio.Group>
           )}
         />
-      </Space>
+      </div>
 
       {formaPagoTipo === 'Credito' && (
         <div>
@@ -112,6 +112,7 @@ export default function PaymentTermsForm() {
             rowKey="id"
             size="small"
             pagination={false}
+            scroll={{ x: 510 }}
             locale={{ emptyText: 'Agregue cuotas de pago' }}
           />
         </div>
