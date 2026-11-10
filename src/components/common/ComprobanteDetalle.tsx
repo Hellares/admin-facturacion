@@ -123,7 +123,7 @@ export default function ComprobanteDetalle(p: ComprobanteDetalleProps) {
                         <td style={{ padding: '8px 4px' }}>{d.unidad}</td>
                         <td style={{ padding: '8px 4px', textAlign: 'right' }}>{d.cantidad}</td>
                         <td style={{ padding: '8px 4px', textAlign: 'right' }}>{formatMoney(it.mto_precio_unitario, p.moneda)}</td>
-                        <td style={{ padding: '8px 4px', textAlign: 'right', fontWeight: 700 }}>{formatMoney(it.total_item, p.moneda)}</td>
+                        <td style={{ padding: '8px 4px', textAlign: 'right', fontWeight: 500, color: ACENTO }}>{formatMoney(it.total_item, p.moneda)}</td>
                       </tr>
                     );
                   })}
